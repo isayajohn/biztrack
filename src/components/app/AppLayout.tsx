@@ -3,6 +3,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import { ADMIN_NAV_ITEMS } from "../../constants/adminNav";
 import { ADMIN_BUTTON_NAV_ITEM, NAV_ITEMS } from "../../constants/nav";
+import { MotionPage } from "../animate-ui/MotionPrimitives";
 import MobileBottomNav from "./MobileBottomNav";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
@@ -26,7 +27,9 @@ export default function AppLayout() {
       <div className="flex min-h-screen flex-1 flex-col lg:pl-60">
         <Topbar isAdminSection={isAdminSection} />
         <main className="flex-1 overflow-y-auto pb-20 lg:pb-0">
-          <Outlet />
+          <MotionPage key={location.pathname}>
+            <Outlet />
+          </MotionPage>
         </main>
       </div>
 

@@ -46,7 +46,7 @@ export default function HeroSection({
       className="hero-pattern relative overflow-hidden pb-14 pt-20 sm:pt-24 md:pb-20 lg:pt-28"
       aria-labelledby="hero-heading"
     >
-      <div className="relative mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(440px,0.92fr)] lg:items-center lg:gap-14">
+      <div className="relative mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:min-h-[620px] lg:grid-cols-[minmax(0,0.92fr)_minmax(520px,1.08fr)] lg:items-center lg:gap-12">
         <div className="animate-fade-up max-w-2xl">
           <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-white px-3.5 py-1.5 text-sm font-bold text-leaf shadow-sm">
             <ShieldCheck size={15} aria-hidden="true" />
@@ -96,7 +96,7 @@ export default function HeroSection({
           </div>
         </div>
 
-        <div className="animate-float relative order-last lg:justify-self-end">
+        <div className="relative order-last min-h-[390px] w-full lg:min-h-[500px] lg:self-center lg:justify-self-end">
           <DashboardPreview variant="compact" />
         </div>
       </div>

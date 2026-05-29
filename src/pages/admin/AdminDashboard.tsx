@@ -26,6 +26,7 @@ import {
 import { Link } from "react-router-dom";
 import type { LucideIcon } from "lucide-react";
 import StatCard from "../../components/dashboard/StatCard";
+import { AnimatedIcon, MotionItem, MotionList, MotionPanel } from "../../components/animate-ui/MotionPrimitives";
 import { getAdminStats } from "../../services/adminApi";
 import type { AdminRole, AdminStatus, AdminUser, PlatformStats } from "../../services/adminApi";
 import { getApiErrorMessage } from "../../services/apiClient";
@@ -101,7 +102,9 @@ function SectionHeader({
   return (
     <div className="flex items-start justify-between gap-3">
       <div className="flex min-w-0 items-center gap-2">
-        <Icon size={16} className="shrink-0 text-ink/40" aria-hidden="true" />
+        <span className="shrink-0 text-ink/40">
+          <AnimatedIcon icon={Icon} size={16} />
+        </span>
         <h2 className="truncate text-sm font-bold text-ink">{title}</h2>
       </div>
       {subtitle && <span className="shrink-0 text-xs font-semibold text-ink/40">{subtitle}</span>}
@@ -112,7 +115,7 @@ function SectionHeader({
 function EmptyState({ message, icon: Icon }: { message: string; icon: LucideIcon }) {
   return (
     <div className="flex min-h-36 flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-ink/15 bg-[#fbfaf6] px-4 py-8 text-center">
-      <Icon size={24} className="text-ink/25" aria-hidden="true" />
+      <AnimatedIcon icon={Icon} size={24} className="text-ink/25" />
       <p className="max-w-xs text-sm font-semibold leading-6 text-ink/45">{message}</p>
     </div>
   );
@@ -188,7 +191,7 @@ function SalesExpensesTooltip({
 
 function RecentUserRow({ user }: { user: AdminUser }) {
   return (
-    <li className="flex items-center justify-between gap-3 py-3">
+    <MotionItem className="flex items-center justify-between gap-3 py-3">
       <div className="min-w-0">
         <Link
           to={`/admin/users/${user.id}`}
@@ -216,17 +219,17 @@ function RecentUserRow({ user }: { user: AdminUser }) {
           {user.role}
         </span>
       </div>
-    </li>
+    </MotionItem>
   );
 }
 
 function SummaryMetricCard({ metric }: { metric: SummaryMetric }) {
   return (
-    <div className="rounded-lg border border-ink/10 bg-[#fbfaf6] p-3">
+    <MotionPanel className="rounded-lg border border-ink/10 bg-[#fbfaf6] p-3">
       <p className="text-xs font-semibold text-ink/45">{metric.label}</p>
       <p className="mt-1 text-xl font-extrabold tracking-tight text-ink">{metric.value}</p>
       <p className="mt-1 text-xs font-semibold leading-5 text-ink/45">{metric.helper}</p>
-    </div>
+    </MotionPanel>
   );
 }
 
@@ -336,7 +339,9 @@ export default function AdminDashboard() {
           disabled={isLoading}
           className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-ink/10 bg-white px-3 py-2 text-xs font-bold text-ink/65 shadow-sm transition-colors hover:bg-mint hover:text-leaf disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
         >
-          <RefreshCcw size={14} className={isLoading ? "animate-spin" : ""} aria-hidden="true" />
+          <span className={isLoading ? "animate-spin" : ""}>
+            <AnimatedIcon icon={RefreshCcw} size={14} />
+          </span>
           Refresh
         </button>
       </div>
@@ -344,7 +349,9 @@ export default function AdminDashboard() {
       {error && (
         <div className="mt-4 flex flex-col gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-2">
-            <AlertCircle size={17} className="mt-0.5 shrink-0" aria-hidden="true" />
+            <span className="mt-0.5 shrink-0">
+              <AnimatedIcon icon={AlertCircle} size={17} />
+            </span>
             <span>{error}</span>
           </div>
           <button
@@ -352,7 +359,7 @@ export default function AdminDashboard() {
             onClick={loadStats}
             className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-2 text-xs font-extrabold text-red-600"
           >
-            <RefreshCcw size={13} aria-hidden="true" />
+            <AnimatedIcon icon={RefreshCcw} size={13} />
             Retry
           </button>
         </div>
@@ -433,11 +440,11 @@ export default function AdminDashboard() {
           {isLoading ? (
             <ListSkeleton />
           ) : stats?.recentUsers.length ? (
-            <ul className="mt-3 divide-y divide-ink/8" role="list">
+            <MotionList className="mt-3 divide-y divide-ink/8" role="list">
               {stats.recentUsers.map((user) => (
                 <RecentUserRow key={user.id} user={user} />
               ))}
-            </ul>
+            </MotionList>
           ) : (
             <div className="mt-4">
               <EmptyState message="No recent users found." icon={Users} />
@@ -454,9 +461,9 @@ export default function AdminDashboard() {
           {isLoading ? (
             <ListSkeleton />
           ) : stats?.recentBusinesses.length ? (
-            <ul className="mt-3 divide-y divide-ink/8" role="list">
+            <MotionList className="mt-3 divide-y divide-ink/8" role="list">
               {stats.recentBusinesses.map((business) => (
-                <li key={business.id} className="flex items-center justify-between gap-3 py-3">
+                <MotionItem key={business.id} className="flex items-center justify-between gap-3 py-3">
                   <div className="min-w-0">
                     <p className="truncate text-sm font-extrabold text-ink">{business.name}</p>
                     <p className="truncate text-xs font-semibold text-ink/45">
@@ -477,9 +484,9 @@ export default function AdminDashboard() {
                       <p className="text-xs font-extrabold text-clay">{business._count.expenses}</p>
                     </div>
                   </div>
-                </li>
+                </MotionItem>
               ))}
-            </ul>
+            </MotionList>
           ) : (
             <div className="mt-4">
               <EmptyState message="No recent businesses found." icon={Store} />

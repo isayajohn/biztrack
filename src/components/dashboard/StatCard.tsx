@@ -1,4 +1,5 @@
 import type { LucideIcon } from "lucide-react";
+import { AnimatedIcon, MotionPanel } from "../animate-ui/MotionPrimitives";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -17,11 +18,11 @@ type StatCardProps = {
 
 function SkeletonStatCard() {
   return (
-    <div className="animate-pulse rounded-xl border border-ink/10 bg-white p-3.5 shadow-sm">
+    <MotionPanel className="animate-pulse rounded-xl border border-ink/10 bg-white p-3.5 shadow-sm">
       <div className="mb-3 h-9 w-9 rounded-lg bg-ink/8" />
       <div className="mb-2 h-2.5 w-14 rounded-full bg-ink/8" />
       <div className="h-6 w-20 rounded-full bg-ink/8" />
-    </div>
+    </MotionPanel>
   );
 }
 
@@ -42,7 +43,7 @@ export default function StatCard({
   const isProfit = profitColor !== undefined;
 
   return (
-    <article
+    <MotionPanel
       className={[
         "rounded-xl border p-3.5 shadow-sm transition-shadow hover:shadow-md",
         isPositive
@@ -56,7 +57,7 @@ export default function StatCard({
         className={`mb-3 grid h-9 w-9 place-items-center rounded-lg ${iconClass}`}
         aria-hidden="true"
       >
-        <Icon size={17} />
+        <AnimatedIcon icon={Icon} size={17} />
       </span>
       <p className="text-xs font-semibold text-ink/50">{label}</p>
       <p
@@ -68,6 +69,6 @@ export default function StatCard({
       >
         {value}
       </p>
-    </article>
+    </MotionPanel>
   );
 }

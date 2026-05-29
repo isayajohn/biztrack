@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
 import BrandLogo from "../BrandLogo";
+import { AnimatedIcon } from "../animate-ui/MotionPrimitives";
 import type { NavItem } from "../../constants/nav";
 
 type Props = {
@@ -33,7 +34,7 @@ export default function Sidebar({ navItems }: Props) {
                   ].join(" ")
                 }
               >
-                <Icon size={18} aria-hidden="true" />
+                <AnimatedIcon icon={Icon} size={18} />
                 {label}
               </NavLink>
             </li>

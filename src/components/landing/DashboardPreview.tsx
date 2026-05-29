@@ -238,16 +238,16 @@ function PhoneMockup() {
   );
 }
 
-function DeviceCarousel() {
+function HeroDeviceMockups() {
   return (
-    <div className="relative min-h-[430px] w-full overflow-hidden" aria-label="BizTrack dashboard on laptop and phone">
-      <div className="mockup-slide absolute inset-x-0 top-0">
+    <div className="relative h-[390px] w-full overflow-visible sm:h-[430px] lg:h-[500px]" aria-label="BizTrack dashboard on laptop and phone">
+      <div className="absolute left-1/2 top-0 w-[min(92vw,560px)] -translate-x-1/2 lg:left-auto lg:right-0 lg:top-10 lg:w-[560px] lg:translate-x-0">
         <LaptopMockup />
       </div>
-      <div className="mockup-slide mockup-slide-delayed absolute inset-x-0 top-0">
+      <div className="absolute right-[4%] top-[120px] z-10 scale-[0.82] sm:right-[10%] sm:top-[116px] sm:scale-90 lg:-right-4 lg:top-[150px] lg:scale-100">
         <PhoneMockup />
       </div>
-      <div className="pointer-events-none absolute inset-x-8 bottom-3 h-8 rounded-full bg-leaf/10 blur-2xl" aria-hidden="true" />
+      <div className="pointer-events-none absolute bottom-8 right-0 h-20 w-3/4 rounded-full bg-leaf/10 blur-2xl" aria-hidden="true" />
     </div>
   );
 }
@@ -255,7 +255,7 @@ function DeviceCarousel() {
 export default function DashboardPreview({ variant = "section" }: DashboardPreviewProps) {
   if (variant === "compact") {
     return (
-      <DeviceCarousel />
+      <HeroDeviceMockups />
     );
   }
 

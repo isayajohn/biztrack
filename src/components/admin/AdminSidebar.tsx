@@ -1,6 +1,7 @@
 import { ShieldCheck } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { ADMIN_NAV_GROUPS } from "../../constants/adminNav";
+import { AnimatedIcon } from "../animate-ui/MotionPrimitives";
 import BrandLogo from "../BrandLogo";
 
 export default function AdminSidebar() {
@@ -15,7 +16,7 @@ export default function AdminSidebar() {
 
       <div className="overflow-y-auto px-3 py-4">
         <div className="mb-3 flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.06] px-3 py-2 text-xs font-bold text-white/70">
-          <ShieldCheck size={15} className="text-leaf" aria-hidden="true" />
+          <AnimatedIcon icon={ShieldCheck} size={15} className="text-leaf" />
           Platform Management
         </div>
         <nav aria-label="Admin navigation">
@@ -43,7 +44,7 @@ export default function AdminSidebar() {
                           ].join(" ")
                         }
                       >
-                        <Icon size={18} aria-hidden="true" />
+                        <AnimatedIcon icon={Icon} size={18} />
                         <span className="truncate">{label}</span>
                       </NavLink>
                     </li>

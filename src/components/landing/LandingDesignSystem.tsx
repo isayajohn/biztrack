@@ -2,6 +2,13 @@ import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 import { CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import {
+  AnimatedIcon,
+  MotionButtonSurface,
+  MotionItem,
+  MotionList,
+  MotionPanel,
+} from "../animate-ui/MotionPrimitives";
 
 function cx(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
@@ -35,24 +42,30 @@ function ButtonBase({ children, to, href, className, icon, type = "button", ...p
 
   if (to) {
     return (
-      <Link to={to} className={classes} onClick={props.onClick}>
-        {buttonContent(children, icon)}
-      </Link>
+      <MotionButtonSurface>
+        <Link to={to} className={classes} onClick={props.onClick}>
+          {buttonContent(children, icon)}
+        </Link>
+      </MotionButtonSurface>
     );
   }
 
   if (href) {
     return (
-      <a href={href} className={classes} onClick={props.onClick}>
-        {buttonContent(children, icon)}
-      </a>
+      <MotionButtonSurface>
+        <a href={href} className={classes} onClick={props.onClick}>
+          {buttonContent(children, icon)}
+        </a>
+      </MotionButtonSurface>
     );
   }
 
   return (
-    <button type={type} className={classes} disabled={props.disabled} onClick={props.onClick}>
-      {buttonContent(children, icon)}
-    </button>
+    <MotionButtonSurface>
+      <button type={type} className={classes} disabled={props.disabled} onClick={props.onClick}>
+        {buttonContent(children, icon)}
+      </button>
+    </MotionButtonSurface>
   );
 }
 
@@ -90,7 +103,7 @@ type SectionHeaderProps = {
 
 export function SectionHeader({ eyebrow, title, description, align = "left", id }: SectionHeaderProps) {
   return (
-    <div className={cx("mb-10 max-w-2xl", align === "center" && "mx-auto text-center")}>
+    <MotionPanel className={cx("mb-10 max-w-2xl", align === "center" && "mx-auto text-center")}>
       {eyebrow && (
         <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-leaf">
           {eyebrow}
@@ -100,7 +113,7 @@ export function SectionHeader({ eyebrow, title, description, align = "left", id 
         {title}
       </h2>
       {description && <p className="mt-4 text-base leading-7 text-slateMuted">{description}</p>}
-    </div>
+    </MotionPanel>
   );
 }
 
@@ -112,13 +125,13 @@ type FeatureCardProps = {
 
 export function FeatureCard({ icon: Icon, title, description }: FeatureCardProps) {
   return (
-    <article className="group flex h-full flex-col rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-card">
+    <MotionPanel className="group flex h-full flex-col rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-200 hover:border-emerald-200 hover:shadow-card">
       <span className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-lg bg-mint text-leaf ring-1 ring-emerald-100">
-        <Icon size={22} aria-hidden="true" />
+        <AnimatedIcon icon={Icon} size={22} />
       </span>
       <h3 className="font-display text-lg font-bold text-ink">{title}</h3>
       <p className="mt-2.5 text-sm leading-6 text-slateMuted">{description}</p>
-    </article>
+    </MotionPanel>
   );
 }
 
@@ -146,9 +159,9 @@ export function PricingCard({
   badge,
 }: PricingCardProps) {
   return (
-    <article
+    <MotionPanel
       className={cx(
-        "relative flex h-full flex-col rounded-xl border bg-white p-7 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card",
+        "relative flex h-full flex-col rounded-xl border bg-white p-7 shadow-sm transition-all duration-200 hover:shadow-card",
         highlighted ? "border-leaf ring-1 ring-leaf/15" : "border-slate-200",
       )}
     >
@@ -165,14 +178,14 @@ export function PricingCard({
         </div>
         <p className="mt-3 text-sm leading-6 text-slateMuted">{description}</p>
       </div>
-      <ul className="mt-6 flex flex-1 flex-col gap-3">
+      <MotionList className="mt-6 flex flex-1 flex-col gap-3">
         {features.map((feature) => (
-          <li key={feature} className="flex items-start gap-2.5 text-sm font-semibold text-slate-700">
+          <MotionItem key={feature} className="flex items-start gap-2.5 text-sm font-semibold text-slate-700">
             <CheckCircle2 size={17} className="mt-0.5 shrink-0 text-leaf" aria-hidden="true" />
             <span>{feature}</span>
-          </li>
+          </MotionItem>
         ))}
-      </ul>
+      </MotionList>
       {highlighted ? (
         <PrimaryButton to={to} className="mt-7 w-full">
           {cta}
@@ -182,7 +195,7 @@ export function PricingCard({
           {cta}
         </SecondaryButton>
       )}
-    </article>
+    </MotionPanel>
   );
 }
 
@@ -195,13 +208,13 @@ type StatCardProps = {
 
 export function StatCard({ icon: Icon, label, value, change }: StatCardProps) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+    <MotionPanel className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
       <span className="mb-3 grid h-10 w-10 place-items-center rounded-lg bg-mint text-leaf ring-1 ring-emerald-100">
-        <Icon size={18} aria-hidden="true" />
+        <AnimatedIcon icon={Icon} size={18} />
       </span>
       <p className="text-xs font-semibold uppercase tracking-[0.06em] text-slateMuted">{label}</p>
       <p className="mt-1 font-display text-2xl font-extrabold text-ink">{value}</p>
       {change && <p className="mt-1 text-xs font-bold text-leaf">{change}</p>}
-    </div>
+    </MotionPanel>
   );
 }
