@@ -70,3 +70,26 @@ select {
 .animate-sale-toast {
   animation: sale-toast 5s ease-in-out 1.8s infinite;
 }
+
+@keyframes mockup-slide {
+  0%, 42% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  50%, 92% {
+    opacity: 0;
+    transform: translateX(-1.75rem) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.mockup-slide {
+  animation: mockup-slide 9s ease-in-out infinite;
+}
+
+.mockup-slide-delayed {
+  animation-delay: -4.5s;
+}

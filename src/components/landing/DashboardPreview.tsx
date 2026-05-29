@@ -1,4 +1,13 @@
-import { BarChart3, Boxes, Coins, ReceiptText, TrendingUp } from "lucide-react";
+import {
+  BarChart3,
+  Boxes,
+  Coins,
+  PackageCheck,
+  ReceiptText,
+  ShoppingBag,
+  TrendingUp,
+  WalletCards,
+} from "lucide-react";
 import { SectionHeader, StatCard } from "./LandingDesignSystem";
 
 const BAR_HEIGHTS = [40, 65, 50, 80, 60, 90, 75];
@@ -79,12 +88,174 @@ function DashboardMock({ compact = false }: { compact?: boolean }) {
   );
 }
 
+function LaptopMockup() {
+  return (
+    <div className="relative mx-auto w-full max-w-[560px]">
+      <div className="rounded-[1.35rem] border border-slate-300 bg-slate-950 p-2 shadow-[0_26px_70px_rgba(15,23,42,0.26)]">
+        <div className="overflow-hidden rounded-xl bg-white">
+          <div className="grid min-h-[300px] grid-cols-[72px_1fr] bg-cloud sm:grid-cols-[112px_1fr]">
+            <aside className="bg-[#11241d] px-3 py-4 text-white">
+              <p className="text-[10px] font-extrabold uppercase tracking-wider text-white/45">BizTrack</p>
+              <div className="mt-5 space-y-2">
+                {[
+                  ["Dashboard", true],
+                  ["Sales", false],
+                  ["Expenses", false],
+                  ["Reports", false],
+                ].map(([label, active]) => (
+                  <div
+                    key={String(label)}
+                    className={[
+                      "h-8 rounded-lg px-2 text-[10px] font-bold leading-8",
+                      active ? "bg-white text-leaf" : "bg-white/0 text-white/50",
+                    ].join(" ")}
+                  >
+                    {label}
+                  </div>
+                ))}
+              </div>
+            </aside>
+
+            <main className="p-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-[11px] font-bold text-slateMuted">Today</p>
+                  <h3 className="font-display text-lg font-extrabold text-ink">Business dashboard</h3>
+                </div>
+                <span className="rounded-full bg-mint px-2.5 py-1 text-[10px] font-extrabold text-leaf">
+                  Live
+                </span>
+              </div>
+
+              <div className="mt-4 grid grid-cols-2 gap-2 lg:grid-cols-4">
+                {STAT_CARDS.map(({ icon: Icon, label, value, change }) => (
+                  <div key={label} className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
+                    <Icon size={14} className="text-leaf" aria-hidden="true" />
+                    <p className="mt-2 truncate text-[10px] font-bold text-slateMuted">{label}</p>
+                    <p className="mt-0.5 text-sm font-extrabold text-ink">{value}</p>
+                    <p className="text-[9px] font-bold text-leaf">{change}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-4 grid gap-3 md:grid-cols-[1.2fr_0.8fr]">
+                <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[10px] font-extrabold uppercase tracking-wider text-slateMuted">Sales trend</p>
+                    <TrendingUp size={14} className="text-leaf" aria-hidden="true" />
+                  </div>
+                  <div className="mt-3 flex h-24 items-end gap-2">
+                    {BAR_HEIGHTS.map((height, index) => (
+                      <div
+                        key={BAR_DAYS[index]}
+                        className={["flex-1 rounded-t-md", index === 5 ? "bg-leaf" : "bg-emerald-100"].join(" ")}
+                        style={{ height: `${height}%` }}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+                  <p className="text-[10px] font-extrabold uppercase tracking-wider text-slateMuted">Recent activity</p>
+                  <div className="mt-3 space-y-2">
+                    {[
+                      { icon: ShoppingBag, label: "Rice sale", value: "+$34" },
+                      { icon: WalletCards, label: "Transport", value: "-$8" },
+                      { icon: PackageCheck, label: "Stock update", value: "12" },
+                    ].map(({ icon: Icon, label, value }) => (
+                      <div key={label} className="flex items-center justify-between rounded-lg bg-cloud px-2 py-2">
+                        <span className="flex items-center gap-2 text-[10px] font-bold text-ink">
+                          <Icon size={13} className="text-leaf" aria-hidden="true" />
+                          {label}
+                        </span>
+                        <span className="text-[10px] font-extrabold text-ink">{value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </main>
+          </div>
+        </div>
+      </div>
+      <div className="mx-auto h-3 w-[72%] rounded-b-[1.5rem] bg-slate-300 shadow-[0_18px_35px_rgba(15,23,42,0.16)]" />
+    </div>
+  );
+}
+
+function PhoneMockup() {
+  return (
+    <div className="relative mx-auto h-[390px] w-[188px] rounded-[2.2rem] bg-slate-950 p-2 shadow-[0_26px_70px_rgba(15,23,42,0.28)]">
+      <div className="absolute left-1/2 top-2 z-10 h-5 w-20 -translate-x-1/2 rounded-b-2xl bg-slate-950" />
+      <div className="flex h-full flex-col overflow-hidden rounded-[1.75rem] bg-[#f4fbf7]">
+        <div className="bg-leaf px-4 pb-5 pt-8 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[9px] font-extrabold uppercase tracking-wider text-white/55">BizTrack</p>
+              <p className="text-[13px] font-bold">Today's overview</p>
+            </div>
+            <span className="grid h-7 w-7 place-items-center rounded-xl bg-white/15">
+              <BarChart3 size={13} aria-hidden="true" />
+            </span>
+          </div>
+          <p className="mt-4 text-[10px] font-semibold text-white/60">Today's profit</p>
+          <p className="text-3xl font-extrabold">$177</p>
+        </div>
+
+        <div className="-mt-4 grid grid-cols-2 gap-2 px-3">
+          {[
+            ["Sales", "$248", "text-leaf"],
+            ["Expenses", "$71", "text-clay"],
+          ].map(([label, value, color]) => (
+            <div key={label} className="rounded-xl bg-white p-3 shadow-card">
+              <p className="text-[9px] font-bold text-ink/45">{label}</p>
+              <p className={`mt-1 text-base font-extrabold ${color}`}>{value}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mx-3 mt-3 rounded-xl bg-white p-3 shadow-card">
+          <div className="mb-2 flex items-center justify-between">
+            <p className="text-[9px] font-extrabold uppercase tracking-wider text-ink/40">Weekly sales</p>
+            <span className="text-[9px] font-extrabold text-leaf">+24%</span>
+          </div>
+          <div className="flex h-16 items-end gap-1.5">
+            {BAR_HEIGHTS.map((height, index) => (
+              <div
+                key={BAR_DAYS[index]}
+                className={["flex-1 rounded-t", index === 5 ? "bg-leaf" : "bg-emerald-100"].join(" ")}
+                style={{ height: `${height}%` }}
+              />
+            ))}
+          </div>
+        </div>
+
+        <div className="mx-3 mt-3 rounded-xl border border-orange-200 bg-orange-50 px-3 py-2 text-[10px] font-extrabold text-clay">
+          Low stock: Rice 5kg, Sugar 1kg
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DeviceCarousel() {
+  return (
+    <div className="relative min-h-[430px] w-full overflow-hidden" aria-label="BizTrack dashboard on laptop and phone">
+      <div className="mockup-slide absolute inset-x-0 top-0">
+        <LaptopMockup />
+      </div>
+      <div className="mockup-slide mockup-slide-delayed absolute inset-x-0 top-0">
+        <PhoneMockup />
+      </div>
+      <div className="pointer-events-none absolute inset-x-8 bottom-3 h-8 rounded-full bg-leaf/10 blur-2xl" aria-hidden="true" />
+    </div>
+  );
+}
+
 export default function DashboardPreview({ variant = "section" }: DashboardPreviewProps) {
   if (variant === "compact") {
     return (
-      <div aria-label="BizTrack dashboard preview">
-        <DashboardMock compact />
-      </div>
+      <DeviceCarousel />
     );
   }
 
@@ -99,7 +270,7 @@ export default function DashboardPreview({ variant = "section" }: DashboardPrevi
           align="center"
         />
 
-        <DashboardMock />
+        <LaptopMockup />
       </div>
     </section>
   );

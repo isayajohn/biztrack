@@ -40,13 +40,17 @@ type Props = {
 
 export default function BrandLogo({ className = "h-auto w-44", variant = "light" }: Props) {
   const [logo, setLogo] = useState<string | null | undefined>(cachedLogo);
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
 
   useEffect(() => {
     let alive = true;
 
     const load = () => {
       loadBrandLogo().then((nextLogo) => {
-        if (alive) setLogo(nextLogo);
+        if (alive) {
+          setLogo(nextLogo);
+          setFailedSrc(null);
+        }
       });
     };
 
@@ -64,12 +68,24 @@ export default function BrandLogo({ className = "h-auto w-44", variant = "light"
     };
   }, []);
 
+  const src = logo || FALLBACK_LOGO;
+
   return (
     <img
-      src={logo || FALLBACK_LOGO}
+      src={failedSrc === src ? FALLBACK_LOGO : src}
       alt="BizTrack"
       className={className}
-      style={variant === "dark" ? { filter: "drop-shadow(0 8px 18px rgba(0,0,0,0.22))" } : undefined}
+      onError={() => {
+        setFailedSrc(src);
+        if (src !== FALLBACK_LOGO) setLogo(null);
+      }}
+      style={{
+        objectFit: "contain",
+        filter:
+          variant === "dark"
+            ? "brightness(1.08) contrast(1.05) drop-shadow(0 8px 18px rgba(0,0,0,0.28))"
+            : "drop-shadow(0 1px 0 rgba(255,255,255,0.7))",
+      }}
     />
   );
 }

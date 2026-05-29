@@ -7,6 +7,7 @@ import {
   FileText,
   HelpCircle,
   Loader2,
+  MapPin,
   Megaphone,
   Plus,
   Save,
@@ -97,6 +98,7 @@ const emptyPricing: PricingItem = {
 };
 const emptyFaq: FaqItem = { question: "", answer: "" };
 const emptyTestimonial: TestimonialItem = { name: "", business: "", message: "" };
+const emptyFooterLink: Record<string, unknown> = { label: "", value: "", href: "" };
 
 function textFrom(record: Record<string, unknown>, keys: string[], fallback = "") {
   for (const key of keys) {
@@ -189,7 +191,13 @@ function payloadFromState(state: LandingEditorState, isPublished: boolean): Land
         business: testimonial.business.trim(),
         message: testimonial.message.trim(),
       })),
-    footerLinks: state.footerLinks,
+    footerLinks: state.footerLinks
+      .map((item) => ({
+        label: textFrom(item, ["label", "title", "type"]).trim(),
+        value: textFrom(item, ["value", "text", "href", "url"]).trim(),
+        href: textFrom(item, ["href", "url"]).trim(),
+      }))
+      .filter((item) => item.label || item.value || item.href),
     seoTitle: state.seoTitle.trim() || null,
     seoDescription: state.seoDescription.trim() || null,
     isPublished,
@@ -212,6 +220,9 @@ function validateState(state: LandingEditorState) {
   }
   if (state.testimonials.some((testimonial) => !testimonial.name.trim() || !testimonial.message.trim())) {
     return "Every testimonial needs a name and message.";
+  }
+  if (state.footerLinks.some((item) => !textFrom(item, ["label", "title", "type"]).trim() || !textFrom(item, ["value", "text", "href", "url"]).trim())) {
+    return "Every footer contact item needs a label and value.";
   }
   return null;
 }
@@ -520,6 +531,46 @@ export default function AdminLandingPagePage() {
               {!state.testimonials.length && <EmptyList label="No testimonials yet." />}
             </DynamicSection>
 
+            <DynamicSection
+              title="Footer contact"
+              description="Manage the contact details shown in the public footer."
+              icon={<MapPin size={18} aria-hidden="true" />}
+              addLabel="Add contact"
+              onAdd={() => update("footerLinks", [...state.footerLinks, { ...emptyFooterLink }])}
+            >
+              {state.footerLinks.map((item, index) => (
+                <RepeaterCard
+                  key={index}
+                  title={`Contact ${index + 1}`}
+                  onDelete={() => update("footerLinks", state.footerLinks.filter((_, itemIndex) => itemIndex !== index))}
+                >
+                  <div className="grid gap-3 lg:grid-cols-3">
+                    <TextField
+                      label="Label"
+                      value={textFrom(item, ["label", "title", "type"])}
+                      onChange={(value) => updateFooterLink(index, "label", value)}
+                      placeholder="Email"
+                      required
+                    />
+                    <TextField
+                      label="Value"
+                      value={textFrom(item, ["value", "text", "href", "url"])}
+                      onChange={(value) => updateFooterLink(index, "value", value)}
+                      placeholder="support@biztrack.co"
+                      required
+                    />
+                    <TextField
+                      label="Link"
+                      value={textFrom(item, ["href", "url"])}
+                      onChange={(value) => updateFooterLink(index, "href", value)}
+                      placeholder="mailto:support@biztrack.co"
+                    />
+                  </div>
+                </RepeaterCard>
+              ))}
+              {!state.footerLinks.length && <EmptyList label="No footer contacts yet. Defaults will be shown on the public page." />}
+            </DynamicSection>
+
             <EditorSection title="SEO" icon={<Search size={18} aria-hidden="true" />}>
               <div className="grid gap-4 lg:grid-cols-2">
                 <TextField label="SEO title" value={state.seoTitle} onChange={(value) => update("seoTitle", value)} />
@@ -564,6 +615,13 @@ export default function AdminLandingPagePage() {
     update(
       "testimonials",
       state.testimonials.map((item, itemIndex) => (itemIndex === index ? { ...item, [key]: value } : item)),
+    );
+  }
+
+  function updateFooterLink(index: number, key: "label" | "value" | "href", value: string) {
+    update(
+      "footerLinks",
+      state.footerLinks.map((item, itemIndex) => (itemIndex === index ? { ...item, [key]: value } : item)),
     );
   }
 }

@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Mail, MapPin, Phone } from "lucide-react";
 import BrandLogo from "../BrandLogo";
 
 const PRODUCT_LINKS = [
@@ -13,23 +14,60 @@ const COMPANY_LINKS = [
   { label: "About", href: "#" },
   { label: "Blog", href: "#" },
   { label: "Careers", href: "#" },
-  { label: "Contact", href: "#" },
+  { label: "Contact", href: "#contact" },
 ];
 
 type Props = {
   seoDescription?: string | null;
+  footerLinks?: Array<Record<string, unknown>> | null;
 };
 
-export default function LandingFooter({ seoDescription }: Props) {
+function textFrom(record: Record<string, unknown>, keys: string[], fallback = "") {
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === "string" && value.trim()) return value.trim();
+    if (typeof value === "number") return String(value);
+  }
+  return fallback;
+}
+
+function contactItemsFrom(footerLinks?: Array<Record<string, unknown>> | null) {
+  const dynamicItems = (footerLinks ?? [])
+    .map((item) => ({
+      label: textFrom(item, ["label", "title", "type"]),
+      value: textFrom(item, ["value", "text", "href", "url"]),
+      href: textFrom(item, ["href", "url"]),
+    }))
+    .filter((item) => item.label && item.value);
+
+  return dynamicItems.length
+    ? dynamicItems
+    : [
+        { label: "Email", value: "support@biztrack.co", href: "mailto:support@biztrack.co" },
+        { label: "Phone", value: "+255 700 000 000", href: "tel:+255700000000" },
+        { label: "Location", value: "Dar es Salaam, Tanzania", href: "#" },
+      ];
+}
+
+function contactIcon(label: string) {
+  const normalized = label.toLowerCase();
+  if (normalized.includes("phone") || normalized.includes("call") || normalized.includes("whatsapp")) return Phone;
+  if (normalized.includes("location") || normalized.includes("address")) return MapPin;
+  return Mail;
+}
+
+export default function LandingFooter({ seoDescription, footerLinks }: Props) {
+  const contactItems = contactItemsFrom(footerLinks);
+
   return (
-    <footer className="bg-[#111815] text-white/60">
+    <footer id="contact" className="bg-[#111815] text-white/60">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         {/* Main grid */}
-        <div className="grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_0.8fr_0.8fr_1fr]">
           {/* Brand */}
-          <div className="lg:col-span-2">
-            <Link to="/" className="inline-flex items-center gap-2.5">
-              <BrandLogo className="h-auto w-44 max-w-full" variant="dark" />
+          <div>
+            <Link to="/" className="inline-flex items-center gap-2.5 rounded-lg bg-white/95 px-3 py-2">
+              <BrandLogo className="h-auto w-40 max-w-full" variant="light" />
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-7 text-white/45">
               {seoDescription ||
@@ -84,6 +122,40 @@ export default function LandingFooter({ seoDescription }: Props) {
                   </a>
                 </li>
               ))}
+            </ul>
+          </nav>
+
+          <nav aria-label="Contact information">
+            <p className="mb-4 text-xs font-bold uppercase tracking-widest text-white/40">
+              Contact
+            </p>
+            <ul className="flex flex-col gap-3">
+              {contactItems.map(({ label, value, href }) => {
+                const Icon = contactIcon(label);
+                const content = (
+                  <>
+                    <Icon size={15} className="mt-0.5 shrink-0 text-leaf" aria-hidden="true" />
+                    <span>
+                      <span className="block text-xs font-bold uppercase tracking-wider text-white/30">
+                        {label}
+                      </span>
+                      <span className="text-sm font-semibold text-white/65">{value}</span>
+                    </span>
+                  </>
+                );
+
+                return (
+                  <li key={`${label}-${value}`}>
+                    {href && href !== "#" ? (
+                      <a href={href} className="flex gap-2.5 transition-colors hover:text-white">
+                        {content}
+                      </a>
+                    ) : (
+                      <div className="flex gap-2.5">{content}</div>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </nav>
         </div>
