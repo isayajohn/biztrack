@@ -1,0 +1,373 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PaymentMethod {
+  CASH
+  MOBILE_MONEY
+  BANK
+  CREDIT
+}
+
+enum ExpenseCategory {
+  STOCK_PURCHASE
+  RENT
+  TRANSPORT
+  SALARY
+  ELECTRICITY
+  INTERNET
+  FOOD
+  MARKETING
+  OTHER
+}
+
+enum SystemRole {
+  USER
+  SUPER_ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum PackageStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum SubscriptionStatus {
+  TRIAL
+  ACTIVE
+  SUSPENDED
+  CANCELLED
+  EXPIRED
+}
+
+enum BillingCycle {
+  MONTHLY
+  YEARLY
+  LIFETIME
+  MANUAL
+}
+
+enum ConfigProvider {
+  SMTP
+  API
+  CUSTOM
+}
+
+enum TemplateType {
+  EMAIL
+  SMS
+}
+
+enum TemplateKey {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+  LOGIN_ALERT
+  OTP_CODE
+  ACCOUNT_SUSPENDED
+  SUBSCRIPTION_ACTIVATED
+  SUBSCRIPTION_EXPIRED
+}
+
+enum AuthTokenType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+  LOGIN_OTP
+}
+
+model User {
+  id                         String     @id @default(uuid())
+  name                       String
+  email                      String     @unique
+  phone                      String?
+  passwordHash               String
+  role                       SystemRole @default(USER)
+  status                     UserStatus @default(ACTIVE)
+  emailVerifiedAt            DateTime?
+  emailVerificationTokenHash String?
+  emailVerificationExpiresAt DateTime?
+  passwordResetTokenHash     String?
+  passwordResetExpiresAt     DateTime?
+  otpCodeHash                String?
+  otpLoginTokenHash          String?
+  otpExpiresAt               DateTime?
+  failedLoginAttempts        Int        @default(0)
+  lockedUntil                DateTime?
+  lastLoginAt                DateTime?
+  businesses                 Business[]
+  authTokens                 AuthToken[]
+  auditLogs                  AuditLog[] @relation("AdminAuditActor")
+  createdAt                  DateTime   @default(now())
+  updatedAt                  DateTime   @updatedAt
+
+  @@index([email])
+  @@index([phone])
+  @@index([role])
+  @@index([status])
+  @@index([emailVerifiedAt])
+  @@index([lockedUntil])
+  @@index([emailVerificationTokenHash])
+  @@index([passwordResetTokenHash])
+  @@index([otpLoginTokenHash])
+  @@index([createdAt])
+}
+
+model AuthToken {
+  id        String        @id @default(uuid())
+  userId    String
+  type      AuthTokenType
+  tokenHash String        @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime      @default(now())
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, type])
+  @@index([type, expiresAt])
+  @@index([usedAt])
+  @@index([createdAt])
+}
+
+model Business {
+  id            String                 @id @default(uuid())
+  userId        String
+  name          String
+  currency      String
+  country       String
+  user          User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  products      Product[]
+  sales         Sale[]
+  expenses      Expense[]
+  subscriptions BusinessSubscription[]
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
+
+  @@index([userId])
+  @@index([userId, name])
+}
+
+model Product {
+  id            String   @id @default(uuid())
+  businessId    String
+  name          String
+  sku           String?
+  buyingPrice   Decimal  @db.Decimal(12, 2)
+  sellingPrice  Decimal  @db.Decimal(12, 2)
+  stockQuantity Int      @default(0)
+  lowStockLevel Int      @default(0)
+  isActive      Boolean  @default(true)
+  business      Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  sales         Sale[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([businessId, sku])
+  @@index([businessId])
+  @@index([businessId, isActive])
+  @@index([businessId, stockQuantity])
+}
+
+model Sale {
+  id            String        @id @default(uuid())
+  businessId    String
+  productId     String?
+  quantity      Int
+  unitPrice     Decimal       @db.Decimal(12, 2)
+  totalAmount   Decimal       @db.Decimal(12, 2)
+  paymentMethod PaymentMethod
+  saleDate      DateTime      @db.Date
+  notes         String?
+  business      Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  product       Product?      @relation(fields: [productId], references: [id], onDelete: SetNull)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([businessId])
+  @@index([businessId, saleDate])
+  @@index([businessId, paymentMethod])
+  @@index([productId])
+}
+
+model Expense {
+  id            String          @id @default(uuid())
+  businessId    String
+  category      ExpenseCategory
+  description   String
+  amount        Decimal         @db.Decimal(12, 2)
+  paymentMethod PaymentMethod
+  expenseDate   DateTime        @db.Date
+  notes         String?
+  business      Business        @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@index([businessId])
+  @@index([businessId, expenseDate])
+  @@index([businessId, category])
+  @@index([businessId, paymentMethod])
+}
+
+model AuditLog {
+  id           String   @id @default(uuid())
+  actorId      String?
+  action       String
+  targetType   String
+  targetId     String?
+  metadata     Json?
+  targetUserId String?
+  details      Json?
+  actor        User?    @relation("AdminAuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+  createdAt    DateTime @default(now())
+
+  @@index([actorId])
+  @@index([action])
+  @@index([targetType])
+  @@index([targetId])
+  @@index([targetType, targetId])
+  @@index([targetUserId])
+  @@index([createdAt])
+}
+
+model Package {
+  id                   String                 @id @default(uuid())
+  name                 String
+  slug                 String                 @unique
+  description          String?
+  priceMonthly         Decimal                @db.Decimal(12, 2)
+  priceYearly          Decimal?               @db.Decimal(12, 2)
+  currency             String
+  trialDays            Int                    @default(0)
+  maxBusinesses        Int
+  maxUsers             Int
+  maxProducts          Int
+  maxSalesPerMonth     Int
+  maxExpensesPerMonth  Int
+  allowReports         Boolean
+  allowPdfExport       Boolean
+  allowCsvExport       Boolean
+  allowInventoryAlerts Boolean
+  allowAiInsights      Boolean
+  status               PackageStatus          @default(ACTIVE)
+  sortOrder            Int                    @default(0)
+  subscriptions        BusinessSubscription[]
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+
+  @@index([status])
+}
+
+model BusinessSubscription {
+  id           String             @id @default(uuid())
+  businessId   String
+  packageId    String
+  status       SubscriptionStatus @default(ACTIVE)
+  billingCycle BillingCycle       @default(MONTHLY)
+  startsAt     DateTime
+  endsAt       DateTime?
+  trialEndsAt  DateTime?
+  notes        String?
+  business     Business           @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  package      Package            @relation(fields: [packageId], references: [id], onDelete: Restrict)
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  @@index([businessId])
+  @@index([packageId])
+  @@index([status])
+}
+
+model LandingPageContent {
+  id                  String   @id @default(uuid())
+  heroTitle           String
+  heroSubtitle        String
+  primaryButtonText   String
+  primaryButtonUrl    String
+  secondaryButtonText String
+  secondaryButtonUrl  String
+  features            Json
+  pricing             Json
+  faqs                Json
+  testimonials        Json?
+  footerLinks         Json?
+  seoTitle            String?
+  seoDescription      String?
+  isPublished         Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model AppBranding {
+  id           String   @id @default(uuid())
+  logoDataUrl  String?
+  logoFileName String?
+  logoMimeType String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model EmailConfig {
+  id                String         @id @default(uuid())
+  provider          ConfigProvider
+  host              String?
+  port              Int?
+  username          String?
+  passwordEncrypted String?
+  apiKeyEncrypted   String?
+  fromName          String
+  fromEmail         String
+  replyToEmail      String?
+  isActive          Boolean        @default(true)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+}
+
+model SmsConfig {
+  id                 String         @id @default(uuid())
+  provider           ConfigProvider
+  baseUrl            String?
+  apiKeyEncrypted    String?
+  apiSecretEncrypted String?
+  senderId           String?
+  isActive           Boolean        @default(true)
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+}
+
+model SecurityConfig {
+  id                         String   @id @default(uuid())
+  requireEmailVerification   Boolean  @default(true)
+  enablePasswordReset        Boolean  @default(true)
+  enableOtpLogin             Boolean  @default(false)
+  enableSmsOtp               Boolean  @default(false)
+  passwordMinLength          Int      @default(8)
+  passwordRequireNumber      Boolean  @default(true)
+  passwordRequireSpecialChar Boolean  @default(false)
+  otpExpiryMinutes           Int      @default(10)
+  maxLoginAttempts           Int      @default(5)
+  lockoutMinutes             Int      @default(15)
+  sessionExpiryMinutes       Int      @default(1440)
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
+}
+
+model MessageTemplate {
+  id        String       @id @default(uuid())
+  type      TemplateType
+  key       TemplateKey
+  subject   String?
+  body      String
+  isActive  Boolean      @default(true)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@index([key])
+}
