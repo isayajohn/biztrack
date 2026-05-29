@@ -35,7 +35,7 @@ export function clearBrandLogoCache() {
 
 type Props = {
   className?: string;
-  variant?: "light" | "dark";
+  variant?: "light" | "dark" | "transparent";
 };
 
 export default function BrandLogo({ className = "h-auto w-44", variant = "light" }: Props) {
@@ -84,7 +84,9 @@ export default function BrandLogo({ className = "h-auto w-44", variant = "light"
         filter:
           variant === "dark"
             ? "brightness(1.08) contrast(1.05) drop-shadow(0 8px 18px rgba(0,0,0,0.28))"
-            : "drop-shadow(0 1px 0 rgba(255,255,255,0.7))",
+            : variant === "transparent"
+              ? "none"
+              : "drop-shadow(0 1px 0 rgba(255,255,255,0.7))",
       }}
     />
   );
