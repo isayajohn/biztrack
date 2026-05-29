@@ -259,19 +259,5 @@ export default function DashboardPreview({ variant = "section" }: DashboardPrevi
     );
   }
 
-  return (
-    <section id="dashboard-preview" className="scroll-mt-24 bg-white py-14 md:py-20" aria-labelledby="preview-heading">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <SectionHeader
-          id="preview-heading"
-          eyebrow="See it in action"
-          title="Your entire business at a glance."
-          description="One clean dashboard replaces the notebooks, spreadsheets, and guesswork."
-          align="center"
-        />
-
-        <LaptopMockup />
-      </div>
-    </section>
-  );
+  return null;
 }
