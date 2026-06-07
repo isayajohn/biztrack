@@ -29,6 +29,17 @@ export const env = {
     clientId: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
   },
+  azamPay: {
+    enabled: (process.env.AZAMPAY_ENABLED ?? "true").toLowerCase() !== "false",
+    appName: process.env.AZAMPAY_APP_NAME,
+    clientId: process.env.AZAMPAY_CLIENT_ID,
+    clientSecret: process.env.AZAMPAY_CLIENT_SECRET,
+    token: process.env.AZAMPAY_TOKEN,
+    authUrl: process.env.AZAMPAY_AUTH_URL ?? "https://authenticator.azampay.co.tz/AppRegistration/GenerateToken",
+    checkoutUrl: process.env.AZAMPAY_CHECKOUT_URL ?? "https://api.azampay.co.tz/checkout",
+    callbackUrl: process.env.AZAMPAY_CALLBACK_URL,
+    returnUrl: process.env.AZAMPAY_RETURN_URL,
+  },
   email: {
     provider: process.env.EMAIL_PROVIDER ?? "SMTP",
     host: process.env.EMAIL_HOST,

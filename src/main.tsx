@@ -24,11 +24,13 @@ import ExpenseFormPage from "./pages/ExpenseFormPage";
 import ProductsPage from "./pages/ProductsPage";
 import ProductFormPage from "./pages/ProductFormPage";
 import ReportsPage from "./pages/ReportsPage";
+import SubscriptionPage from "./pages/SubscriptionPage";
 import SettingsPage from "./pages/SettingsPage";
 import OnboardingPage from "./pages/OnboardingPage";
 import AdminAuditLogsPage from "./pages/admin/AdminAuditLogsPage";
 import AdminBusinessDetailPage from "./pages/admin/AdminBusinessDetailPage";
 import AdminBusinessesPage from "./pages/admin/AdminBusinessesPage";
+import AdminCollectionsPage from "./pages/admin/AdminCollectionsPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminEmailConfigPage from "./pages/admin/AdminEmailConfigPage";
 import AdminEmailProviderConfigPage from "./pages/admin/AdminEmailProviderConfigPage";
@@ -81,6 +83,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 <Route path="/products/new" element={<ProductFormPage />} />
                 <Route path="/products/:id/edit" element={<ProductFormPage />} />
                 <Route path="/reports" element={<ReportsPage />} />
+                <Route path="/subscription" element={<SubscriptionPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
               </Route>
             </Route>
@@ -97,6 +100,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 <Route path="/admin/packages/new" element={<AdminPackageFormPage />} />
                 <Route path="/admin/packages/:id/edit" element={<AdminPackageFormPage />} />
                 <Route path="/admin/subscriptions" element={<AdminSubscriptionsPage />} />
+                <Route path="/admin/collections" element={<AdminCollectionsPage />} />
                 <Route path="/admin/landing-page" element={<AdminLandingPagePage />} />
                 <Route path="/admin/email" element={<AdminEmailConfigPage />} />
                 <Route path="/admin/security" element={<AdminSecurityConfigPage />} />

@@ -6,6 +6,7 @@ export type AdminStatus = "ACTIVE" | "SUSPENDED";
 export type PackageStatus = "ACTIVE" | "INACTIVE";
 export type SubscriptionStatus = "TRIAL" | "ACTIVE" | "SUSPENDED" | "CANCELLED" | "EXPIRED";
 export type BillingCycle = "MONTHLY" | "YEARLY" | "LIFETIME" | "MANUAL";
+export type PaymentStatus = "PENDING" | "PAID" | "FAILED" | "CANCELLED";
 export type ConfigProvider = "SMTP" | "API" | "CUSTOM";
 export type TemplateType = "EMAIL" | "SMS";
 export type TemplateKey =
@@ -196,6 +197,36 @@ export type AdminSubscription = {
   >;
   createdAt: string;
   updatedAt: string;
+};
+
+export type AdminCollection = {
+  id: string;
+  businessId: string;
+  packageId: string;
+  subscriptionId?: string | null;
+  status: PaymentStatus;
+  billingCycle: BillingCycle;
+  amount: number;
+  currency: string;
+  provider: string;
+  externalId: string;
+  providerReference?: string | null;
+  checkoutUrl?: string | null;
+  paidAt?: string | null;
+  failedAt?: string | null;
+  business: Pick<AdminBusiness, "id" | "name" | "currency" | "country"> & {
+    user: Pick<AdminUser, "id" | "name" | "email">;
+  };
+  package: Pick<AdminPackage, "id" | "name" | "slug" | "currency" | "priceMonthly" | "priceYearly">;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type AdminCollectionStats = {
+  totalCount: number;
+  totalAmount: number;
+  byStatus: Partial<Record<PaymentStatus, { count: number; amount: number }>>;
+  latest: AdminCollection[];
 };
 
 export type LandingPageContent = {
@@ -492,6 +523,23 @@ export async function updateAdminSubscriptionStatus(id: string, status: Subscrip
 
 export async function extendAdminSubscription(id: string, payload: { endsAt: string; notes?: string | null }) {
   return unwrap<AdminSubscription>(await apiClient.patch(`/admin/subscriptions/${id}/extend`, payload));
+}
+
+export async function getAdminCollections(params: {
+  search?: string;
+  status?: PaymentStatus;
+  businessId?: string;
+  packageId?: string;
+  page?: number;
+  limit?: number;
+} = {}) {
+  return unwrap<PaginatedResult<AdminCollection>>(
+    await apiClient.get("/admin/collections", { params }),
+  );
+}
+
+export async function getAdminCollectionStats() {
+  return unwrap<AdminCollectionStats>(await apiClient.get("/admin/collections/stats"));
 }
 
 export async function getAdminLandingContent() {

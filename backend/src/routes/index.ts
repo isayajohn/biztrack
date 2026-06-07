@@ -11,6 +11,7 @@ import profileRoutes from "./profile.routes";
 import publicPackageRoutes from "./publicPackage.routes";
 import reportRoutes from "./report.routes";
 import saleRoutes from "./sale.routes";
+import subscriptionRoutes from "./subscription.routes";
 
 const router = Router();
 
@@ -31,5 +32,6 @@ router.use("/sales", saleRoutes);
 router.use("/expenses", expenseRoutes);
 router.use("/dashboard", dashboardRoutes);
 router.use("/reports", reportRoutes);
+router.use("/subscriptions", subscriptionRoutes);
 
 export default router;

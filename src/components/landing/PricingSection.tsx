@@ -87,7 +87,7 @@ export default function PricingSection() {
         </div>
 
         <p className="mt-8 text-center text-sm font-semibold text-slateMuted">
-          All plans include a 14-day free trial on paid features. No credit card required to start.
+          New businesses start with a 7-day trial across all features. No credit card required to start.
         </p>
       </div>
     </section>

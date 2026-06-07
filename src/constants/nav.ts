@@ -2,6 +2,7 @@ import {
   BarChart3,
   Boxes,
   CircleDollarSign,
+  CreditCard,
   LayoutDashboard,
   Settings,
   ShieldCheck,
@@ -21,6 +22,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Expenses", to: "/expenses", icon: WalletCards },
   { label: "Products", to: "/products", icon: Boxes },
   { label: "Reports", to: "/reports", icon: BarChart3 },
+  { label: "Billing", to: "/subscription", icon: CreditCard },
   { label: "Settings", to: "/settings", icon: Settings },
 ];
 

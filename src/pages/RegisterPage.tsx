@@ -62,7 +62,7 @@ function packageSummary(plan: PublicPackage) {
     `Up to ${plan.limits.maxProducts} products`,
     `${plan.limits.maxSalesPerMonth} sales/month`,
   ];
-  if (plan.trialDays > 0) pieces.push(`${plan.trialDays}-day trial`);
+  pieces.push("7-day all-features trial");
   return pieces.join(" / ");
 }
 

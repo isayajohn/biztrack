@@ -41,6 +41,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     items: [
       { label: "Packages", to: "/admin/packages", icon: Package },
       { label: "Subscriptions", to: "/admin/subscriptions", icon: CreditCard },
+      { label: "Collections", to: "/admin/collections", icon: CreditCard },
     ],
   },
   {
@@ -68,7 +69,12 @@ export const ADMIN_NAV_ITEMS: NavItem[] = ADMIN_NAV_GROUPS.flatMap((group) => gr
 export const ADMIN_MOBILE_NAV_ITEMS: AdminMobileNavItem[] = [
   { label: "Dashboard", to: "/admin", icon: LayoutDashboard, match: ["/admin"], exact: true },
   { label: "People", to: "/admin/users", icon: Users, match: ["/admin/users", "/admin/businesses"] },
-  { label: "Plans", to: "/admin/packages", icon: Package, match: ["/admin/packages", "/admin/subscriptions"] },
+  {
+    label: "Plans",
+    to: "/admin/packages",
+    icon: Package,
+    match: ["/admin/packages", "/admin/subscriptions", "/admin/collections"],
+  },
   { label: "Website", to: "/admin/landing-page", icon: PanelTop, match: ["/admin/landing-page"] },
   { label: "Config", to: "/admin/config/email", icon: Settings, match: ["/admin/config", "/admin/templates"] },
   { label: "Logs", to: "/admin/audit-logs", icon: ClipboardList, match: ["/admin/audit-logs"] },

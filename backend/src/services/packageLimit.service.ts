@@ -34,6 +34,7 @@ type ActiveSubscriptionOptions = {
 };
 
 export const PACKAGE_LIMIT_ERROR_MESSAGE = "Package limit reached. Please upgrade your package.";
+export const PACKAGE_ACCESS_ERROR_MESSAGE = "This feature is not included in your current package.";
 
 const activeSubscriptionStatuses = ["TRIAL", "ACTIVE"] as const;
 export const defaultFreePackageSlug = "free";
@@ -69,7 +70,18 @@ export async function getOrCreateDefaultFreePackage(client: PrismaExecutor) {
 }
 
 function packageLimitError(details?: Record<string, unknown>) {
-  return new AppError(PACKAGE_LIMIT_ERROR_MESSAGE, 403, details);
+  const reason = typeof details?.reason === "string" ? details.reason : null;
+  const featureName = typeof details?.featureName === "string" ? details.featureName : null;
+  const message =
+    featureName || reason === "SUBSCRIPTION_EXPIRED"
+      ? PACKAGE_ACCESS_ERROR_MESSAGE
+      : PACKAGE_LIMIT_ERROR_MESSAGE;
+
+  return new AppError(message, 403, {
+    code: "PACKAGE_ACCESS_REQUIRED",
+    action: "UPGRADE_PACKAGE",
+    ...details,
+  });
 }
 
 function isBeforeOrEqual(left: Date, right: Date) {
@@ -174,6 +186,8 @@ export function createPackageLimitService(client: PrismaExecutor = prisma) {
   ): Promise<SubscriptionWithPackage> {
     const subscription = await getBusinessActiveSubscription(businessId, options);
 
+    if (subscription.status === "TRIAL") return subscription;
+
     if (!subscription.package[featureName]) {
       throw packageLimitError({
         featureName,
@@ -195,6 +209,9 @@ export function createPackageLimitService(client: PrismaExecutor = prisma) {
     const subscription = await getBusinessActiveSubscription(businessId, { client: executor, now });
     const limit = subscription.package[limitName];
     const incrementBy = options.incrementBy ?? 1;
+
+    if (subscription.status === "TRIAL") return subscription;
+
     let used = 0;
 
     if (limitName === "maxProducts") {

@@ -16,6 +16,7 @@ import {
   Boxes,
   CheckCircle2,
   CircleDollarSign,
+  CreditCard,
   Plus,
   TrendingDown,
   TrendingUp,
@@ -26,7 +27,7 @@ import type { LucideIcon } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
 import StatCard from "../components/dashboard/StatCard";
 import { generateBusinessSummary } from "../services/aiApi";
-import { getApiErrorMessage } from "../services/apiClient";
+import { getApiErrorMessage, isPackageAccessError } from "../services/apiClient";
 import { getExpenses } from "../services/expenseService";
 import { getProducts } from "../services/productService";
 import { getSales } from "../services/saleService";
@@ -185,6 +186,7 @@ export default function Dashboard() {
   const [aiGeneratedAt, setAiGeneratedAt] = useState("");
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
   const [summaryError, setSummaryError] = useState("");
+  const [summaryNeedsUpgrade, setSummaryNeedsUpgrade] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -245,11 +247,15 @@ export default function Dashboard() {
   const handleGenerateSummary = async () => {
     setIsGeneratingSummary(true);
     setSummaryError("");
+    setSummaryNeedsUpgrade(false);
     try {
       const result = await generateBusinessSummary();
       setAiSummary(result.summary);
       setAiGeneratedAt(result.generatedAt);
     } catch (err) {
+      if (isPackageAccessError(err)) {
+        setSummaryNeedsUpgrade(true);
+      }
       setSummaryError(getApiErrorMessage(err));
     } finally {
       setIsGeneratingSummary(false);
@@ -350,6 +356,22 @@ export default function Dashboard() {
         <div className="mt-3 rounded-lg bg-[#f8f6f1] px-3.5 py-3">
           {isGeneratingSummary ? (
             <p className="text-sm font-semibold text-ink/55">Preparing your business summary...</p>
+          ) : summaryNeedsUpgrade ? (
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-black text-ink">AI summary needs a paid package.</p>
+                <p className="mt-1 text-sm font-semibold text-ink/55">
+                  {summaryError} Choose a package and complete payment to unlock AI insights.
+                </p>
+              </div>
+              <Link
+                to="/subscription"
+                className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-leaf px-3.5 py-2 text-xs font-bold text-white shadow-sm transition-colors hover:bg-leaf/90"
+              >
+                <CreditCard size={13} aria-hidden="true" />
+                Pay package
+              </Link>
+            </div>
           ) : summaryError ? (
             <p className="text-sm font-semibold text-red-600">{summaryError}</p>
           ) : aiSummary ? (

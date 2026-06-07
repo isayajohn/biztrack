@@ -53,3 +53,18 @@ export function getApiErrorMessage(error: unknown): string {
   }
   return "Something went wrong. Please try again.";
 }
+
+export function getApiErrorDetails<T = unknown>(error: unknown): T | null {
+  if (!axios.isAxiosError(error)) return null;
+  return (error.response?.data?.details as T | undefined) ?? null;
+}
+
+export function isPackageAccessError(error: unknown): boolean {
+  const details = getApiErrorDetails<{ code?: string; action?: string }>(error);
+  return details?.code === "PACKAGE_ACCESS_REQUIRED" || details?.action === "UPGRADE_PACKAGE";
+}
+
+export function isPaymentProviderError(error: unknown): boolean {
+  const details = getApiErrorDetails<{ code?: string; provider?: string }>(error);
+  return Boolean(details?.code?.startsWith("PAYMENT_PROVIDER_") || details?.provider === "AZAMPAY");
+}

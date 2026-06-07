@@ -5,6 +5,7 @@ import { validate } from "../middleware/validate.middleware";
 import { asyncHandler } from "../utils/asyncHandler";
 import * as adminSubscriptionController from "../controllers/adminSubscription.controller";
 import adminPackageRoutes from "./adminPackage.routes";
+import adminCollectionRoutes from "./adminCollection.routes";
 import adminSubscriptionRoutes from "./adminSubscription.routes";
 import emailConfigRoutes from "./emailConfig.routes";
 import securityConfigRoutes from "./securityConfig.routes";
@@ -53,6 +54,7 @@ router.put(
 router.delete("/branding/logo", asyncHandler(adminController.removeBrandingLogo));
 router.use("/packages", adminPackageRoutes);
 router.use("/subscriptions", adminSubscriptionRoutes);
+router.use("/collections", adminCollectionRoutes);
 router.use("/config/email", emailConfigRoutes);
 router.use("/config/security", securityConfigRoutes);
 router.use("/config/sms", smsConfigRoutes);

@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import { AppError } from "../utils/AppError";
 import {
   createPackageLimitService,
+  PACKAGE_ACCESS_ERROR_MESSAGE,
   PACKAGE_LIMIT_ERROR_MESSAGE,
 } from "./packageLimit.service";
 
@@ -120,6 +121,15 @@ function assertPackageLimitError(error: unknown) {
   return true;
 }
 
+function assertPackageAccessError(error: unknown) {
+  assert.ok(error instanceof AppError);
+  assert.equal(error.statusCode, 403);
+  assert.equal(error.message, PACKAGE_ACCESS_ERROR_MESSAGE);
+  assert.deepEqual((error.details as Record<string, unknown>).code, "PACKAGE_ACCESS_REQUIRED");
+  assert.deepEqual((error.details as Record<string, unknown>).action, "UPGRADE_PACKAGE");
+  return true;
+}
+
 describe("package limit service", () => {
   it("blocks feature access when the active package does not include the feature", async () => {
     const { client } = mockClient({
@@ -129,7 +139,7 @@ describe("package limit service", () => {
 
     await assert.rejects(
       () => service.checkPackageFeature("business-1", "allowReports", { now }),
-      assertPackageLimitError,
+      assertPackageAccessError,
     );
   });
 

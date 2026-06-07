@@ -53,6 +53,7 @@ type RegistrationPackage = Pick<
   "id" | "name" | "slug" | "priceMonthly" | "trialDays"
 >;
 
+const INITIAL_TRIAL_DAYS = 7;
 const VERIFY_EMAIL_MESSAGE = "If the account needs verification, a verification email has been sent.";
 const FORGOT_PASSWORD_MESSAGE = "If an account exists for that email, password reset instructions have been sent.";
 const googleClient = new OAuth2Client(env.google.clientId);
@@ -283,8 +284,7 @@ export async function register(input: RegisterInput) {
 
   const user = await prisma.$transaction(async (tx) => {
     const now = new Date();
-    const trialEndsAt =
-      selectedPackage.trialDays > 0 ? addMinutes(now, selectedPackage.trialDays * 24 * 60) : null;
+    const trialEndsAt = addMinutes(now, INITIAL_TRIAL_DAYS * 24 * 60);
     const isFreePackage = Number(selectedPackage.priceMonthly.toString()) === 0;
 
     const createdUser = await tx.user.create({
@@ -312,11 +312,11 @@ export async function register(input: RegisterInput) {
       data: {
         businessId: createdBusiness.id,
         packageId: selectedPackage.id,
-        status: trialEndsAt ? "TRIAL" : "ACTIVE",
+        status: "TRIAL",
         billingCycle: isFreePackage ? "MANUAL" : "MONTHLY",
         startsAt: now,
         trialEndsAt,
-        notes: `Assigned during registration from ${selectedPackage.name} package.`,
+        notes: `Initial ${INITIAL_TRIAL_DAYS}-day trial assigned during registration from ${selectedPackage.name} package.`,
       },
     });
 
