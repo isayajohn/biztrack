@@ -18,6 +18,11 @@ export async function login(req: Request, res: Response) {
   res.json({ success: true, data: result });
 }
 
+export async function googleAuth(req: Request, res: Response) {
+  const result = await authService.googleAuth(req.body.credential, requestMeta(req));
+  res.json({ success: true, data: result });
+}
+
 export async function requestLoginOtp(req: Request, res: Response) {
   const result = await authService.requestLoginOtp(req.body.email, req.body.password, requestMeta(req));
   res.json({ success: true, data: result });

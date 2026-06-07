@@ -55,6 +55,14 @@ export async function login(email: string, password: string): Promise<User> {
   return mapApiUser(result.user);
 }
 
+export async function loginWithGoogle(credential: string): Promise<User> {
+  const result = unwrap<AuthResponse>(
+    await apiClient.post("/auth/google", { credential }),
+  );
+  localStorage.setItem(AUTH_TOKEN_KEY, result.token);
+  return mapApiUser(result.user);
+}
+
 export async function register(data: RegisterData): Promise<RegisterApiResult> {
   const result = unwrap<AuthResponse>(
     await apiClient.post("/auth/register", {
@@ -92,6 +100,13 @@ export async function verifyEmail(token: string): Promise<User> {
 export async function forgotPassword(email: string): Promise<string> {
   const result = unwrap<{ message: string }>(
     await apiClient.post("/auth/forgot-password", { email }),
+  );
+  return result.message;
+}
+
+export async function resetPassword(token: string, password: string): Promise<string> {
+  const result = unwrap<{ message: string }>(
+    await apiClient.post("/auth/reset-password", { token, password }),
   );
   return result.message;
 }

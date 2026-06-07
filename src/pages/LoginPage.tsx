@@ -1,12 +1,12 @@
-import { useState, useCallback } from "react";
-import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
+import { useCallback, useState } from "react";
+import { ArrowLeft, Eye, EyeOff, Loader2, Mail, Sparkles } from "lucide-react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import AuthLoadingScreen from "../components/AuthLoadingScreen";
+import AuthShowcasePanel from "../components/auth/AuthShowcasePanel";
 import BrandLogo from "../components/BrandLogo";
+import GoogleAuthButton from "../components/GoogleAuthButton";
 import { getApiErrorMessage } from "../services/apiClient";
-
-// ─── Validation ───────────────────────────────────────────────────────────────
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -25,22 +25,18 @@ function validate(email: string, password: string): FormErrors {
   return errs;
 }
 
-// ─── Shared input class helpers ───────────────────────────────────────────────
-
 function inputCls(hasError?: boolean) {
   return [
-    "w-full rounded-xl border px-4 py-2.5 text-sm font-medium text-ink outline-none",
-    "transition-all focus:ring-2",
+    "w-full rounded-lg border px-5 py-3.5 text-sm font-semibold text-ink outline-none",
+    "bg-[#f5f9f8] transition-all placeholder:text-slateMuted/55 focus:ring-2",
     hasError
-      ? "border-red-400 bg-red-50/40 focus:border-red-400 focus:ring-red-200/50"
-      : "border-ink/15 bg-[#fbfaf6] focus:border-leaf focus:ring-leaf/15",
+      ? "border-red-400 focus:border-red-400 focus:ring-red-200/50"
+      : "border-transparent focus:border-leaf focus:ring-leaf/15",
   ].join(" ");
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
 export default function LoginPage() {
-  const { login, isAuthenticated, isLoading: isCheckingAuth, user } = useAuth();
+  const { login, loginWithGoogle, isAuthenticated, isLoading: isCheckingAuth, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const locationState = location.state as { message?: string } | null;
@@ -50,13 +46,18 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   if (isCheckingAuth) return <AuthLoadingScreen />;
 
-  // Already signed in → go straight to dashboard
   if (isAuthenticated) {
     return <Navigate to={user?.role === "SUPER_ADMIN" ? "/admin" : "/dashboard"} replace />;
   }
+
+  const routeAfterLogin = (loggedInUser: typeof user) => {
+    if (loggedInUser?.role === "SUPER_ADMIN") return "/admin";
+    return loggedInUser?.businessId ? "/dashboard" : "/onboarding";
+  };
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -70,7 +71,7 @@ export default function LoginPage() {
       setIsLoading(true);
       try {
         const loggedInUser = await login(email, password);
-        navigate(loggedInUser.role === "SUPER_ADMIN" ? "/admin" : "/dashboard", { replace: true });
+        navigate(routeAfterLogin(loggedInUser), { replace: true });
       } catch (err) {
         setErrors({ general: getApiErrorMessage(err) });
       } finally {
@@ -80,61 +81,90 @@ export default function LoginPage() {
     [email, password, login, navigate],
   );
 
-  return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[#fbfaf6] px-4 py-10">
-      <div className="w-full max-w-sm">
-        <div className="mb-8 flex justify-center">
-          <BrandLogo className="h-auto w-56 max-w-full" />
-        </div>
+  const handleGoogleCredential = useCallback(
+    async (credential: string) => {
+      setErrors({});
+      setIsGoogleLoading(true);
+      try {
+        const loggedInUser = await loginWithGoogle(credential);
+        navigate(routeAfterLogin(loggedInUser), { replace: true });
+      } catch (error) {
+        setErrors({ general: getApiErrorMessage(error) });
+      } finally {
+        setIsGoogleLoading(false);
+      }
+    },
+    [loginWithGoogle, navigate],
+  );
 
-        {/* Card */}
-        <div className="rounded-2xl border border-ink/10 bg-white p-8 shadow-soft">
-          <h1 className="font-display text-2xl font-bold text-ink">Welcome back</h1>
-          <p className="mt-1.5 text-sm text-ink/55">Sign in to your BizTrack account</p>
+  return (
+    <main className="min-h-screen bg-white text-ink lg:grid lg:grid-cols-2">
+      <section className="flex min-h-screen items-center justify-center px-5 py-8 sm:px-8 lg:px-12">
+        <div className="w-full max-w-md">
+          <div className="mb-20 sm:mb-24">
+            <BrandLogo className="h-auto w-44 max-w-full" />
+          </div>
+
+          <div>
+            <p className="mb-3 inline-flex items-center gap-2 rounded-full bg-mint px-3 py-1 text-xs font-black text-leaf">
+              <Sparkles size={14} aria-hidden="true" />
+              Welcome back
+            </p>
+            <h1 className="font-display text-3xl font-black tracking-normal text-ink">
+              Log in to your account
+            </h1>
+            <p className="mt-3 text-sm font-semibold leading-6 text-slateMuted">
+              Track sales, expenses, stock, and profit from one simple workspace.
+            </p>
+          </div>
 
           {locationState?.message && (
-            <div className="mt-5 rounded-xl border border-leaf/20 bg-mint px-4 py-3 text-sm font-semibold text-leaf">
+            <div className="mt-6 rounded-lg border border-leaf/20 bg-mint px-4 py-3 text-sm font-semibold text-leaf">
               {locationState.message}
             </div>
           )}
 
-          {/* General error */}
           {errors.general && (
-            <div className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600">
+            <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600">
               {errors.general}
             </div>
           )}
 
-          <form className="mt-5 flex flex-col gap-4" onSubmit={handleSubmit} noValidate>
-            {/* Email */}
+          <form className="mt-8 grid gap-5" onSubmit={handleSubmit} noValidate>
             <div>
-              <label htmlFor="email" className="mb-1.5 block text-sm font-semibold text-ink">
-                Email address
+              <label htmlFor="email" className="mb-2 block text-sm font-bold text-ink">
+                Email
               </label>
-              <input
-                id="email"
-                type="email"
-                autoComplete="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  if (errors.email) setErrors((p) => ({ ...p, email: undefined }));
-                }}
-                className={inputCls(!!errors.email)}
-                aria-invalid={!!errors.email}
-                aria-describedby={errors.email ? "email-error" : undefined}
-              />
+              <div className="relative">
+                <input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (errors.email) setErrors((p) => ({ ...p, email: undefined }));
+                  }}
+                  className={inputCls(Boolean(errors.email)) + " pr-12"}
+                  aria-invalid={Boolean(errors.email)}
+                  aria-describedby={errors.email ? "email-error" : undefined}
+                />
+                <Mail
+                  size={17}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slateMuted/60"
+                  aria-hidden="true"
+                />
+              </div>
               {errors.email && (
-                <p id="email-error" className="mt-1 text-xs font-medium text-red-500">
+                <p id="email-error" className="mt-1.5 text-xs font-semibold text-red-500">
                   {errors.email}
                 </p>
               )}
             </div>
 
-            {/* Password */}
             <div>
-              <label htmlFor="password" className="mb-1.5 block text-sm font-semibold text-ink">
+              <label htmlFor="password" className="mb-2 block text-sm font-bold text-ink">
                 Password
               </label>
               <div className="relative">
@@ -142,66 +172,94 @@ export default function LoginPage() {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
-                  placeholder="••••••••"
+                  placeholder="Enter your password"
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
                     if (errors.password) setErrors((p) => ({ ...p, password: undefined }));
                   }}
-                  className={inputCls(!!errors.password) + " pr-11"}
-                  aria-invalid={!!errors.password}
+                  className={inputCls(Boolean(errors.password)) + " pr-12"}
+                  aria-invalid={Boolean(errors.password)}
                   aria-describedby={errors.password ? "pw-error" : undefined}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-ink/35 transition-colors hover:text-ink/60"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slateMuted/60 transition-colors hover:text-leaf"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
                 </button>
               </div>
               {errors.password && (
-                <p id="pw-error" className="mt-1 text-xs font-medium text-red-500">
+                <p id="pw-error" className="mt-1.5 text-xs font-semibold text-red-500">
                   {errors.password}
                 </p>
               )}
             </div>
 
-            {/* Submit */}
+            <div className="flex items-center justify-between gap-3">
+              <label className="flex items-center gap-2 text-sm font-semibold text-slateMuted">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 rounded border-ink/20 text-leaf focus:ring-leaf"
+                />
+                Remember me
+              </label>
+              <Link to="/forgot-password" className="text-sm font-black text-leaf hover:underline">
+                Forgot password?
+              </Link>
+            </div>
+
             <button
               type="submit"
               disabled={isLoading}
-              className="mt-1 flex w-full items-center justify-center gap-2 rounded-xl bg-leaf py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-leaf/90 disabled:cursor-not-allowed disabled:opacity-65"
+              className="mt-1 flex w-full items-center justify-center gap-2 rounded-lg bg-leaf py-4 text-sm font-black text-white shadow-sm transition-all hover:bg-[#0b5f59] disabled:cursor-not-allowed disabled:opacity-65"
             >
               {isLoading ? (
                 <>
-                  <Loader2 size={15} className="animate-spin" aria-hidden="true" />
-                  Signing in…
+                  <Loader2 size={16} className="animate-spin" aria-hidden="true" />
+                  Signing in...
                 </>
               ) : (
-                "Sign In"
+                "Log in"
               )}
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-ink/50">
+          <div className="my-7 flex items-center gap-3 text-sm font-bold text-slateMuted/70">
+            <span className="h-px flex-1 bg-ink/10" />
+            Or
+            <span className="h-px flex-1 bg-ink/10" />
+          </div>
+
+          <GoogleAuthButton
+            disabled={isGoogleLoading || isLoading}
+            onCredential={handleGoogleCredential}
+            onError={(message) => setErrors({ general: message })}
+          />
+
+          <p className="mt-8 text-center text-sm font-semibold text-slateMuted">
             Don't have an account?{" "}
-            <Link to="/register" className="font-semibold text-leaf hover:underline">
-              Get started free
+            <Link to="/register" className="font-black text-leaf hover:underline">
+              Sign up
             </Link>
           </p>
-        </div>
 
-        {/* Back */}
-        <Link
-          to="/"
-          className="mt-6 flex items-center justify-center gap-2 text-sm font-semibold text-ink/45 transition-colors hover:text-ink"
-        >
-          <ArrowLeft size={15} aria-hidden="true" />
-          Back to home
-        </Link>
-      </div>
-    </div>
+          <Link
+            to="/"
+            className="mt-8 flex items-center justify-center gap-2 text-sm font-bold text-slateMuted transition-colors hover:text-ink"
+          >
+            <ArrowLeft size={15} aria-hidden="true" />
+            Back to home
+          </Link>
+        </div>
+      </section>
+
+      <AuthShowcasePanel
+        title="Very simple way to manage business"
+        text="Welcome to BizTrack. Record daily sales, control expenses, manage products, and understand your profit with less effort."
+      />
+    </main>
   );
 }

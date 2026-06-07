@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import crypto from "crypto";
+import { OAuth2Client } from "google-auth-library";
 import type { AuthTokenType, Package as PrismaPackage, Prisma } from "@prisma/client";
 import { env } from "../config/env";
 import { prisma } from "../config/prisma";
@@ -54,6 +55,7 @@ type RegistrationPackage = Pick<
 
 const VERIFY_EMAIL_MESSAGE = "If the account needs verification, a verification email has been sent.";
 const FORGOT_PASSWORD_MESSAGE = "If an account exists for that email, password reset instructions have been sent.";
+const googleClient = new OAuth2Client(env.google.clientId);
 
 function serializeAuthUser(user: AuthUser) {
   return {
@@ -406,6 +408,53 @@ export async function login(email: string, password: string, meta?: RequestMeta)
 
   sendLoginAlertEmail(updatedUser, meta);
   return buildAuthResponse(updatedUser);
+}
+
+export async function googleAuth(credential: string, meta?: RequestMeta) {
+  if (!env.google.clientId) {
+    throw new AppError("Google sign-in is not configured.", 500);
+  }
+
+  const ticket = await googleClient
+    .verifyIdToken({
+      idToken: credential,
+      audience: env.google.clientId,
+    })
+    .catch(() => {
+      throw new AppError("Google sign-in could not be verified.", 401);
+    });
+  const payload = ticket.getPayload();
+  const email = payload?.email?.toLowerCase();
+
+  if (!email || !payload?.email_verified) {
+    throw new AppError("Google account email could not be verified.", 401);
+  }
+
+  const name = payload.name?.trim() || email.split("@")[0] || "BizTrack User";
+  const passwordHash = await bcrypt.hash(randomToken(), 12);
+
+  const user = await prisma.user.upsert({
+    where: { email },
+    update: {
+      name,
+      emailVerifiedAt: new Date(),
+      failedLoginAttempts: 0,
+      lockedUntil: null,
+      lastLoginAt: new Date(),
+    },
+    create: {
+      name,
+      email,
+      passwordHash,
+      emailVerifiedAt: new Date(),
+      lastLoginAt: new Date(),
+    },
+    select: authUserSelect,
+  });
+
+  assertAccountCanAuthenticate(user);
+  sendLoginAlertEmail(user, meta);
+  return buildAuthResponse(user);
 }
 
 export async function requestLoginOtp(email: string, password: string, _meta?: RequestMeta) {

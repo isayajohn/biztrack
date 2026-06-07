@@ -7,6 +7,7 @@ import { asyncHandler } from "../utils/asyncHandler";
 import {
   changePasswordSchema,
   forgotPasswordSchema,
+  googleAuthSchema,
   loginSchema,
   otpLoginSchema,
   registerSchema,
@@ -29,6 +30,12 @@ router.post(
   authRateLimiter,
   validate({ body: loginSchema }),
   asyncHandler(authController.login),
+);
+router.post(
+  "/google",
+  authRateLimiter,
+  validate({ body: googleAuthSchema }),
+  asyncHandler(authController.googleAuth),
 );
 router.post(
   "/request-login-otp",

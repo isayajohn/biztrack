@@ -1,4 +1,5 @@
 import React from "react";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import ReactDOM from "react-dom/client";
 import { ThemeProvider } from "@mui/material/styles";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
@@ -13,6 +14,8 @@ import ForbiddenPage from "./pages/ForbiddenPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
+import ForgetPasswordPage from "./pages/ForgetPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import Dashboard from "./pages/Dashboard";
 import SalesPage from "./pages/SalesPage";
 import SaleFormPage from "./pages/SaleFormPage";
@@ -22,6 +25,7 @@ import ProductsPage from "./pages/ProductsPage";
 import ProductFormPage from "./pages/ProductFormPage";
 import ReportsPage from "./pages/ReportsPage";
 import SettingsPage from "./pages/SettingsPage";
+import OnboardingPage from "./pages/OnboardingPage";
 import AdminAuditLogsPage from "./pages/admin/AdminAuditLogsPage";
 import AdminBusinessDetailPage from "./pages/admin/AdminBusinessDetailPage";
 import AdminBusinessesPage from "./pages/admin/AdminBusinessesPage";
@@ -43,23 +47,29 @@ import AdminUsersPage from "./pages/admin/AdminUsersPage";
 import { muiTheme } from "./theme";
 import "./styles.css";
 
+const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ThemeProvider theme={muiTheme}>
-      <BrowserRouter>
-        <AuthProvider>
-          <Routes>
+    <GoogleOAuthProvider clientId={googleClientId}>
+      <ThemeProvider theme={muiTheme}>
+        <BrowserRouter>
+          <AuthProvider>
+            <Routes>
             {/* Public routes */}
             <Route path="/" element={<LandingPage />} />
             <Route path="/demo" element={<DemoDashboard />} />
             <Route path="/403" element={<ForbiddenPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
-            <Route path="/verify-email" element={<VerifyEmailPage />} />
+<Route path="/verify-email" element={<VerifyEmailPage />} />
+            <Route path="/forgot-password" element={<ForgetPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
 
             {/* Protected routes — wrapped in AppLayout */}
             <Route element={<ProtectedRoute />}>
               <Route element={<AppLayout />}>
+                <Route path="/onboarding" element={<OnboardingPage />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/sales" element={<SalesPage />} />
                 <Route path="/sales/new" element={<SaleFormPage />} />
@@ -100,9 +110,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 <Route path="/admin/settings" element={<AdminSettingsPage />} />
               </Route>
             </Route>
-          </Routes>
-        </AuthProvider>
-      </BrowserRouter>
-    </ThemeProvider>
+            </Routes>
+          </AuthProvider>
+        </BrowserRouter>
+      </ThemeProvider>
+    </GoogleOAuthProvider>
   </React.StrictMode>,
 );

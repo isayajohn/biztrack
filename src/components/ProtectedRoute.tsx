@@ -1,4 +1,4 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import AuthLoadingScreen from "./AuthLoadingScreen";
 
@@ -7,7 +7,16 @@ import AuthLoadingScreen from "./AuthLoadingScreen";
  * Usage in router: <Route element={<ProtectedRoute />}>  <Route path="/dashboard" ... /> </Route>
  */
 export default function ProtectedRoute() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
+  const location = useLocation();
   if (isLoading) return <AuthLoadingScreen />;
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (
+    user?.role !== "SUPER_ADMIN" &&
+    !user?.businessId &&
+    location.pathname !== "/onboarding"
+  ) {
+    return <Navigate to="/onboarding" replace />;
+  }
+  return <Outlet />;
 }

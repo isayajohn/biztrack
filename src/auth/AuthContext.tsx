@@ -38,6 +38,7 @@ type AuthContextType = {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<User>;
+  loginWithGoogle: (credential: string) => Promise<User>;
   register: (data: RegisterData) => Promise<RegisterResult>;
   updateUser: (data: Partial<User>) => void;
   refreshUser: () => Promise<void>;
@@ -93,6 +94,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = useCallback(async (email: string, password: string) => {
     const loggedInUser = await authApi.login(email, password);
+    saveAuth(loggedInUser, readStoredToken() ?? "");
+    return loggedInUser;
+  }, []);
+
+  const loginWithGoogle = useCallback(async (credential: string) => {
+    const loggedInUser = await authApi.loginWithGoogle(credential);
     saveAuth(loggedInUser, readStoredToken() ?? "");
     return loggedInUser;
   }, []);
@@ -175,6 +182,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAuthenticated: Boolean(token && user),
         isLoading,
         login,
+        loginWithGoogle,
         register,
         updateUser,
         refreshUser,

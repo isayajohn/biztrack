@@ -25,6 +25,10 @@ export const env = {
   openaiApiKey: process.env.OPENAI_API_KEY,
   openaiModel: process.env.OPENAI_MODEL ?? "gpt-4o-mini",
   appUrl: process.env.APP_URL,
+  google: {
+    clientId: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  },
   email: {
     provider: process.env.EMAIL_PROVIDER ?? "SMTP",
     host: process.env.EMAIL_HOST,

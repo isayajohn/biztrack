@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  ArrowLeft,
   AlertCircle,
+  ArrowLeft,
   CheckCircle2,
   ChevronDown,
   Eye,
@@ -11,34 +11,47 @@ import {
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth, type RegisterData } from "../auth/AuthContext";
 import AuthLoadingScreen from "../components/AuthLoadingScreen";
+import AuthShowcasePanel from "../components/auth/AuthShowcasePanel";
 import BrandLogo from "../components/BrandLogo";
+import GoogleAuthButton from "../components/GoogleAuthButton";
 import { getApiErrorMessage, getRateLimitSeconds } from "../services/apiClient";
-import { getPublicPackages } from "../services/landingApi";
-import type { PublicPackage } from "../services/landingApi";
+import { getPublicPackages, type PublicPackage } from "../services/landingApi";
 import { formatCurrency } from "../utils/format";
 
-// ─── Currency list ────────────────────────────────────────────────────────────
-
 const CURRENCIES = [
+  { code: "TZS", name: "Tanzanian Shilling" },
   { code: "USD", name: "US Dollar" },
-  { code: "EUR", name: "Euro" },
-  { code: "GBP", name: "British Pound" },
-  { code: "NGN", name: "Nigerian Naira" },
   { code: "KES", name: "Kenyan Shilling" },
+  { code: "UGX", name: "Ugandan Shilling" },
+  { code: "NGN", name: "Nigerian Naira" },
   { code: "GHS", name: "Ghanaian Cedi" },
   { code: "ZAR", name: "South African Rand" },
-  { code: "INR", name: "Indian Rupee" },
-  { code: "PHP", name: "Philippine Peso" },
-  { code: "BRL", name: "Brazilian Real" },
-  { code: "MXN", name: "Mexican Peso" },
-  { code: "PKR", name: "Pakistani Rupee" },
 ];
 
-const PERKS = [
-  "Free forever on the basic plan",
-  "No credit card required",
-  "Set up in under 5 minutes",
-];
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+type FormErrors = Partial<
+  Record<
+    | "name"
+    | "email"
+    | "password"
+    | "confirmPassword"
+    | "businessName"
+    | "currency"
+    | "terms"
+    | "general",
+    string
+  >
+>;
+
+type Fields = {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  businessName: string;
+  currency: string;
+};
 
 function packagePrice(plan: PublicPackage) {
   return plan.priceMonthly === 0 ? "Free" : `${formatCurrency(plan.priceMonthly, plan.currency)}/mo`;
@@ -53,29 +66,9 @@ function packageSummary(plan: PublicPackage) {
   return pieces.join(" / ");
 }
 
-// ─── Validation ───────────────────────────────────────────────────────────────
-
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-type FormErrors = Partial<
-  Record<
-    "name" | "email" | "password" | "confirmPassword" | "businessName" | "currency" | "general",
-    string
-  >
->;
-
-type Fields = {
-  name: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  businessName: string;
-  currency: string;
-};
-
-function validate(f: Fields): FormErrors {
+function validate(f: Fields, acceptedTerms: boolean): FormErrors {
   const e: FormErrors = {};
-  if (!f.name.trim()) e.name = "Full name is required.";
+  if (!f.name.trim()) e.name = "Name is required.";
   else if (f.name.trim().length < 2) e.name = "Name must be at least 2 characters.";
   if (!f.email.trim()) e.email = "Email is required.";
   else if (!EMAIL_RE.test(f.email)) e.email = "Enter a valid email address.";
@@ -87,25 +80,22 @@ function validate(f: Fields): FormErrors {
   else if (f.businessName.trim().length < 2)
     e.businessName = "Business name must be at least 2 characters.";
   if (!f.currency) e.currency = "Please select a currency.";
+  if (!acceptedTerms) e.terms = "Accept the terms to continue.";
   return e;
 }
 
-// ─── Shared input class helper ────────────────────────────────────────────────
-
 function inputCls(hasError?: boolean) {
   return [
-    "w-full rounded-xl border px-4 py-2.5 text-sm font-medium text-ink outline-none",
-    "transition-all focus:ring-2",
+    "w-full rounded-lg border px-5 py-3.5 text-sm font-semibold text-ink outline-none",
+    "bg-[#f5f9f8] transition-all placeholder:text-slateMuted/55 focus:ring-2",
     hasError
-      ? "border-red-400 bg-red-50/40 focus:border-red-400 focus:ring-red-200/50"
-      : "border-ink/15 bg-[#fbfaf6] focus:border-leaf focus:ring-leaf/15",
+      ? "border-red-400 focus:border-red-400 focus:ring-red-200/50"
+      : "border-transparent focus:border-leaf focus:ring-leaf/15",
   ].join(" ");
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
 export default function RegisterPage() {
-  const { register, isAuthenticated, isLoading: isCheckingAuth, user } = useAuth();
+  const { register, loginWithGoogle, isAuthenticated, isLoading: isCheckingAuth, user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const packageSlug = searchParams.get("package")?.trim().toLowerCase() ?? "";
@@ -116,10 +106,11 @@ export default function RegisterPage() {
     password: "",
     confirmPassword: "",
     businessName: "",
-    currency: "",
+    currency: "TZS",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const [notification, setNotification] = useState<{
     type: "loading" | "success" | "error";
@@ -127,6 +118,7 @@ export default function RegisterPage() {
   } | null>(null);
   const [retrySeconds, setRetrySeconds] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [packages, setPackages] = useState<PublicPackage[]>([]);
   const [isLoadingPackages, setIsLoadingPackages] = useState(true);
   const [selectedPackageId, setSelectedPackageId] = useState("");
@@ -202,6 +194,11 @@ export default function RegisterPage() {
     return <Navigate to={user?.role === "SUPER_ADMIN" ? "/admin" : "/dashboard"} replace />;
   }
 
+  const routeAfterLogin = (loggedInUser: typeof user) => {
+    if (loggedInUser?.role === "SUPER_ADMIN") return "/admin";
+    return loggedInUser?.businessId ? "/dashboard" : "/onboarding";
+  };
+
   const set =
     <K extends keyof Fields>(key: K) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -212,7 +209,7 @@ export default function RegisterPage() {
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      const errs = validate(fields);
+      const errs = validate(fields, acceptedTerms);
       if (Object.keys(errs).length > 0) {
         setErrors(errs);
         return;
@@ -240,9 +237,7 @@ export default function RegisterPage() {
           });
           navigate("/login", {
             replace: true,
-            state: {
-              message,
-            },
+            state: { message },
           });
           return;
         }
@@ -266,16 +261,36 @@ export default function RegisterPage() {
         setIsLoading(false);
       }
     },
-    [fields, navigate, register, selectedPackageId],
+    [acceptedTerms, fields, navigate, register, selectedPackageId],
+  );
+
+  const handleGoogleCredential = useCallback(
+    async (credential: string) => {
+      setErrors({});
+      setNotification({ type: "loading", message: "Connecting your Google account..." });
+      setIsGoogleLoading(true);
+      try {
+        const loggedInUser = await loginWithGoogle(credential);
+        setNotification({ type: "success", message: "Google account connected." });
+        navigate(routeAfterLogin(loggedInUser), { replace: true });
+      } catch (error) {
+        const message = getApiErrorMessage(error);
+        setErrors({ general: message });
+        setNotification({ type: "error", message });
+      } finally {
+        setIsGoogleLoading(false);
+      }
+    },
+    [loginWithGoogle, navigate],
   );
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[#fbfaf6] px-4 py-12">
+    <main className="min-h-screen bg-white text-ink lg:grid lg:grid-cols-2">
       {notification && (
         <div
           role="status"
           className={[
-            "fixed right-4 top-4 z-50 flex max-w-sm items-start gap-2 rounded-xl border bg-white px-4 py-3 text-sm font-semibold shadow-soft",
+            "fixed right-4 top-4 z-50 flex max-w-sm items-start gap-2 rounded-lg border bg-white px-4 py-3 text-sm font-semibold shadow-soft",
             notification.type === "success"
               ? "border-leaf/20 text-leaf"
               : notification.type === "error"
@@ -298,164 +313,74 @@ export default function RegisterPage() {
           )}
         </div>
       )}
-      <div className="w-full max-w-md">
-        <div className="mb-8 flex justify-center">
-          <BrandLogo className="h-auto w-56 max-w-full" />
-        </div>
 
-        {/* Card */}
-        <div className="rounded-2xl border border-ink/10 bg-white p-8 shadow-soft">
-          <h1 className="font-display text-2xl font-bold text-ink">Create your account</h1>
-          <p className="mt-1.5 text-sm text-ink/55">Start tracking your business for free</p>
-
-          {/* Perks */}
-          <div className="mt-4 flex flex-col gap-1.5">
-            {PERKS.map((perk) => (
-              <div key={perk} className="flex items-center gap-2">
-                <CheckCircle2 size={14} className="shrink-0 text-leaf" aria-hidden="true" />
-                <span className="text-xs font-semibold text-ink/55">{perk}</span>
-              </div>
-            ))}
+      <section className="flex min-h-screen items-center justify-center px-5 py-8 sm:px-8 lg:px-12">
+        <div className="w-full max-w-md">
+          <div className="mb-12">
+            <BrandLogo className="h-auto w-44 max-w-full" />
           </div>
 
-          {/* General error */}
+          <h1 className="font-display text-3xl font-black tracking-normal text-ink">
+            Create an account
+          </h1>
+          <p className="mt-3 text-sm font-semibold leading-6 text-slateMuted">
+            Sign up with Google, or create your account with business details now.
+          </p>
+
           {errors.general && (
-            <div className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600">
+            <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600">
               {errors.general}
             </div>
           )}
 
-          <div className="mt-5">
-            <label htmlFor="packageId" className="mb-1.5 block text-sm font-semibold text-ink">
-              Package
-            </label>
-            {isLoadingPackages ? (
-              <div className="rounded-xl border border-ink/15 bg-[#fbfaf6] px-4 py-2.5 text-sm font-semibold text-ink/45">
-                Loading packages...
-              </div>
-            ) : packages.length > 0 ? (
-              <>
-                <div className="relative">
-                  <select
-                    id="packageId"
-                    value={selectedPackageId}
-                    onChange={(event) => setSelectedPackageId(event.target.value)}
-                    className={inputCls(false) + " cursor-pointer appearance-none pr-10"}
-                  >
-                    {packages.map((plan) => (
-                      <option key={plan.id} value={plan.id}>
-                        {plan.name} - {packagePrice(plan)}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown
-                    size={15}
-                    className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-ink/40"
-                    aria-hidden="true"
-                  />
-                </div>
-                {selectedPackage && (
-                  <p className="mt-2 text-xs font-semibold leading-5 text-ink/50">
-                    <span className="font-extrabold text-ink">{selectedPackage.name}</span>{" "}
-                    includes {packageSummary(selectedPackage)}.
-                  </p>
-                )}
-              </>
-            ) : (
-              <p className="rounded-xl border border-ink/15 bg-[#fbfaf6] px-4 py-2.5 text-sm font-semibold text-ink/50">
-                Free package will be assigned automatically.
-              </p>
-            )}
-          </div>
-
-          <form className="mt-6 flex flex-col gap-4" onSubmit={handleSubmit} noValidate>
-            {/* Full name */}
-            <div>
-              <label htmlFor="name" className="mb-1.5 block text-sm font-semibold text-ink">
-                Full name
-              </label>
+          <form className="mt-8 grid gap-4" onSubmit={handleSubmit} noValidate>
+            <Field id="name" label="Name" error={errors.name}>
               <input
                 id="name"
                 type="text"
                 autoComplete="name"
-                placeholder="Jane Smith"
+                placeholder="Enter your name"
                 value={fields.name}
                 onChange={set("name")}
-                className={inputCls(!!errors.name)}
-                aria-invalid={!!errors.name}
-                aria-describedby={errors.name ? "name-err" : undefined}
+                className={inputCls(Boolean(errors.name))}
               />
-              {errors.name && (
-                <p id="name-err" className="mt-1 text-xs font-medium text-red-500">
-                  {errors.name}
-                </p>
-              )}
-            </div>
+            </Field>
 
-            {/* Email */}
-            <div>
-              <label htmlFor="email" className="mb-1.5 block text-sm font-semibold text-ink">
-                Email address
-              </label>
+            <Field id="email" label="Email" error={errors.email}>
               <input
                 id="email"
                 type="email"
                 autoComplete="email"
-                placeholder="you@example.com"
+                placeholder="Enter your email"
                 value={fields.email}
                 onChange={set("email")}
-                className={inputCls(!!errors.email)}
-                aria-invalid={!!errors.email}
-                aria-describedby={errors.email ? "email-err" : undefined}
+                className={inputCls(Boolean(errors.email))}
               />
-              {errors.email && (
-                <p id="email-err" className="mt-1 text-xs font-medium text-red-500">
-                  {errors.email}
-                </p>
-              )}
-            </div>
+            </Field>
 
-            {/* Password */}
-            <div>
-              <label htmlFor="password" className="mb-1.5 block text-sm font-semibold text-ink">
-                Password
-              </label>
+            <Field id="password" label="Password" error={errors.password}>
               <div className="relative">
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
                   autoComplete="new-password"
-                  placeholder="Min. 6 characters"
+                  placeholder="Enter your password"
                   value={fields.password}
                   onChange={set("password")}
-                  className={inputCls(!!errors.password) + " pr-11"}
-                  aria-invalid={!!errors.password}
-                  aria-describedby={errors.password ? "pw-err" : undefined}
+                  className={inputCls(Boolean(errors.password)) + " pr-12"}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-ink/35 transition-colors hover:text-ink/60"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slateMuted/60 transition-colors hover:text-leaf"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
                 </button>
               </div>
-              {errors.password && (
-                <p id="pw-err" className="mt-1 text-xs font-medium text-red-500">
-                  {errors.password}
-                </p>
-              )}
-            </div>
+            </Field>
 
-            {/* Confirm password */}
-            <div>
-              <label
-                htmlFor="confirmPassword"
-                className="mb-1.5 block text-sm font-semibold text-ink"
-              >
-                Confirm password
-              </label>
+            <Field id="confirmPassword" label="Confirm password" error={errors.confirmPassword}>
               <div className="relative">
                 <input
                   id="confirmPassword"
@@ -464,126 +389,196 @@ export default function RegisterPage() {
                   placeholder="Re-enter your password"
                   value={fields.confirmPassword}
                   onChange={set("confirmPassword")}
-                  className={inputCls(!!errors.confirmPassword) + " pr-11"}
-                  aria-invalid={!!errors.confirmPassword}
-                  aria-describedby={errors.confirmPassword ? "cpw-err" : undefined}
+                  className={inputCls(Boolean(errors.confirmPassword)) + " pr-12"}
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword((v) => !v)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-ink/35 transition-colors hover:text-ink/60"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slateMuted/60 transition-colors hover:text-leaf"
                   aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                 >
-                  {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {showConfirmPassword ? <EyeOff size={17} /> : <Eye size={17} />}
                 </button>
               </div>
-              {errors.confirmPassword && (
-                <p id="cpw-err" className="mt-1 text-xs font-medium text-red-500">
-                  {errors.confirmPassword}
-                </p>
-              )}
-            </div>
+            </Field>
 
-            {/* Business name */}
-            <div>
-              <label
-                htmlFor="businessName"
-                className="mb-1.5 block text-sm font-semibold text-ink"
-              >
-                Business name
-              </label>
-              <input
-                id="businessName"
-                type="text"
-                placeholder="e.g. Jane's Store"
-                value={fields.businessName}
-                onChange={set("businessName")}
-                className={inputCls(!!errors.businessName)}
-                aria-invalid={!!errors.businessName}
-                aria-describedby={errors.businessName ? "biz-err" : undefined}
-              />
-              {errors.businessName && (
-                <p id="biz-err" className="mt-1 text-xs font-medium text-red-500">
-                  {errors.businessName}
-                </p>
-              )}
-            </div>
-
-            {/* Currency */}
-            <div>
-              <label htmlFor="currency" className="mb-1.5 block text-sm font-semibold text-ink">
-                Currency
-              </label>
-              <div className="relative">
-                <select
-                  id="currency"
-                  value={fields.currency}
-                  onChange={set("currency")}
-                  className={
-                    inputCls(!!errors.currency) +
-                    " cursor-pointer appearance-none pr-10"
-                  }
-                  aria-invalid={!!errors.currency}
-                  aria-describedby={errors.currency ? "cur-err" : undefined}
-                >
-                  <option value="" disabled>
-                    Select your currency…
-                  </option>
-                  {CURRENCIES.map(({ code, name }) => (
-                    <option key={code} value={code}>
-                      {code} – {name}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown
-                  size={15}
-                  className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-ink/40"
-                  aria-hidden="true"
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field id="businessName" label="Business" error={errors.businessName}>
+                <input
+                  id="businessName"
+                  type="text"
+                  placeholder="Business name"
+                  value={fields.businessName}
+                  onChange={set("businessName")}
+                  className={inputCls(Boolean(errors.businessName))}
                 />
-              </div>
-              {errors.currency && (
-                <p id="cur-err" className="mt-1 text-xs font-medium text-red-500">
-                  {errors.currency}
+              </Field>
+
+              <Field id="currency" label="Currency" error={errors.currency}>
+                <div className="relative">
+                  <select
+                    id="currency"
+                    value={fields.currency}
+                    onChange={set("currency")}
+                    className={inputCls(Boolean(errors.currency)) + " appearance-none pr-10"}
+                  >
+                    {CURRENCIES.map(({ code, name }) => (
+                      <option key={code} value={code}>
+                        {code} - {name}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown
+                    size={15}
+                    className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-slateMuted/55"
+                    aria-hidden="true"
+                  />
+                </div>
+              </Field>
+            </div>
+
+            <div>
+              <label htmlFor="packageId" className="mb-2 block text-sm font-bold text-ink">
+                Package
+              </label>
+              {isLoadingPackages ? (
+                <div className="rounded-lg bg-[#f5f9f8] px-5 py-3.5 text-sm font-semibold text-slateMuted">
+                  Loading packages...
+                </div>
+              ) : packages.length > 0 ? (
+                <>
+                  <div className="relative">
+                    <select
+                      id="packageId"
+                      value={selectedPackageId}
+                      onChange={(event) => setSelectedPackageId(event.target.value)}
+                      className={inputCls(false) + " appearance-none pr-10"}
+                    >
+                      {packages.map((plan) => (
+                        <option key={plan.id} value={plan.id}>
+                          {plan.name} - {packagePrice(plan)}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown
+                      size={15}
+                      className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-slateMuted/55"
+                      aria-hidden="true"
+                    />
+                  </div>
+                  {selectedPackage && (
+                    <p className="mt-2 text-xs font-semibold leading-5 text-slateMuted">
+                      <span className="font-black text-ink">{selectedPackage.name}</span>{" "}
+                      includes {packageSummary(selectedPackage)}.
+                    </p>
+                  )}
+                </>
+              ) : (
+                <p className="rounded-lg bg-[#f5f9f8] px-5 py-3.5 text-sm font-semibold text-slateMuted">
+                  Free package will be assigned automatically.
                 </p>
               )}
             </div>
 
-            {/* Submit */}
+            <div>
+              <label className="flex items-start gap-2 text-sm font-semibold text-slateMuted">
+                <input
+                  type="checkbox"
+                  checked={acceptedTerms}
+                  onChange={(event) => {
+                    setAcceptedTerms(event.target.checked);
+                    if (errors.terms) setErrors((p) => ({ ...p, terms: undefined }));
+                  }}
+                  className="mt-0.5 h-4 w-4 rounded border-ink/20 text-leaf focus:ring-leaf"
+                />
+                <span>
+                  I agree to the{" "}
+                  <a href="#" className="font-black text-leaf underline">
+                    Terms & Conditions
+                  </a>
+                </span>
+              </label>
+              {errors.terms && (
+                <p className="mt-1.5 text-xs font-semibold text-red-500">{errors.terms}</p>
+              )}
+            </div>
+
             <button
               type="submit"
               disabled={isLoading || retrySeconds > 0}
-              className="mt-1 flex w-full items-center justify-center gap-2 rounded-xl bg-leaf py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-leaf/90 disabled:cursor-not-allowed disabled:opacity-65"
+              className="mt-1 flex w-full items-center justify-center gap-2 rounded-lg bg-leaf py-4 text-sm font-black text-white shadow-sm transition-all hover:bg-[#0b5f59] disabled:cursor-not-allowed disabled:opacity-65"
             >
               {retrySeconds > 0 ? (
                 `Try again in ${retrySeconds}s`
               ) : isLoading ? (
                 <>
-                  <Loader2 size={15} className="animate-spin" aria-hidden="true" />
-                  Creating account…
+                  <Loader2 size={16} className="animate-spin" aria-hidden="true" />
+                  Creating account...
                 </>
               ) : (
-                selectedPackage?.priceMonthly === 0 ? "Create Free Account" : "Create Account"
+                "Sign up"
               )}
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-ink/50">
+          <div className="my-7 flex items-center gap-3 text-sm font-bold text-slateMuted/70">
+            <span className="h-px flex-1 bg-ink/10" />
+            Or
+            <span className="h-px flex-1 bg-ink/10" />
+          </div>
+
+          <GoogleAuthButton
+            disabled={isGoogleLoading || isLoading || retrySeconds > 0}
+            onCredential={handleGoogleCredential}
+            onError={(message) => {
+              setErrors({ general: message });
+              setNotification({ type: "error", message });
+            }}
+          />
+
+          <p className="mt-8 text-center text-sm font-semibold text-slateMuted">
             Already have an account?{" "}
-            <Link to="/login" className="font-semibold text-leaf hover:underline">
-              Sign in
+            <Link to="/login" className="font-black text-leaf hover:underline">
+              Log in
             </Link>
           </p>
-        </div>
 
-        {/* Back */}
-        <Link
-          to="/"
-          className="mt-6 flex items-center justify-center gap-2 text-sm font-semibold text-ink/45 transition-colors hover:text-ink"
-        >
-          <ArrowLeft size={15} aria-hidden="true" />
-          Back to home
-        </Link>
-      </div>
+          <Link
+            to="/"
+            className="mt-8 flex items-center justify-center gap-2 text-sm font-bold text-slateMuted transition-colors hover:text-ink"
+          >
+            <ArrowLeft size={15} aria-hidden="true" />
+            Back to home
+          </Link>
+        </div>
+      </section>
+
+      <AuthShowcasePanel
+        title="Very simple way you can engage"
+        text="Welcome to BizTrack. Efficiently track sales, inventory, expenses, and profit with a guided account setup."
+      />
+    </main>
+  );
+}
+
+function Field({
+  id,
+  label,
+  error,
+  children,
+}: {
+  id: string;
+  label: string;
+  error?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <label htmlFor={id} className="mb-2 block text-sm font-bold text-ink">
+        {label}
+      </label>
+      {children}
+      {error && <p className="mt-1.5 text-xs font-semibold text-red-500">{error}</p>}
     </div>
   );
 }

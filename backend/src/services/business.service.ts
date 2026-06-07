@@ -1,4 +1,5 @@
 import { prisma } from "../config/prisma";
+import { getOrCreateDefaultFreePackage } from "./packageLimit.service";
 
 type BusinessInput = {
   name: string;
@@ -15,9 +16,9 @@ export async function getBusinessProfile(userId: string) {
 
 export async function upsertBusinessProfile(userId: string, input: BusinessInput) {
   const existing = await getBusinessProfile(userId);
-  const [business] = await prisma.$transaction([
-    existing
-      ? prisma.business.update({
+  return prisma.$transaction(async (tx) => {
+    const business = existing
+      ? await tx.business.update({
           where: { id: existing.id },
           data: {
             name: input.name,
@@ -25,23 +26,38 @@ export async function upsertBusinessProfile(userId: string, input: BusinessInput
             currency: input.currency,
           },
         })
-      : prisma.business.create({
+      : await tx.business.create({
           data: {
             userId,
             name: input.name,
             country: input.country,
             currency: input.currency,
           },
-        }),
-    prisma.user.update({
+        });
+
+    if (!existing) {
+      const selectedPackage = await getOrCreateDefaultFreePackage(tx);
+      await tx.businessSubscription.create({
+        data: {
+          businessId: business.id,
+          packageId: selectedPackage.id,
+          status: "ACTIVE",
+          billingCycle: "MANUAL",
+          startsAt: new Date(),
+          notes: "Assigned after Google onboarding.",
+        },
+      });
+    }
+
+    await tx.user.update({
       where: { id: userId },
       data: {
         name: input.ownerName,
         email: input.email,
         phone: input.phone ?? null,
       },
-    }),
-  ]);
+    });
 
-  return business;
+    return business;
+  });
 }
