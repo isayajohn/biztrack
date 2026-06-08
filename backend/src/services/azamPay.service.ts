@@ -15,6 +15,12 @@ type CheckoutInput = {
   externalId: string;
   callbackUrl: string;
   returnUrl: string;
+  customer?: {
+    name: string;
+    email: string;
+    phone?: string | null;
+    businessName: string;
+  };
 };
 
 type CheckoutResponse = {
@@ -43,6 +49,23 @@ function requireAzamPayConfig() {
   }
 }
 
+function requireHostedCheckoutConfig() {
+  const missing = {
+    appName: !env.azamPay.appName,
+    clientId: !env.azamPay.clientId,
+    vendorId: !env.azamPay.vendorId,
+    vendorName: !env.azamPay.vendorName,
+  };
+
+  if (Object.values(missing).some(Boolean)) {
+    throw new AppError("AzamPay hosted checkout is not configured. Please contact support.", 503, {
+      code: "PAYMENT_PROVIDER_NOT_CONFIGURED",
+      provider: "AZAMPAY",
+      missing,
+    });
+  }
+}
+
 function findString(value: unknown, keys: string[]): string | null {
   if (!value || typeof value !== "object") return null;
   const record = value as Record<string, unknown>;
@@ -67,7 +90,7 @@ async function parseJsonResponse(response: Response) {
   try {
     return JSON.parse(text) as unknown;
   } catch {
-    return { message: text };
+    return text;
   }
 }
 
@@ -133,21 +156,40 @@ export async function getAzamPayAccessToken() {
 }
 
 export async function createAzamPayCheckout(input: CheckoutInput): Promise<CheckoutResponse> {
-  const token = await getAzamPayAccessToken();
+  requireHostedCheckoutConfig();
   const payload = {
-    amount: input.amount,
+    appName: env.azamPay.appName,
+    clientId: env.azamPay.clientId,
+    vendorId: env.azamPay.vendorId,
+    language: "en",
     currency: input.currency,
-    description: input.description,
     externalId: input.externalId,
-    reference: input.externalId,
-    callback_url: input.callbackUrl,
-    return_url: input.returnUrl,
-    callbackUrl: input.callbackUrl,
-    returnUrl: input.returnUrl,
+    requestOrigin: input.returnUrl,
+    redirectFailURL: input.returnUrl,
+    redirectSuccessURL: input.returnUrl,
+    vendorName: env.azamPay.vendorName,
+    amount: input.amount.toFixed(2),
+    cart: {
+      items: [
+        {
+          name: input.description,
+          quantity: 1,
+          amount: input.amount.toFixed(2),
+          total: input.amount.toFixed(2),
+        },
+      ],
+    },
+    metadata: {
+      callbackUrl: input.callbackUrl,
+      customer: input.customer,
+    },
   };
 
-  const response = await postJson(env.azamPay.checkoutUrl, payload, token);
-  const checkoutUrl = findString(response, [
+  const response = await postJson(env.azamPay.checkoutUrl, payload);
+  const checkoutUrl =
+    typeof response === "string" && response.trim()
+      ? response.trim()
+      : findString(response, [
     "checkout_url",
     "checkoutUrl",
     "paymentUrl",

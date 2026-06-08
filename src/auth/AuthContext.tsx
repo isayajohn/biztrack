@@ -52,7 +52,10 @@ const TOKEN_KEY = AUTH_TOKEN_KEY;
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function readStoredToken(): string | null {
-  return localStorage.getItem(TOKEN_KEY);
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (!token || isJwtUsable(token)) return token;
+  localStorage.removeItem(TOKEN_KEY);
+  return null;
 }
 
 function persistToken(token: string) {
@@ -61,6 +64,23 @@ function persistToken(token: string) {
 
 function clearAuth() {
   localStorage.removeItem(TOKEN_KEY);
+}
+
+function isJwtUsable(token: string) {
+  const parts = token.split(".");
+  if (parts.length !== 3) return false;
+
+  try {
+    const normalized = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+    const payload = JSON.parse(atob(padded)) as {
+      exp?: number;
+    };
+    if (!payload.exp) return true;
+    return payload.exp * 1000 > Date.now();
+  } catch {
+    return false;
+  }
 }
 
 // ─── Context ──────────────────────────────────────────────────────────────────
