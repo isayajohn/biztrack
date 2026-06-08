@@ -15,6 +15,7 @@ import {
   X,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import QuickAddDialog from "../components/app/QuickAddDialog";
 import { deleteExpense, getExpenses } from "../services/expenseService";
 import { getApiErrorMessage } from "../services/apiClient";
 import type {
@@ -407,13 +408,12 @@ export default function ExpensesPage() {
             {expenses.length}
           </span>
         </div>
-        <Link
-          to="/expenses/new"
-          className="flex items-center gap-1.5 rounded-xl bg-clay px-3.5 py-2 text-sm font-bold text-white shadow-sm hover:bg-clay/90 transition-colors"
-        >
-          <Plus size={15} aria-hidden="true" />
-          Add Expense
-        </Link>
+        <QuickAddDialog
+          formType="expense"
+          triggerLabel="Add Expense"
+          triggerClassName="flex items-center gap-1.5 rounded-xl bg-clay px-3.5 py-2 text-sm font-bold text-white shadow-sm hover:bg-clay/90 transition-colors"
+          onSaved={loadExpenses}
+        />
       </div>
 
       {/* ── Search + Filters ── */}

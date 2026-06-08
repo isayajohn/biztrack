@@ -15,6 +15,7 @@ import {
   X,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import QuickAddDialog from "../components/app/QuickAddDialog";
 import { deleteSale, getSales } from "../services/saleService";
 import { getApiErrorMessage } from "../services/apiClient";
 import type {
@@ -378,13 +379,12 @@ export default function SalesPage() {
             {sales.length}
           </span>
         </div>
-        <Link
-          to="/sales/new"
-          className="flex items-center gap-1.5 rounded-xl bg-leaf px-3.5 py-2 text-sm font-bold text-white shadow-sm hover:bg-leaf/90 transition-colors"
-        >
-          <Plus size={15} aria-hidden="true" />
-          Record Sale
-        </Link>
+        <QuickAddDialog
+          formType="sale"
+          triggerLabel="Record Sale"
+          triggerClassName="flex items-center gap-1.5 rounded-xl bg-leaf px-3.5 py-2 text-sm font-bold text-white shadow-sm hover:bg-leaf/90 transition-colors"
+          onSaved={loadSales}
+        />
       </div>
 
       {/* ── Search + Filters ── */}

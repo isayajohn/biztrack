@@ -1,13 +1,12 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  AlertCircle,
   ArrowLeft,
-  CheckCircle2,
   ChevronDown,
   Eye,
   EyeOff,
   Loader2,
 } from "lucide-react";
+import { useSnackbar, type SnackbarKey, type VariantType } from "notistack";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth, type RegisterData } from "../auth/AuthContext";
 import AuthLoadingScreen from "../components/AuthLoadingScreen";
@@ -96,6 +95,8 @@ function inputCls(hasError?: boolean) {
 
 export default function RegisterPage() {
   const { register, loginWithGoogle, isAuthenticated, isLoading: isCheckingAuth, user } = useAuth();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const loadingSnackbarRef = useRef<SnackbarKey | null>(null);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const packageSlug = searchParams.get("package")?.trim().toLowerCase() ?? "";
@@ -112,10 +113,6 @@ export default function RegisterPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
-  const [notification, setNotification] = useState<{
-    type: "loading" | "success" | "error";
-    message: string;
-  } | null>(null);
   const [retrySeconds, setRetrySeconds] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
@@ -126,6 +123,31 @@ export default function RegisterPage() {
   const selectedPackage = useMemo(
     () => packages.find((plan) => plan.id === selectedPackageId) ?? null,
     [packages, selectedPackageId],
+  );
+
+  const closeLoadingNotification = useCallback(() => {
+    if (loadingSnackbarRef.current == null) return;
+    closeSnackbar(loadingSnackbarRef.current);
+    loadingSnackbarRef.current = null;
+  }, [closeSnackbar]);
+
+  const showLoadingNotification = useCallback(
+    (message: string) => {
+      closeLoadingNotification();
+      loadingSnackbarRef.current = enqueueSnackbar(message, {
+        variant: "info",
+        persist: true,
+      });
+    },
+    [closeLoadingNotification, enqueueSnackbar],
+  );
+
+  const showNotification = useCallback(
+    (message: string, variant: VariantType) => {
+      closeLoadingNotification();
+      enqueueSnackbar(message, { variant });
+    },
+    [closeLoadingNotification, enqueueSnackbar],
   );
 
   useEffect(() => {
@@ -142,10 +164,6 @@ export default function RegisterPage() {
         if (rateLimitSeconds) {
           const seconds = Math.max(1, Math.min(rateLimitSeconds, 60));
           setRetrySeconds(seconds);
-          setNotification({
-            type: "error",
-            message: `Too many requests. Please wait ${seconds} seconds. This page will refresh automatically.`,
-          });
         }
         setPackages([]);
       })
@@ -215,7 +233,7 @@ export default function RegisterPage() {
         return;
       }
       setErrors({});
-      setNotification({ type: "loading", message: "Creating your account..." });
+      showLoadingNotification("Creating your account...");
       setIsLoading(true);
       try {
         const data: RegisterData = {
@@ -231,17 +249,14 @@ export default function RegisterPage() {
           const message = result.verificationEmailSent
             ? "Account created. Check your email to verify your account before signing in."
             : "Account created, but the verification email could not be sent. Ask an admin to resend it.";
-          setNotification({
-            type: result.verificationEmailSent ? "success" : "error",
-            message,
-          });
+          showNotification(message, result.verificationEmailSent ? "success" : "error");
           navigate("/login", {
             replace: true,
             state: { message },
           });
           return;
         }
-        setNotification({ type: "success", message: "Account created. Opening your dashboard..." });
+        showNotification("Account created. Opening your dashboard...", "success");
         navigate("/dashboard", { replace: true });
       } catch (error) {
         const rateLimitSeconds = getRateLimitSeconds(error);
@@ -250,70 +265,52 @@ export default function RegisterPage() {
           setRetrySeconds(seconds);
           const message = `Too many attempts. Please wait ${seconds} seconds. This page will refresh automatically.`;
           setErrors({ general: message });
-          setNotification({ type: "error", message });
           return;
         }
 
         const message = getApiErrorMessage(error);
         setErrors({ general: message });
-        setNotification({ type: "error", message });
+        showNotification(message, "error");
       } finally {
+        closeLoadingNotification();
         setIsLoading(false);
       }
     },
-    [acceptedTerms, fields, navigate, register, selectedPackageId],
+    [
+      acceptedTerms,
+      closeLoadingNotification,
+      fields,
+      navigate,
+      register,
+      selectedPackageId,
+      showLoadingNotification,
+      showNotification,
+    ],
   );
 
   const handleGoogleCredential = useCallback(
     async (credential: string) => {
       setErrors({});
-      setNotification({ type: "loading", message: "Connecting your Google account..." });
+      showLoadingNotification("Connecting your Google account...");
       setIsGoogleLoading(true);
       try {
         const loggedInUser = await loginWithGoogle(credential);
-        setNotification({ type: "success", message: "Google account connected." });
+        showNotification("Google account connected.", "success");
         navigate(routeAfterLogin(loggedInUser), { replace: true });
       } catch (error) {
         const message = getApiErrorMessage(error);
         setErrors({ general: message });
-        setNotification({ type: "error", message });
+        showNotification(message, "error");
       } finally {
+        closeLoadingNotification();
         setIsGoogleLoading(false);
       }
     },
-    [loginWithGoogle, navigate],
+    [closeLoadingNotification, loginWithGoogle, navigate, showLoadingNotification, showNotification],
   );
 
   return (
     <main className="min-h-screen bg-white text-ink lg:grid lg:grid-cols-2">
-      {notification && (
-        <div
-          role="status"
-          className={[
-            "fixed right-4 top-4 z-50 flex max-w-sm items-start gap-2 rounded-lg border bg-white px-4 py-3 text-sm font-semibold shadow-soft",
-            notification.type === "success"
-              ? "border-leaf/20 text-leaf"
-              : notification.type === "error"
-                ? "border-red-200 text-red-600"
-                : "border-ink/10 text-ink/65",
-          ].join(" ")}
-        >
-          {notification.type === "loading" ? (
-            <Loader2 size={16} className="mt-0.5 animate-spin" aria-hidden="true" />
-          ) : notification.type === "error" ? (
-            <AlertCircle size={16} className="mt-0.5" aria-hidden="true" />
-          ) : (
-            <CheckCircle2 size={16} className="mt-0.5" aria-hidden="true" />
-          )}
-          <span>{notification.message}</span>
-          {retrySeconds > 0 && (
-            <span className="ml-1 rounded-full bg-ink/8 px-2 py-0.5 text-xs font-black">
-              {retrySeconds}s
-            </span>
-          )}
-        </div>
-      )}
-
       <section className="flex min-h-screen items-center justify-center px-5 py-8 sm:px-8 lg:px-12">
         <div className="w-full max-w-md">
           <div className="mb-12">
@@ -532,7 +529,7 @@ export default function RegisterPage() {
             onCredential={handleGoogleCredential}
             onError={(message) => {
               setErrors({ general: message });
-              setNotification({ type: "error", message });
+              showNotification(message, "error");
             }}
           />
 

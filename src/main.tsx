@@ -4,6 +4,7 @@ import ReactDOM from "react-dom/client";
 import { ThemeProvider } from "@mui/material/styles";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./auth/AuthContext";
+import AppSnackbarProvider from "./components/AppSnackbarProvider";
 import AdminRoute from "./components/AdminRoute";
 import AdminLayout from "./components/admin/AdminLayout";
 import AppLayout from "./components/app/AppLayout";
@@ -56,8 +57,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <GoogleOAuthProvider clientId={googleClientId}>
       <ThemeProvider theme={muiTheme}>
         <BrowserRouter>
-          <AuthProvider>
-            <Routes>
+          <AppSnackbarProvider>
+            <AuthProvider>
+              <Routes>
             {/* Public routes */}
             <Route path="/" element={<LandingPage />} />
             <Route path="/demo" element={<DemoDashboard />} />
@@ -114,8 +116,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 <Route path="/admin/settings" element={<AdminSettingsPage />} />
               </Route>
             </Route>
-            </Routes>
-          </AuthProvider>
+              </Routes>
+            </AuthProvider>
+          </AppSnackbarProvider>
         </BrowserRouter>
       </ThemeProvider>
     </GoogleOAuthProvider>

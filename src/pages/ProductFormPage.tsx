@@ -79,7 +79,13 @@ const EMPTY_FORM: ProductFormData = {
 
 // ─── ProductFormPage ──────────────────────────────────────────────────────────
 
-export default function ProductFormPage() {
+type EmbeddedFormProps = {
+  embedded?: boolean;
+  onClose?: () => void;
+  onSaved?: () => void;
+};
+
+export default function ProductFormPage({ embedded = false, onClose, onSaved }: EmbeddedFormProps = {}) {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const isEdit = !!id;
@@ -174,7 +180,11 @@ export default function ProductFormPage() {
       } else {
         await createProduct(data);
       }
-      navigate("/products");
+      if (embedded && !isEdit) {
+        onSaved?.();
+      } else {
+        navigate("/products");
+      }
     } catch (err) {
       setSubmitError(getApiErrorMessage(err));
     } finally {
@@ -193,15 +203,26 @@ export default function ProductFormPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-5 sm:px-6">
+    <div className={embedded ? "mx-auto max-w-2xl px-1 pb-2" : "mx-auto max-w-2xl px-4 py-5 sm:px-6"}>
       {/* Back link */}
-      <Link
-        to="/products"
-        className="inline-flex items-center gap-2 text-sm font-semibold text-ink/45 transition-colors hover:text-ink"
-      >
-        <ArrowLeft size={15} aria-hidden="true" />
-        Back to Products
-      </Link>
+      {embedded ? (
+        <button
+          type="button"
+          onClick={onClose}
+          className="inline-flex items-center gap-2 text-sm font-semibold text-ink/45 transition-colors hover:text-ink"
+        >
+          <ArrowLeft size={15} aria-hidden="true" />
+          Close
+        </button>
+      ) : (
+        <Link
+          to="/products"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-ink/45 transition-colors hover:text-ink"
+        >
+          <ArrowLeft size={15} aria-hidden="true" />
+          Back to Products
+        </Link>
+      )}
 
       {/* Title */}
       <h1 className="mt-4 font-display text-2xl font-bold text-ink">
@@ -453,12 +474,22 @@ export default function ProductFormPage() {
 
         {/* ── Action buttons ── */}
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-          <Link
-            to="/products"
-            className="flex items-center justify-center rounded-xl border border-ink/15 px-5 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-[#f4f0e8]"
-          >
-            Cancel
-          </Link>
+          {embedded ? (
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex items-center justify-center rounded-xl border border-ink/15 px-5 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-[#f4f0e8]"
+            >
+              Cancel
+            </button>
+          ) : (
+            <Link
+              to="/products"
+              className="flex items-center justify-center rounded-xl border border-ink/15 px-5 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-[#f4f0e8]"
+            >
+              Cancel
+            </Link>
+          )}
           <button
             type="submit"
             disabled={isSaving}

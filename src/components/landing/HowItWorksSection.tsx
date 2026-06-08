@@ -37,7 +37,7 @@ export default function HowItWorksSection() {
   return (
     <section
       id="how-it-works"
-      className="scroll-mt-20 bg-cloud py-14 sm:py-20"
+      className="scroll-mt-20 bg-white py-16 sm:py-20"
       aria-labelledby="how-it-works-heading"
     >
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -49,29 +49,55 @@ export default function HowItWorksSection() {
           align="center"
         />
 
-        {/* Steps */}
-        <div className="relative grid gap-10 lg:grid-cols-3">
-          {/* Connecting line — desktop only */}
+        <div className="relative">
           <div
-            className="absolute left-0 right-0 top-11 hidden h-px bg-gradient-to-r from-transparent via-leaf/30 to-transparent lg:block"
+            className="absolute left-8 right-8 top-24 hidden h-px bg-gradient-to-r from-transparent via-leaf/25 to-transparent lg:block"
             aria-hidden="true"
           />
 
-          {HOW_IT_WORKS.map(({ number, icon: Icon, title, description }) => (
-            <div key={number} className="relative flex flex-col items-start">
-              {/* Step circle + icon */}
-              <div className="relative mb-5 flex items-center gap-4">
-                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-leaf font-display text-sm font-bold text-white shadow-sm">
+          <div className="grid gap-5 md:grid-cols-3">
+            {HOW_IT_WORKS.map(({ number, icon: Icon, title, description }) => (
+              <article
+                key={number}
+                className="group relative overflow-hidden rounded-xl border border-slate-200 bg-cloud p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-emerald-200 hover:bg-white hover:shadow-card"
+              >
+                <div
+                  className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-[radial-gradient(circle_at_top,rgba(16,185,129,0.18),transparent_65%)]"
+                  aria-hidden="true"
+                />
+
+                <div className="relative flex min-h-32 items-center justify-center">
+                  <div className="absolute h-28 w-28 rounded-full border border-leaf/10" aria-hidden="true" />
+                  <div className="absolute h-20 w-20 rounded-full border border-leaf/15" aria-hidden="true" />
+                  <span className="grid h-16 w-16 place-items-center rounded-full bg-leaf text-white shadow-card ring-8 ring-emerald-100/80 transition-transform duration-200 group-hover:scale-105">
+                    <Icon size={27} aria-hidden="true" />
+                  </span>
+                </div>
+
+                <div className="relative mt-3">
+                  <p className="text-xs font-extrabold uppercase tracking-[0.08em] text-leaf">
+                    Step {number}
+                  </p>
+                  <h3 className="mt-2 font-display text-lg font-extrabold text-ink">{title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-slateMuted">{description}</p>
+                </div>
+
+                <span
+                  className="absolute right-5 top-5 font-display text-5xl font-extrabold text-leaf/[0.07]"
+                  aria-hidden="true"
+                >
                   {number}
                 </span>
-                <span className="flex h-11 w-11 items-center justify-center rounded-lg border border-emerald-100 bg-white text-leaf shadow-sm">
-                  <Icon size={20} aria-hidden="true" />
-                </span>
-              </div>
-              <h3 className="font-display text-xl font-bold text-ink">{title}</h3>
-              <p className="mt-2.5 text-sm leading-6 text-slateMuted">{description}</p>
+              </article>
+            ))}
+          </div>
+
+          <div className="mt-8 flex justify-center">
+            <div className="inline-flex flex-wrap items-center justify-center gap-2 rounded-full border border-emerald-100 bg-mint px-4 py-2 text-sm font-bold text-leaf">
+              <span className="h-2 w-2 rounded-full bg-leaf" aria-hidden="true" />
+              Setup takes minutes, then your daily numbers stay organized automatically.
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </section>

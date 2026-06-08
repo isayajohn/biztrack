@@ -1,3 +1,5 @@
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
 import {
   ArrowRight,
   CheckCircle2,
@@ -37,34 +39,76 @@ export default function HeroSection({
   secondaryText = "View Demo",
   secondaryUrl = "#dashboard-preview",
 }: HeroSectionProps) {
+  const heroRef = useRef<HTMLElement | null>(null);
   const secondaryButtonProps = secondaryUrl.startsWith("#")
     ? { href: secondaryUrl }
     : { to: secondaryUrl };
 
+  useEffect(() => {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion || !heroRef.current) return undefined;
+
+    const context = gsap.context(() => {
+      gsap.set(
+        [
+          ".hero-kicker",
+          ".hero-title",
+          ".hero-copy",
+          ".hero-actions",
+          ".hero-trust",
+          ".hero-preview",
+        ],
+        { autoAlpha: 0, y: 22 },
+      );
+
+      const timeline = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+      timeline
+        .to(".hero-kicker", { autoAlpha: 1, y: 0, duration: 0.45 })
+        .to(".hero-title", { autoAlpha: 1, y: 0, duration: 0.62 }, "-=0.22")
+        .to(".hero-copy", { autoAlpha: 1, y: 0, duration: 0.5 }, "-=0.3")
+        .to(".hero-actions", { autoAlpha: 1, y: 0, duration: 0.45 }, "-=0.24")
+        .to(".hero-trust", { autoAlpha: 1, y: 0, duration: 0.45 }, "-=0.22")
+        .to(".hero-preview", { autoAlpha: 1, y: 0, duration: 0.72 }, "-=0.48")
+        .from(".hero-chip", { autoAlpha: 0, y: 10, stagger: 0.08, duration: 0.32 }, "-=0.36");
+
+      gsap.to(".hero-preview", {
+        y: -8,
+        duration: 3.4,
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut",
+      });
+    }, heroRef);
+
+    return () => context.revert();
+  }, []);
+
   return (
     <section
+      ref={heroRef}
       className="hero-pattern relative overflow-hidden pb-14 pt-20 sm:pt-24 md:pb-20 lg:pt-28"
       aria-labelledby="hero-heading"
     >
       <div className="relative mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:min-h-[620px] lg:grid-cols-[minmax(0,0.92fr)_minmax(520px,1.08fr)] lg:items-center lg:gap-12">
-        <div className="animate-fade-up max-w-2xl">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-white px-3.5 py-1.5 text-sm font-bold text-leaf shadow-sm">
+        <div className="max-w-2xl">
+          <div className="hero-kicker mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-white px-3.5 py-1.5 text-sm font-bold text-leaf shadow-sm">
             <ShieldCheck size={15} aria-hidden="true" />
             Built for small businesses
           </div>
 
           <h1
             id="hero-heading"
-            className="font-display text-4xl font-extrabold leading-[1.08] tracking-normal text-ink sm:text-5xl lg:text-[3.5rem]"
+            className="hero-title font-display text-4xl font-extrabold leading-[1.08] tracking-normal text-ink sm:text-5xl lg:text-[3.5rem]"
           >
             {title}
           </h1>
 
-          <p className="mt-5 max-w-xl text-base leading-7 text-slateMuted sm:text-lg sm:leading-8">
+          <p className="hero-copy mt-5 max-w-xl text-base leading-7 text-slateMuted sm:text-lg sm:leading-8">
             {subtitle}
           </p>
 
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <div className="hero-actions mt-8 flex flex-col gap-3 sm:flex-row">
             <PrimaryButton
               to={primaryUrl}
               className="min-h-12 px-6 py-3.5 text-base"
@@ -77,7 +121,7 @@ export default function HeroSection({
             </SecondaryButton>
           </div>
 
-          <div className="mt-7 border-t border-slate-200 pt-5">
+          <div className="hero-trust mt-7 border-t border-slate-200 pt-5">
             <p className="flex max-w-xl items-start gap-2 text-sm font-semibold leading-6 text-slate-700">
               <CheckCircle2 size={17} className="mt-1 shrink-0 text-leaf" aria-hidden="true" />
               <span>{TRUST_TEXT}</span>
@@ -86,7 +130,7 @@ export default function HeroSection({
               {TRUST_INDICATORS.map(({ label, icon: Icon }) => (
                 <span
                   key={label}
-                  className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-sm"
+                  className="hero-chip inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-sm"
                 >
                   <Icon size={13} className="text-leaf" aria-hidden="true" />
                   {label}
@@ -96,7 +140,7 @@ export default function HeroSection({
           </div>
         </div>
 
-        <div className="relative order-last min-h-[390px] w-full lg:min-h-[500px] lg:self-center lg:justify-self-end">
+        <div className="hero-preview relative order-last min-h-[390px] w-full lg:min-h-[500px] lg:self-center lg:justify-self-end">
           <DashboardPreview variant="compact" />
         </div>
       </div>

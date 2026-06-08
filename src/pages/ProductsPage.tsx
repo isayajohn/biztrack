@@ -15,6 +15,7 @@ import {
   X,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import QuickAddDialog from "../components/app/QuickAddDialog";
 import {
   deleteProduct,
   getProducts,
@@ -383,13 +384,12 @@ export default function ProductsPage() {
             {products.length}
           </span>
         </div>
-        <Link
-          to="/products/new"
-          className="flex items-center gap-1.5 rounded-xl bg-leaf px-3.5 py-2 text-sm font-bold text-white shadow-sm hover:bg-leaf/90 transition-colors"
-        >
-          <Plus size={15} aria-hidden="true" />
-          Add Product
-        </Link>
+        <QuickAddDialog
+          formType="product"
+          triggerLabel="Add Product"
+          triggerClassName="flex items-center gap-1.5 rounded-xl bg-leaf px-3.5 py-2 text-sm font-bold text-white shadow-sm hover:bg-leaf/90 transition-colors"
+          onSaved={loadProducts}
+        />
       </div>
 
       {/* ── Search + Filters ── */}

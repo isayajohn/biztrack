@@ -17,7 +17,6 @@ import {
   CheckCircle2,
   CircleDollarSign,
   CreditCard,
-  Plus,
   TrendingDown,
   TrendingUp,
   WalletCards,
@@ -25,6 +24,7 @@ import {
 import { Link } from "react-router-dom";
 import type { LucideIcon } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
+import QuickAddDialog from "../components/app/QuickAddDialog";
 import StatCard from "../components/dashboard/StatCard";
 import { generateBusinessSummary } from "../services/aiApi";
 import { getApiErrorMessage, isPackageAccessError } from "../services/apiClient";
@@ -273,27 +273,24 @@ export default function Dashboard() {
           </h1>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Link
-            to="/sales/new"
-            className="flex items-center gap-1.5 rounded-xl bg-leaf px-3.5 py-2 text-xs font-bold text-white shadow-sm transition-colors hover:bg-leaf/90"
-          >
-            <Plus size={13} aria-hidden="true" />
-            Add Sale
-          </Link>
-          <Link
-            to="/expenses/new"
-            className="flex items-center gap-1.5 rounded-xl border border-ink/15 bg-white px-3.5 py-2 text-xs font-bold text-ink transition-colors hover:bg-[#f4f0e8]"
-          >
-            <Plus size={13} aria-hidden="true" />
-            Add Expense
-          </Link>
-          <Link
-            to="/products/new"
-            className="flex items-center gap-1.5 rounded-xl border border-ink/15 bg-white px-3.5 py-2 text-xs font-bold text-ink transition-colors hover:bg-[#f4f0e8]"
-          >
-            <Plus size={13} aria-hidden="true" />
-            Add Product
-          </Link>
+          <QuickAddDialog
+            formType="sale"
+            triggerLabel="Add Sale"
+            triggerIconSize={13}
+            triggerClassName="flex items-center gap-1.5 rounded-xl bg-leaf px-3.5 py-2 text-xs font-bold text-white shadow-sm transition-colors hover:bg-leaf/90"
+          />
+          <QuickAddDialog
+            formType="expense"
+            triggerLabel="Add Expense"
+            triggerIconSize={13}
+            triggerClassName="flex items-center gap-1.5 rounded-xl border border-ink/15 bg-white px-3.5 py-2 text-xs font-bold text-ink transition-colors hover:bg-[#f4f0e8]"
+          />
+          <QuickAddDialog
+            formType="product"
+            triggerLabel="Add Product"
+            triggerIconSize={13}
+            triggerClassName="flex items-center gap-1.5 rounded-xl border border-ink/15 bg-white px-3.5 py-2 text-xs font-bold text-ink transition-colors hover:bg-[#f4f0e8]"
+          />
         </div>
       </div>
 
