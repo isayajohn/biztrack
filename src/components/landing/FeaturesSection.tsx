@@ -55,6 +55,7 @@ export default function FeaturesSection() {
           eyebrow="Everything you need"
           title="Powerful features, simple enough for anyone"
           description="BizTrack packs everything a small business owner needs into a clean, easy-to-use interface."
+          align="center"
         />
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

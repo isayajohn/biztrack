@@ -93,3 +93,18 @@ select {
 .mockup-slide-delayed {
   animation-delay: -4.5s;
 }
+
+@keyframes testimonial-swipe-right {
+  from {
+    opacity: 0.45;
+    transform: translateX(-1.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-testimonial-swipe-right {
+  animation: testimonial-swipe-right 0.45s ease-out both;
+}

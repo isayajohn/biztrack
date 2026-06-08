@@ -24,7 +24,7 @@ export default function ProblemSection() {
     <section className="bg-ink py-16 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         {/* Heading */}
-        <div className="mb-10 max-w-2xl">
+        <div className="mx-auto mb-10 max-w-2xl text-center">
           <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-emerald-300">
             Sound familiar?
           </p>

@@ -46,6 +46,7 @@ export default function HowItWorksSection() {
           eyebrow="How it works"
           title="Up and running in minutes"
           description="No training needed. BizTrack is designed to be simple enough that anyone can start using it immediately."
+          align="center"
         />
 
         {/* Steps */}

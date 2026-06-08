@@ -1,4 +1,5 @@
-import { Star } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { SectionHeader } from "./LandingDesignSystem";
 
 export type Testimonial = {
@@ -61,6 +62,9 @@ const TESTIMONIALS: Testimonial[] = [
   },
 ];
 
+const VISIBLE_TESTIMONIALS = 3;
+const TESTIMONIAL_INTERVAL_MS = 4000;
+
 function StarRow({ count = 5 }: { count?: number }) {
   return (
     <div className="flex gap-0.5" aria-label={`${count} out of 5 stars`}>
@@ -71,8 +75,59 @@ function StarRow({ count = 5 }: { count?: number }) {
   );
 }
 
+function TestimonialCard({ name, role, business, text, avatarSeed, stars }: Testimonial) {
+  return (
+    <article className="flex min-h-[260px] flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-card">
+      <StarRow count={stars} />
+      <blockquote className="mt-3 flex-1 text-sm leading-6 text-slateMuted">
+        &ldquo;{text}&rdquo;
+      </blockquote>
+      <div className="mt-4 flex items-center gap-2.5 border-t border-slate-200 pt-4">
+        <img
+          src={`https://i.pravatar.cc/36?u=${avatarSeed}`}
+          alt={name}
+          className="h-9 w-9 rounded-full object-cover"
+          width={36}
+          height={36}
+        />
+        <div>
+          <p className="text-sm font-bold text-ink">{name}</p>
+          <p className="text-xs text-slateMuted">
+            {role} · {business}
+          </p>
+        </div>
+      </div>
+    </article>
+  );
+}
+
 export default function TestimonialsSection() {
-  const [featured, ...rest] = TESTIMONIALS;
+  const [startIndex, setStartIndex] = useState(0);
+
+  const movePrevious = () => {
+    setStartIndex((current) => (current + 1) % TESTIMONIALS.length);
+  };
+
+  const moveNext = () => {
+    setStartIndex((current) => (current - 1 + TESTIMONIALS.length) % TESTIMONIALS.length);
+  };
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      moveNext();
+    }, TESTIMONIAL_INTERVAL_MS);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const visibleTestimonials = useMemo(
+    () =>
+      Array.from({ length: Math.min(VISIBLE_TESTIMONIALS, TESTIMONIALS.length) }, (_, index) => {
+        const testimonialIndex = (startIndex + index) % TESTIMONIALS.length;
+        return TESTIMONIALS[testimonialIndex];
+      }),
+    [startIndex],
+  );
 
   return (
     <section
@@ -80,57 +135,41 @@ export default function TestimonialsSection() {
       aria-labelledby="testimonials-heading"
     >
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <SectionHeader id="testimonials-heading" eyebrow="Real stories" title="What business owners say." />
+        <SectionHeader
+          id="testimonials-heading"
+          eyebrow="Real stories"
+          title="What business owners say."
+          align="center"
+        />
 
-        {/* Featured testimonial */}
-        <div className="mb-6 rounded-xl border border-emerald-200 bg-white p-7 shadow-card md:p-9">
-          <StarRow count={featured.stars} />
-          <blockquote className="mt-4 font-display text-xl font-semibold leading-snug text-ink sm:text-2xl">
-            &ldquo;{featured.text}&rdquo;
-          </blockquote>
-          <div className="mt-5 flex items-center gap-3">
-            <img
-              src={`https://i.pravatar.cc/48?u=${featured.avatarSeed}`}
-              alt={featured.name}
-              className="h-11 w-11 rounded-full object-cover"
-              width={44}
-              height={44}
-            />
-            <div>
-              <p className="font-bold text-ink">{featured.name}</p>
-              <p className="text-sm text-slateMuted">
-                {featured.role} · {featured.business}
-              </p>
+        <div className="relative">
+          <button
+            type="button"
+            onClick={movePrevious}
+            className="absolute left-0 top-1/2 z-10 inline-flex h-11 w-11 -translate-x-3 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white text-ink shadow-sm transition-all hover:-translate-y-[calc(50%+0.125rem)] hover:border-emerald-200 hover:text-leaf hover:shadow-card focus:outline-none focus:ring-4 focus:ring-leaf/15 sm:-translate-x-5 lg:-translate-x-6"
+            aria-label="Previous testimonials"
+          >
+            <ChevronLeft size={20} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            onClick={moveNext}
+            className="absolute right-0 top-1/2 z-10 inline-flex h-11 w-11 translate-x-3 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white text-ink shadow-sm transition-all hover:-translate-y-[calc(50%+0.125rem)] hover:border-emerald-200 hover:text-leaf hover:shadow-card focus:outline-none focus:ring-4 focus:ring-leaf/15 sm:translate-x-5 lg:translate-x-6"
+            aria-label="Next testimonials"
+          >
+            <ChevronRight size={20} aria-hidden="true" />
+          </button>
+
+          <div className="overflow-hidden px-8 sm:px-10 lg:px-0">
+            <div
+              key={startIndex}
+              className="grid animate-testimonial-swipe-right gap-4 sm:grid-cols-2 lg:grid-cols-3"
+            >
+              {visibleTestimonials.map((testimonial) => (
+                <TestimonialCard key={`${startIndex}-${testimonial.name}`} {...testimonial} />
+              ))}
             </div>
           </div>
-        </div>
-
-        {/* Supporting grid */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {rest.map(({ name, role, business, text, avatarSeed, stars }) => (
-            <article
-              key={name}
-              className="flex flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-card"
-            >
-              <StarRow count={stars} />
-              <blockquote className="mt-3 flex-1 text-sm leading-6 text-slateMuted">
-                &ldquo;{text}&rdquo;
-              </blockquote>
-              <div className="mt-4 flex items-center gap-2.5 border-t border-slate-200 pt-4">
-                <img
-                  src={`https://i.pravatar.cc/36?u=${avatarSeed}`}
-                  alt={name}
-                  className="h-9 w-9 rounded-full object-cover"
-                  width={36}
-                  height={36}
-                />
-                <div>
-                  <p className="text-sm font-bold text-ink">{name}</p>
-                  <p className="text-xs text-slateMuted">{business}</p>
-                </div>
-              </div>
-            </article>
-          ))}
         </div>
       </div>
     </section>
