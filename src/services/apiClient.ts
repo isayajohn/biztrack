@@ -47,7 +47,7 @@ export function getApiErrorMessage(error: unknown): string {
     if (error.response?.status === 429) {
       return `Too many requests. Please wait ${getRateLimitSeconds(error) ?? 60} seconds, then try again.`;
     }
-    const message = error.response?.data?.message;
+    const message = error.response?.data?.message ?? error.response?.data?.error;
     if (typeof message === "string") return message;
     if (error.message) return error.message;
   }

@@ -377,8 +377,267 @@ function unwrap<T>(response: { data: { data: T } }): T {
   return response.data.data;
 }
 
+function numberOrZero(value: unknown): number {
+  const numeric = Number(value ?? 0);
+  return Number.isFinite(numeric) ? numeric : 0;
+}
+
+function normalizePagination<T>(payload: {
+  total?: number;
+  page?: number;
+  limit?: number;
+}, fallbackLimit = 20): PaginationMeta {
+  const page = Math.max(1, numberOrZero(payload.page) || 1);
+  const limit = Math.max(1, numberOrZero(payload.limit) || fallbackLimit);
+  const total = Math.max(0, numberOrZero(payload.total));
+  const totalPages = Math.max(1, Math.ceil(total / limit));
+
+  return {
+    page,
+    limit,
+    total,
+    totalPages,
+    hasNextPage: page < totalPages,
+    hasPreviousPage: page > 1,
+  };
+}
+
+function normalizePaginated<T>(
+  payload: { total?: number; page?: number; limit?: number } & Record<string, unknown>,
+  key: string,
+): PaginatedResult<T> {
+  const items = payload[key];
+  return {
+    items: Array.isArray(items) ? (items as T[]) : [],
+    pagination: normalizePagination(payload),
+  };
+}
+
+type PlatformStatsResponse = Partial<PlatformStats> & {
+  activeSubscriptions?: number;
+};
+
+type ApiEmailConfig = Partial<EmailConfig> & {
+  from_name?: string;
+  from_email?: string;
+  reply_to_email?: string | null;
+  password_encrypted?: string | null;
+  api_key_encrypted?: string | null;
+  is_active?: boolean | number;
+  created_at?: string;
+  updated_at?: string;
+};
+
+type ApiMessageTemplate = Partial<MessageTemplate> & {
+  is_active?: boolean | number;
+  created_at?: string;
+  updated_at?: string;
+};
+
+type ApiAppBranding = Partial<AppBranding> & {
+  logo_data_url?: string | null;
+  logo_file_name?: string | null;
+  logo_mime_type?: string | null;
+  updated_at?: string | null;
+};
+
+type ApiLandingPageContent = Partial<LandingPageContent> & {
+  hero_title?: string;
+  hero_subtitle?: string;
+  primary_button_text?: string;
+  primary_button_url?: string;
+  secondary_button_text?: string;
+  secondary_button_url?: string;
+  footer_links?: Array<Record<string, unknown>> | null;
+  seo_title?: string | null;
+  seo_description?: string | null;
+  is_published?: boolean | number;
+  created_at?: string | null;
+  updated_at?: string | null;
+};
+
+type ApiSmsConfig = Partial<SmsConfig> & {
+  base_url?: string | null;
+  api_key_encrypted?: string | null;
+  api_secret_encrypted?: string | null;
+  sender_id?: string | null;
+  is_active?: boolean | number;
+  created_at?: string;
+  updated_at?: string;
+};
+
+type ApiSecurityConfig = Partial<SecurityConfig> & {
+  require_email_verification?: boolean | number;
+  enable_password_reset?: boolean | number;
+  enable_otp_login?: boolean | number;
+  enable_sms_otp?: boolean | number;
+  password_min_length?: number;
+  password_require_number?: boolean | number;
+  password_require_special_char?: boolean | number;
+  otp_expiry_minutes?: number;
+  max_login_attempts?: number;
+  lockout_minutes?: number;
+  session_expiry_minutes?: number;
+  created_at?: string;
+  updated_at?: string;
+};
+
+const emptyLandingContent: LandingPageContent = {
+  id: null,
+  heroTitle: "",
+  heroSubtitle: "",
+  primaryButtonText: "Get Started Free",
+  primaryButtonUrl: "/register",
+  secondaryButtonText: "View Demo",
+  secondaryButtonUrl: "/demo",
+  features: [],
+  pricing: [],
+  faqs: [],
+  testimonials: [],
+  footerLinks: [],
+  seoTitle: "",
+  seoDescription: "",
+  isPublished: false,
+  createdAt: null,
+  updatedAt: null,
+};
+
+const defaultSecurityConfig: SecurityConfig = {
+  id: "",
+  requireEmailVerification: true,
+  enablePasswordReset: true,
+  enableOtpLogin: false,
+  enableSmsOtp: false,
+  passwordMinLength: 8,
+  passwordRequireNumber: true,
+  passwordRequireSpecialChar: false,
+  otpExpiryMinutes: 10,
+  maxLoginAttempts: 5,
+  lockoutMinutes: 15,
+  sessionExpiryMinutes: 1440,
+  createdAt: "",
+  updatedAt: "",
+};
+
+function normalizePlatformStats(stats: PlatformStatsResponse): PlatformStats {
+  return {
+    totalUsers: numberOrZero(stats.totalUsers),
+    activeUsers: numberOrZero(stats.activeUsers),
+    suspendedUsers: numberOrZero(stats.suspendedUsers),
+    totalBusinesses: numberOrZero(stats.totalBusinesses),
+    totalSalesAmount: numberOrZero(stats.totalSalesAmount),
+    totalExpensesAmount: numberOrZero(stats.totalExpensesAmount),
+    totalProducts: numberOrZero(stats.totalProducts),
+    recentUsers: Array.isArray(stats.recentUsers) ? stats.recentUsers : [],
+    recentBusinesses: Array.isArray(stats.recentBusinesses) ? stats.recentBusinesses : [],
+  };
+}
+
+function normalizeBranding(branding: ApiAppBranding | null): AppBranding {
+  return {
+    logoUrl: branding?.logoUrl ?? branding?.logo_data_url ?? null,
+    logoFileName: branding?.logoFileName ?? branding?.logo_file_name ?? null,
+    logoMimeType: branding?.logoMimeType ?? branding?.logo_mime_type ?? null,
+    updatedAt: branding?.updatedAt ?? branding?.updated_at ?? null,
+  };
+}
+
+function normalizeLandingContent(content: ApiLandingPageContent | null): LandingPageContent {
+  if (!content) return { ...emptyLandingContent };
+
+  return {
+    id: content.id ?? null,
+    heroTitle: content.heroTitle ?? content.hero_title ?? "",
+    heroSubtitle: content.heroSubtitle ?? content.hero_subtitle ?? "",
+    primaryButtonText: content.primaryButtonText ?? content.primary_button_text ?? "Get Started Free",
+    primaryButtonUrl: content.primaryButtonUrl ?? content.primary_button_url ?? "/register",
+    secondaryButtonText: content.secondaryButtonText ?? content.secondary_button_text ?? "View Demo",
+    secondaryButtonUrl: content.secondaryButtonUrl ?? content.secondary_button_url ?? "/demo",
+    features: Array.isArray(content.features) ? content.features : [],
+    pricing: Array.isArray(content.pricing) ? content.pricing : [],
+    faqs: Array.isArray(content.faqs) ? content.faqs : [],
+    testimonials: Array.isArray(content.testimonials) ? content.testimonials : [],
+    footerLinks: Array.isArray(content.footerLinks) ? content.footerLinks : Array.isArray(content.footer_links) ? content.footer_links : [],
+    seoTitle: content.seoTitle ?? content.seo_title ?? "",
+    seoDescription: content.seoDescription ?? content.seo_description ?? "",
+    isPublished: Boolean(content.isPublished ?? content.is_published),
+    createdAt: content.createdAt ?? content.created_at ?? null,
+    updatedAt: content.updatedAt ?? content.updated_at ?? null,
+  };
+}
+
+function normalizeEmailConfig(config: ApiEmailConfig | null): EmailConfig | null {
+  if (!config) return null;
+
+  return {
+    id: config.id ?? "",
+    provider: config.provider ?? "SMTP",
+    host: config.host ?? null,
+    port: config.port == null ? null : Number(config.port),
+    username: config.username ?? null,
+    passwordMasked: config.passwordMasked ?? (config.password_encrypted ? "********" : null),
+    apiKeyMasked: config.apiKeyMasked ?? (config.api_key_encrypted ? "********" : null),
+    fromName: config.fromName ?? config.from_name ?? "BizTrack",
+    fromEmail: config.fromEmail ?? config.from_email ?? "",
+    replyToEmail: config.replyToEmail ?? config.reply_to_email ?? null,
+    isActive: Boolean(config.isActive ?? config.is_active),
+    createdAt: config.createdAt ?? config.created_at ?? "",
+    updatedAt: config.updatedAt ?? config.updated_at ?? "",
+  };
+}
+
+function normalizeMessageTemplate(template: ApiMessageTemplate): MessageTemplate {
+  return {
+    id: template.id ?? "",
+    type: template.type ?? "EMAIL",
+    key: template.key ?? "EMAIL_VERIFICATION",
+    subject: template.subject ?? null,
+    body: template.body ?? "",
+    isActive: Boolean(template.isActive ?? template.is_active),
+    createdAt: template.createdAt ?? template.created_at ?? "",
+    updatedAt: template.updatedAt ?? template.updated_at ?? "",
+  };
+}
+
+function normalizeSmsConfig(config: ApiSmsConfig | null): SmsConfig | null {
+  if (!config) return null;
+
+  return {
+    id: config.id ?? "",
+    provider: config.provider ?? "API",
+    baseUrl: config.baseUrl ?? config.base_url ?? null,
+    apiKeyMasked: config.apiKeyMasked ?? (config.api_key_encrypted ? "********" : null),
+    apiSecretMasked: config.apiSecretMasked ?? (config.api_secret_encrypted ? "********" : null),
+    senderId: config.senderId ?? config.sender_id ?? null,
+    isActive: Boolean(config.isActive ?? config.is_active ?? true),
+    createdAt: config.createdAt ?? config.created_at ?? "",
+    updatedAt: config.updatedAt ?? config.updated_at ?? "",
+  };
+}
+
+function normalizeSecurityConfig(config: ApiSecurityConfig | null): SecurityConfig {
+  if (!config) return { ...defaultSecurityConfig };
+
+  return {
+    id: config.id ?? "",
+    requireEmailVerification: Boolean(config.requireEmailVerification ?? config.require_email_verification ?? defaultSecurityConfig.requireEmailVerification),
+    enablePasswordReset: Boolean(config.enablePasswordReset ?? config.enable_password_reset ?? defaultSecurityConfig.enablePasswordReset),
+    enableOtpLogin: Boolean(config.enableOtpLogin ?? config.enable_otp_login ?? defaultSecurityConfig.enableOtpLogin),
+    enableSmsOtp: Boolean(config.enableSmsOtp ?? config.enable_sms_otp ?? defaultSecurityConfig.enableSmsOtp),
+    passwordMinLength: numberOrZero(config.passwordMinLength ?? config.password_min_length) || defaultSecurityConfig.passwordMinLength,
+    passwordRequireNumber: Boolean(config.passwordRequireNumber ?? config.password_require_number ?? defaultSecurityConfig.passwordRequireNumber),
+    passwordRequireSpecialChar: Boolean(config.passwordRequireSpecialChar ?? config.password_require_special_char ?? defaultSecurityConfig.passwordRequireSpecialChar),
+    otpExpiryMinutes: numberOrZero(config.otpExpiryMinutes ?? config.otp_expiry_minutes) || defaultSecurityConfig.otpExpiryMinutes,
+    maxLoginAttempts: numberOrZero(config.maxLoginAttempts ?? config.max_login_attempts) || defaultSecurityConfig.maxLoginAttempts,
+    lockoutMinutes: numberOrZero(config.lockoutMinutes ?? config.lockout_minutes) || defaultSecurityConfig.lockoutMinutes,
+    sessionExpiryMinutes: numberOrZero(config.sessionExpiryMinutes ?? config.session_expiry_minutes) || defaultSecurityConfig.sessionExpiryMinutes,
+    createdAt: config.createdAt ?? config.created_at ?? "",
+    updatedAt: config.updatedAt ?? config.updated_at ?? "",
+  };
+}
+
 export async function getAdminStats() {
-  return unwrap<PlatformStats>(await apiClient.get("/admin/stats"));
+  return normalizePlatformStats(unwrap<PlatformStatsResponse>(await apiClient.get("/admin/stats")));
 }
 
 export async function getSystemSummary() {
@@ -386,7 +645,7 @@ export async function getSystemSummary() {
 }
 
 export async function getAdminBranding() {
-  return unwrap<AppBranding>(await apiClient.get("/admin/branding"));
+  return normalizeBranding(unwrap<ApiAppBranding | null>(await apiClient.get("/admin/branding")));
 }
 
 export async function updateAdminBranding(payload: {
@@ -394,11 +653,11 @@ export async function updateAdminBranding(payload: {
   logoFileName?: string | null;
   logoMimeType?: string | null;
 }) {
-  return unwrap<AppBranding>(await apiClient.put("/admin/branding", payload));
+  return normalizeBranding(unwrap<ApiAppBranding>(await apiClient.put("/admin/branding", payload)));
 }
 
 export async function removeAdminBrandingLogo() {
-  return unwrap<AppBranding>(await apiClient.delete("/admin/branding/logo"));
+  return normalizeBranding(unwrap<ApiAppBranding | null>(await apiClient.delete("/admin/branding/logo")));
 }
 
 export async function getAdminUsers(search = "") {
@@ -429,7 +688,10 @@ export async function getAdminUsersPage(params: {
   page?: number;
   limit?: number;
 } = {}) {
-  return unwrap<PaginatedResult<AdminUser>>(await apiClient.get("/admin/users", { params }));
+  const payload = unwrap<Record<string, unknown> & { total?: number; page?: number; limit?: number }>(
+    await apiClient.get("/admin/users", { params }),
+  );
+  return normalizePaginated<AdminUser>(payload, "users");
 }
 
 export async function getAdminBusinessesPage(params: {
@@ -438,7 +700,10 @@ export async function getAdminBusinessesPage(params: {
   page?: number;
   limit?: number;
 } = {}) {
-  return unwrap<PaginatedResult<AdminBusiness>>(await apiClient.get("/admin/businesses", { params }));
+  const payload = unwrap<Record<string, unknown> & { total?: number; page?: number; limit?: number }>(
+    await apiClient.get("/admin/businesses", { params }),
+  );
+  return normalizePaginated<AdminBusiness>(payload, "businesses");
 }
 
 export async function getAdminBusinesses() {
@@ -451,11 +716,15 @@ export async function getAdminBusiness(id: string) {
 }
 
 export async function getAuditLogs(params: AuditLogsQuery = {}) {
-  return unwrap<PaginatedResult<AuditLog>>(await apiClient.get("/admin/audit-logs", { params }));
+  const payload = unwrap<Record<string, unknown> & { total?: number; page?: number; limit?: number }>(
+    await apiClient.get("/admin/audit-logs", { params }),
+  );
+  return normalizePaginated<AuditLog>(payload, "logs");
 }
 
 export async function getAdminPackages() {
-  return unwrap<AdminPackage[]>(await apiClient.get("/admin/packages"));
+  const payload = unwrap<AdminPackage[] | { packages?: AdminPackage[] }>(await apiClient.get("/admin/packages"));
+  return Array.isArray(payload) ? payload : payload.packages ?? [];
 }
 
 export async function getAdminPackage(id: string) {
@@ -487,9 +756,10 @@ export async function getAdminSubscriptions(params: {
   page?: number;
   limit?: number;
 } = {}) {
-  return unwrap<PaginatedResult<AdminSubscription>>(
+  const payload = unwrap<Record<string, unknown> & { total?: number; page?: number; limit?: number }>(
     await apiClient.get("/admin/subscriptions", { params }),
   );
+  return normalizePaginated<AdminSubscription>(payload, "subscriptions");
 }
 
 export async function assignAdminSubscription(payload: {
@@ -533,9 +803,10 @@ export async function getAdminCollections(params: {
   page?: number;
   limit?: number;
 } = {}) {
-  return unwrap<PaginatedResult<AdminCollection>>(
+  const payload = unwrap<Record<string, unknown> & { total?: number; page?: number; limit?: number }>(
     await apiClient.get("/admin/collections", { params }),
   );
+  return normalizePaginated<AdminCollection>(payload, "transactions");
 }
 
 export async function getAdminCollectionStats() {
@@ -543,23 +814,29 @@ export async function getAdminCollectionStats() {
 }
 
 export async function getAdminLandingContent() {
-  return unwrap<LandingPageContent>(await apiClient.get("/admin/landing-page"));
+  return normalizeLandingContent(unwrap<ApiLandingPageContent | null>(await apiClient.get("/admin/landing-page")));
 }
 
 export async function updateAdminLandingContent(payload: LandingPageContent) {
-  return unwrap<LandingPageContent>(await apiClient.put("/admin/landing-page", payload));
+  return normalizeLandingContent(unwrap<ApiLandingPageContent>(await apiClient.put("/admin/landing-page", payload)));
 }
 
 export async function publishAdminLandingContent() {
-  return unwrap<LandingPageContent>(await apiClient.post("/admin/landing-page/publish"));
+  return normalizeLandingContent(unwrap<ApiLandingPageContent>(await apiClient.post("/admin/landing-page/publish")));
 }
 
 export async function getEmailSettings() {
-  return unwrap<EmailSettings>(await apiClient.get("/admin/email"));
+  const payload = unwrap<{ config: ApiEmailConfig | null; templates?: ApiMessageTemplate[] }>(
+    await apiClient.get("/admin/email"),
+  );
+  return {
+    config: normalizeEmailConfig(payload.config),
+    templates: Array.isArray(payload.templates) ? payload.templates.map(normalizeMessageTemplate) : [],
+  };
 }
 
 export async function getEmailConfig() {
-  return unwrap<EmailConfig | null>(await apiClient.get("/admin/config/email"));
+  return normalizeEmailConfig(unwrap<ApiEmailConfig | null>(await apiClient.get("/admin/config/email")));
 }
 
 export async function updateEmailProviderConfig(payload: {
@@ -574,11 +851,11 @@ export async function updateEmailProviderConfig(payload: {
   replyToEmail?: string | null;
   isActive: boolean;
 }) {
-  return unwrap<EmailConfig>(await apiClient.put("/admin/config/email", payload));
+  return normalizeEmailConfig(unwrap<ApiEmailConfig>(await apiClient.put("/admin/config/email", payload)))!;
 }
 
 export async function sendTestEmail(payload: { to: string }) {
-  return unwrap<EmailTestResult>(await apiClient.post("/admin/config/email/test", payload));
+  return unwrap<EmailTestResult>(await apiClient.post("/admin/config/email/test", { toEmail: payload.to }));
 }
 
 export async function updateEmailConfig(payload: {
@@ -595,7 +872,7 @@ export async function updateEmailConfig(payload: {
   replyToEmail?: string | null;
   isActive: boolean;
 }) {
-  return unwrap<EmailConfig>(await apiClient.put("/admin/email/config", payload));
+  return normalizeEmailConfig(unwrap<ApiEmailConfig>(await apiClient.put("/admin/email/config", payload)))!;
 }
 
 export async function updateEmailTemplate(key: TemplateKey, payload: {
@@ -603,15 +880,17 @@ export async function updateEmailTemplate(key: TemplateKey, payload: {
   body: string;
   isActive: boolean;
 }) {
-  return unwrap<MessageTemplate>(await apiClient.put(`/admin/email/templates/${key}`, payload));
+  return normalizeMessageTemplate(unwrap<ApiMessageTemplate>(await apiClient.put(`/admin/email/templates/${key}`, payload)));
 }
 
 export async function getEmailTemplates() {
-  return unwrap<ManagedEmailTemplate[]>(await apiClient.get("/admin/templates/email"));
+  const payload = unwrap<ApiMessageTemplate[] | { templates?: ApiMessageTemplate[] }>(await apiClient.get("/admin/templates/email"));
+  const templates = Array.isArray(payload) ? payload : payload.templates;
+  return Array.isArray(templates) ? templates.map(normalizeMessageTemplate) as ManagedEmailTemplate[] : [];
 }
 
 export async function getEmailTemplate(key: TemplateKey) {
-  return unwrap<ManagedEmailTemplate>(await apiClient.get(`/admin/templates/email/${key}`));
+  return normalizeMessageTemplate(unwrap<ApiMessageTemplate>(await apiClient.get(`/admin/templates/email/${key}`))) as ManagedEmailTemplate;
 }
 
 export async function updateManagedEmailTemplate(key: TemplateKey, payload: {
@@ -619,7 +898,7 @@ export async function updateManagedEmailTemplate(key: TemplateKey, payload: {
   body: string;
   isActive: boolean;
 }) {
-  return unwrap<ManagedEmailTemplate>(await apiClient.put(`/admin/templates/email/${key}`, payload));
+  return normalizeMessageTemplate(unwrap<ApiMessageTemplate>(await apiClient.put(`/admin/templates/email/${key}`, payload))) as ManagedEmailTemplate;
 }
 
 export async function previewEmailTemplate(key: TemplateKey, variables: Record<string, string> = {}) {
@@ -629,11 +908,17 @@ export async function previewEmailTemplate(key: TemplateKey, variables: Record<s
 }
 
 export async function getSmsSettings() {
-  return unwrap<SmsSettings>(await apiClient.get("/admin/sms"));
+  const payload = unwrap<{ config: ApiSmsConfig | null; templates?: ApiMessageTemplate[] }>(
+    await apiClient.get("/admin/sms"),
+  );
+  return {
+    config: normalizeSmsConfig(payload.config),
+    templates: Array.isArray(payload.templates) ? payload.templates.map(normalizeMessageTemplate) : [],
+  };
 }
 
 export async function getSmsConfig() {
-  return unwrap<SmsConfig | null>(await apiClient.get("/admin/config/sms"));
+  return normalizeSmsConfig(unwrap<ApiSmsConfig | null>(await apiClient.get("/admin/config/sms")));
 }
 
 export async function updateSmsProviderConfig(payload: {
@@ -644,7 +929,7 @@ export async function updateSmsProviderConfig(payload: {
   senderId?: string | null;
   isActive: boolean;
 }) {
-  return unwrap<SmsConfig>(await apiClient.put("/admin/config/sms", payload));
+  return normalizeSmsConfig(unwrap<ApiSmsConfig>(await apiClient.put("/admin/config/sms", payload)))!;
 }
 
 export async function sendConfigTestSms(payload: { phoneNumber: string; message: string }) {
@@ -661,7 +946,7 @@ export async function updateSmsConfig(payload: {
   senderId?: string | null;
   isActive: boolean;
 }) {
-  return unwrap<SmsConfig>(await apiClient.put("/admin/sms/config", payload));
+  return normalizeSmsConfig(unwrap<ApiSmsConfig>(await apiClient.put("/admin/sms/config", payload)))!;
 }
 
 export async function updateSmsTemplate(key: TemplateKey, payload: {
@@ -669,7 +954,7 @@ export async function updateSmsTemplate(key: TemplateKey, payload: {
   body: string;
   isActive: boolean;
 }) {
-  return unwrap<MessageTemplate>(await apiClient.put(`/admin/sms/templates/${key}`, payload));
+  return normalizeMessageTemplate(unwrap<ApiMessageTemplate>(await apiClient.put(`/admin/sms/templates/${key}`, payload)));
 }
 
 export async function sendTestSms(payload: { to: string; message: string }) {
@@ -683,18 +968,20 @@ export async function sendTestSms(payload: { to: string; message: string }) {
 }
 
 export async function getSmsTemplates() {
-  return unwrap<ManagedSmsTemplate[]>(await apiClient.get("/admin/templates/sms"));
+  const payload = unwrap<ApiMessageTemplate[] | { templates?: ApiMessageTemplate[] }>(await apiClient.get("/admin/templates/sms"));
+  const templates = Array.isArray(payload) ? payload : payload.templates;
+  return Array.isArray(templates) ? templates.map(normalizeMessageTemplate) as ManagedSmsTemplate[] : [];
 }
 
 export async function getSmsTemplate(key: ManagedSmsTemplate["key"]) {
-  return unwrap<ManagedSmsTemplate>(await apiClient.get(`/admin/templates/sms/${key}`));
+  return normalizeMessageTemplate(unwrap<ApiMessageTemplate>(await apiClient.get(`/admin/templates/sms/${key}`))) as ManagedSmsTemplate;
 }
 
 export async function updateManagedSmsTemplate(key: ManagedSmsTemplate["key"], payload: {
   body: string;
   isActive: boolean;
 }) {
-  return unwrap<ManagedSmsTemplate>(await apiClient.put(`/admin/templates/sms/${key}`, payload));
+  return normalizeMessageTemplate(unwrap<ApiMessageTemplate>(await apiClient.put(`/admin/templates/sms/${key}`, payload))) as ManagedSmsTemplate;
 }
 
 export async function previewSmsTemplate(key: ManagedSmsTemplate["key"], variables: Record<string, string> = {}) {
@@ -704,9 +991,9 @@ export async function previewSmsTemplate(key: ManagedSmsTemplate["key"], variabl
 }
 
 export async function getSecurityConfig() {
-  return unwrap<SecurityConfig>(await apiClient.get("/admin/config/security"));
+  return normalizeSecurityConfig(unwrap<ApiSecurityConfig | null>(await apiClient.get("/admin/config/security")));
 }
 
 export async function updateSecurityConfig(payload: Omit<SecurityConfig, "id" | "createdAt" | "updatedAt">) {
-  return unwrap<SecurityConfig>(await apiClient.put("/admin/config/security", payload));
+  return normalizeSecurityConfig(unwrap<ApiSecurityConfig>(await apiClient.put("/admin/config/security", payload)));
 }

@@ -6,6 +6,8 @@ type ApiProduct = Omit<Product, "stock"> & {
   stockQuantity?: number;
 };
 
+type ProductsResponse = ApiProduct[] | { products?: ApiProduct[] };
+
 function unwrap<T>(response: { data: { data: T } }): T {
   return response.data.data;
 }
@@ -18,8 +20,9 @@ function normalizeProduct(product: ApiProduct): Product {
 }
 
 export async function getProducts(): Promise<Product[]> {
-  const products = unwrap<ApiProduct[]>(await apiClient.get("/products"));
-  return products.map(normalizeProduct);
+  const payload = unwrap<ProductsResponse>(await apiClient.get("/products"));
+  const products = Array.isArray(payload) ? payload : payload.products;
+  return Array.isArray(products) ? products.map(normalizeProduct) : [];
 }
 
 export async function getProductById(id: string): Promise<Product | undefined> {

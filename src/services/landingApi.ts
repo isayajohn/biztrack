@@ -53,6 +53,56 @@ function unwrap<T>(response: { data: { data: T } }): T {
   return response.data.data;
 }
 
+type PublicPackageApiItem = Omit<PublicPackage, "limits" | "features"> & {
+  limits?: PublicPackage["limits"];
+  features?: PublicPackage["features"];
+  maxBusinesses?: number;
+  maxUsers?: number;
+  maxProducts?: number;
+  maxSalesPerMonth?: number;
+  maxExpensesPerMonth?: number;
+  allowReports?: boolean;
+  allowPdfExport?: boolean;
+  allowCsvExport?: boolean;
+  allowInventoryAlerts?: boolean;
+  allowAiInsights?: boolean;
+};
+
+type PublicPackagesResponse = PublicPackageApiItem[] | { packages?: PublicPackageApiItem[] };
+
+function normalizePublicPackage(plan: PublicPackageApiItem): PublicPackage {
+  return {
+    id: plan.id,
+    name: plan.name,
+    slug: plan.slug,
+    description: plan.description ?? null,
+    priceMonthly: Number(plan.priceMonthly ?? 0),
+    priceYearly: plan.priceYearly == null ? null : Number(plan.priceYearly),
+    currency: plan.currency,
+    trialDays: Number(plan.trialDays ?? 0),
+    sortOrder: Number(plan.sortOrder ?? 0),
+    limits: {
+      maxBusinesses: Number(plan.limits?.maxBusinesses ?? plan.maxBusinesses ?? 0),
+      maxUsers: Number(plan.limits?.maxUsers ?? plan.maxUsers ?? 0),
+      maxProducts: Number(plan.limits?.maxProducts ?? plan.maxProducts ?? 0),
+      maxSalesPerMonth: Number(plan.limits?.maxSalesPerMonth ?? plan.maxSalesPerMonth ?? 0),
+      maxExpensesPerMonth: Number(plan.limits?.maxExpensesPerMonth ?? plan.maxExpensesPerMonth ?? 0),
+    },
+    features: {
+      allowReports: Boolean(plan.features?.allowReports ?? plan.allowReports),
+      allowPdfExport: Boolean(plan.features?.allowPdfExport ?? plan.allowPdfExport),
+      allowCsvExport: Boolean(plan.features?.allowCsvExport ?? plan.allowCsvExport),
+      allowInventoryAlerts: Boolean(plan.features?.allowInventoryAlerts ?? plan.allowInventoryAlerts),
+      allowAiInsights: Boolean(plan.features?.allowAiInsights ?? plan.allowAiInsights),
+    },
+  };
+}
+
+function normalizePublicPackages(payload: PublicPackagesResponse): PublicPackage[] {
+  const packages = Array.isArray(payload) ? payload : payload.packages;
+  return Array.isArray(packages) ? packages.map(normalizePublicPackage) : [];
+}
+
 function sanitizeLandingContent(content: PublicLandingPageContent): PublicLandingPageContent {
   return {
     heroTitle: content.heroTitle,
@@ -81,5 +131,6 @@ export async function getPublicBranding() {
 }
 
 export async function getPublicPackages() {
-  return unwrap<PublicPackage[]>(await apiClient.get("/public/packages"));
+  const payload = unwrap<PublicPackagesResponse>(await apiClient.get("/public/packages"));
+  return normalizePublicPackages(payload);
 }

@@ -72,7 +72,7 @@ function validate(f: Fields, acceptedTerms: boolean): FormErrors {
   if (!f.email.trim()) e.email = "Email is required.";
   else if (!EMAIL_RE.test(f.email)) e.email = "Enter a valid email address.";
   if (!f.password) e.password = "Password is required.";
-  else if (f.password.length < 6) e.password = "Password must be at least 6 characters.";
+  else if (f.password.length < 8) e.password = "Password must be at least 8 characters.";
   if (!f.confirmPassword) e.confirmPassword = "Please confirm your password.";
   else if (f.confirmPassword !== f.password) e.confirmPassword = "Passwords do not match.";
   if (!f.businessName.trim()) e.businessName = "Business name is required.";

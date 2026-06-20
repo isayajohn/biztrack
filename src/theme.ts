@@ -29,4 +29,87 @@ export const muiTheme = createTheme({
   shape: {
     borderRadius: 12,
   },
+  components: {
+    MuiTableContainer: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "#ffffff",
+        },
+      },
+    },
+    MuiTable: {
+      styleOverrides: {
+        root: {
+          minWidth: 720,
+          borderCollapse: "separate",
+          borderSpacing: 0,
+        },
+      },
+    },
+    MuiTableHead: {
+      styleOverrides: {
+        root: {
+          ".MuiTableCell-root": {
+            backgroundColor: "#fbfaf6",
+            color: "rgba(23, 33, 27, 0.52)",
+            fontSize: 11,
+            fontWeight: 800,
+            lineHeight: 1.2,
+            textTransform: "uppercase",
+            whiteSpace: "nowrap",
+          },
+        },
+      },
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        root: {
+          borderBottom: "1px solid rgba(23, 33, 27, 0.08)",
+          color: "#17211b",
+          fontSize: 13,
+          padding: "12px 14px",
+          verticalAlign: "middle",
+        },
+        head: {
+          paddingBottom: 10,
+          paddingTop: 10,
+        },
+      },
+    },
+    MuiTableRow: {
+      styleOverrides: {
+        root: {
+          transition: "background-color 140ms ease",
+          "&.MuiTableRow-hover:hover": {
+            backgroundColor: "rgba(31, 138, 91, 0.045)",
+          },
+          "&:last-child .MuiTableCell-root": {
+            borderBottom: 0,
+          },
+        },
+      },
+    },
+    MuiTablePagination: {
+      styleOverrides: {
+        root: {
+          borderTop: "1px solid rgba(23, 33, 27, 0.08)",
+          color: "rgba(23, 33, 27, 0.62)",
+          overflow: "hidden",
+        },
+        toolbar: {
+          minHeight: 52,
+          paddingLeft: 16,
+          paddingRight: 10,
+        },
+        selectLabel: {
+          fontSize: 12,
+          fontWeight: 700,
+        },
+        displayedRows: {
+          fontSize: 12,
+          fontWeight: 700,
+        },
+      },
+    },
+  },
 });
