@@ -11,6 +11,12 @@ export default function ProtectedRoute() {
   const location = useLocation();
   if (isLoading) return <AuthLoadingScreen />;
   if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (location.pathname === "/onboarding" && user?.role === "SUPER_ADMIN") {
+    return <Navigate to="/admin" replace />;
+  }
+  if (location.pathname === "/onboarding" && user?.businessId) {
+    return <Navigate to="/dashboard" replace />;
+  }
   if (
     user?.role !== "SUPER_ADMIN" &&
     !user?.businessId &&

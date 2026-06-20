@@ -482,6 +482,83 @@ type ApiSecurityConfig = Partial<SecurityConfig> & {
   updated_at?: string;
 };
 
+type ApiAdminBusiness = Partial<Omit<AdminBusiness, "_count" | "user">> & {
+  user?: Partial<AdminBusiness["user"]> | null;
+  _count?: Partial<AdminBusiness["_count"]>;
+  productsCount?: number;
+  salesCount?: number;
+  expensesCount?: number;
+  total_sales_amount?: number;
+  total_expenses_amount?: number;
+  created_at?: string;
+  updated_at?: string;
+};
+
+type ApiAdminUser = Partial<Omit<AdminUser, "businesses">> & {
+  phone?: string | null;
+  email_verified_at?: string | null;
+  last_login_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  businesses_count?: number;
+  businesses?: Array<{
+    id?: string;
+    name?: string;
+    country?: string;
+    currency?: string;
+    createdAt?: string;
+    created_at?: string;
+  }>;
+};
+
+type ApiAdminSubscription = Partial<Omit<AdminSubscription, "business" | "package">> & {
+  business?: {
+    id?: string;
+    name?: string;
+    currency?: string;
+    country?: string;
+    user?: Partial<AdminSubscription["business"]["user"]> | null;
+  } | null;
+  package?: Partial<AdminPackage> | null;
+  business_id?: string;
+  package_id?: string;
+  billing_cycle?: BillingCycle;
+  starts_at?: string;
+  ends_at?: string | null;
+  trial_ends_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
+type ApiAdminCollection = Partial<Omit<AdminCollection, "business" | "package">> & {
+  business?: {
+    id?: string;
+    name?: string;
+    currency?: string;
+    country?: string;
+    user?: Partial<AdminCollection["business"]["user"]> | null;
+  } | null;
+  package?: Partial<AdminCollection["package"]> | null;
+  business_id?: string;
+  package_id?: string;
+  subscription_id?: string | null;
+  external_id?: string;
+  provider_reference?: string | null;
+  checkout_url?: string | null;
+  billing_cycle?: BillingCycle;
+  paid_at?: string | null;
+  failed_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
+type ApiAdminCollectionStats = Partial<AdminCollectionStats> & {
+  totalCollected?: number;
+  totalPending?: number;
+  totalFailed?: number;
+  totalTransactions?: number;
+};
+
 const emptyLandingContent: LandingPageContent = {
   id: null,
   heroTitle: "",
@@ -636,6 +713,183 @@ function normalizeSecurityConfig(config: ApiSecurityConfig | null): SecurityConf
   };
 }
 
+function normalizeAdminBusiness(business: ApiAdminBusiness): AdminBusiness {
+  return {
+    id: business.id ?? "",
+    name: business.name ?? "Unnamed business",
+    country: business.country ?? "",
+    currency: business.currency ?? "TZS",
+    createdAt: business.createdAt ?? business.created_at ?? "",
+    updatedAt: business.updatedAt ?? business.updated_at ?? "",
+    user: {
+      id: business.user?.id ?? "",
+      name: business.user?.name ?? "Unknown owner",
+      email: business.user?.email ?? "",
+      role: business.user?.role ?? "USER",
+      status: business.user?.status ?? "ACTIVE",
+    },
+    _count: {
+      products: numberOrZero(business._count?.products ?? business.productsCount),
+      sales: numberOrZero(business._count?.sales ?? business.salesCount),
+      expenses: numberOrZero(business._count?.expenses ?? business.expensesCount),
+    },
+    totalSalesAmount: numberOrZero(business.totalSalesAmount ?? business.total_sales_amount),
+    totalExpensesAmount: numberOrZero(business.totalExpensesAmount ?? business.total_expenses_amount),
+  };
+}
+
+function normalizeAdminUser(user: ApiAdminUser): AdminUser {
+  const businesses = Array.isArray(user.businesses)
+    ? user.businesses.map((business) => ({
+        id: business.id ?? "",
+        name: business.name ?? "Unnamed business",
+        country: business.country ?? "",
+        currency: business.currency ?? "TZS",
+        createdAt: business.createdAt ?? business.created_at ?? "",
+      }))
+    : undefined;
+
+  return {
+    id: user.id ?? "",
+    name: user.name ?? "Unknown user",
+    email: user.email ?? "",
+    role: user.role ?? "USER",
+    status: user.status ?? "ACTIVE",
+    lastLoginAt: user.lastLoginAt ?? user.last_login_at ?? null,
+    businessCount: numberOrZero(user.businessCount ?? user.businesses_count ?? businesses?.length),
+    businesses,
+    createdAt: user.createdAt ?? user.created_at ?? "",
+    updatedAt: user.updatedAt ?? user.updated_at ?? "",
+  };
+}
+
+function normalizeAdminPackage(plan: Partial<AdminPackage> | null | undefined): AdminPackage {
+  return {
+    id: plan?.id ?? "",
+    name: plan?.name ?? "Unnamed package",
+    slug: plan?.slug ?? "",
+    description: plan?.description ?? null,
+    priceMonthly: numberOrZero(plan?.priceMonthly),
+    priceYearly: plan?.priceYearly == null ? null : numberOrZero(plan.priceYearly),
+    currency: plan?.currency ?? "TZS",
+    trialDays: numberOrZero(plan?.trialDays),
+    maxBusinesses: numberOrZero(plan?.maxBusinesses),
+    maxUsers: numberOrZero(plan?.maxUsers),
+    maxProducts: numberOrZero(plan?.maxProducts),
+    maxSalesPerMonth: numberOrZero(plan?.maxSalesPerMonth),
+    maxExpensesPerMonth: numberOrZero(plan?.maxExpensesPerMonth),
+    allowReports: Boolean(plan?.allowReports),
+    allowPdfExport: Boolean(plan?.allowPdfExport),
+    allowCsvExport: Boolean(plan?.allowCsvExport),
+    allowInventoryAlerts: Boolean(plan?.allowInventoryAlerts),
+    allowAiInsights: Boolean(plan?.allowAiInsights),
+    status: plan?.status ?? "INACTIVE",
+    sortOrder: numberOrZero(plan?.sortOrder),
+    subscriptionCount: numberOrZero(plan?.subscriptionCount),
+    createdAt: plan?.createdAt ?? "",
+    updatedAt: plan?.updatedAt ?? "",
+  };
+}
+
+function normalizeAdminSubscription(subscription: ApiAdminSubscription): AdminSubscription {
+  const businessId = subscription.businessId ?? subscription.business_id ?? subscription.business?.id ?? "";
+  const packageId = subscription.packageId ?? subscription.package_id ?? subscription.package?.id ?? "";
+  const businessCurrency = subscription.business?.currency ?? "TZS";
+
+  return {
+    id: subscription.id ?? "",
+    businessId,
+    packageId,
+    status: subscription.status ?? "ACTIVE",
+    billingCycle: subscription.billingCycle ?? subscription.billing_cycle ?? "MONTHLY",
+    startsAt: subscription.startsAt ?? subscription.starts_at ?? "",
+    endsAt: subscription.endsAt ?? subscription.ends_at ?? null,
+    trialEndsAt: subscription.trialEndsAt ?? subscription.trial_ends_at ?? null,
+    notes: subscription.notes ?? null,
+    business: {
+      id: businessId,
+      name: subscription.business?.name ?? "Unknown business",
+      currency: businessCurrency,
+      country: subscription.business?.country ?? "",
+      user: {
+        id: subscription.business?.user?.id ?? "",
+        name: subscription.business?.user?.name ?? "Unknown owner",
+        email: subscription.business?.user?.email ?? "",
+      },
+    },
+    package: normalizeAdminPackage({
+      ...subscription.package,
+      id: packageId,
+      currency: subscription.package?.currency ?? businessCurrency,
+    }),
+    packageLimits: subscription.packageLimits,
+    createdAt: subscription.createdAt ?? subscription.created_at ?? "",
+    updatedAt: subscription.updatedAt ?? subscription.updated_at ?? "",
+  };
+}
+
+function normalizeAdminCollection(collection: ApiAdminCollection): AdminCollection {
+  const businessId = collection.businessId ?? collection.business_id ?? collection.business?.id ?? "";
+  const packageId = collection.packageId ?? collection.package_id ?? collection.package?.id ?? "";
+  const currency = collection.currency ?? collection.business?.currency ?? collection.package?.currency ?? "TZS";
+
+  return {
+    id: collection.id ?? "",
+    businessId,
+    packageId,
+    subscriptionId: collection.subscriptionId ?? collection.subscription_id ?? null,
+    status: collection.status ?? "PENDING",
+    billingCycle: collection.billingCycle ?? collection.billing_cycle ?? "MONTHLY",
+    amount: numberOrZero(collection.amount),
+    currency,
+    provider: collection.provider ?? "",
+    externalId: collection.externalId ?? collection.external_id ?? "",
+    providerReference: collection.providerReference ?? collection.provider_reference ?? null,
+    checkoutUrl: collection.checkoutUrl ?? collection.checkout_url ?? null,
+    paidAt: collection.paidAt ?? collection.paid_at ?? null,
+    failedAt: collection.failedAt ?? collection.failed_at ?? null,
+    business: {
+      id: businessId,
+      name: collection.business?.name ?? "Unknown business",
+      currency,
+      country: collection.business?.country ?? "",
+      user: {
+        id: collection.business?.user?.id ?? "",
+        name: collection.business?.user?.name ?? "Unknown owner",
+        email: collection.business?.user?.email ?? "",
+      },
+    },
+    package: {
+      id: packageId,
+      name: collection.package?.name ?? "Unknown package",
+      slug: collection.package?.slug ?? "",
+      currency,
+      priceMonthly: numberOrZero(collection.package?.priceMonthly),
+      priceYearly: collection.package?.priceYearly == null ? null : numberOrZero(collection.package.priceYearly),
+    },
+    createdAt: collection.createdAt ?? collection.created_at ?? "",
+    updatedAt: collection.updatedAt ?? collection.updated_at ?? "",
+  };
+}
+
+function normalizeCollectionStats(stats: ApiAdminCollectionStats): AdminCollectionStats {
+  const paid = stats.byStatus?.PAID ?? { count: 0, amount: numberOrZero(stats.totalCollected) };
+  const pending = stats.byStatus?.PENDING ?? { count: 0, amount: numberOrZero(stats.totalPending) };
+  const failed = stats.byStatus?.FAILED ?? { count: numberOrZero(stats.totalFailed), amount: 0 };
+
+  return {
+    totalCount: numberOrZero(stats.totalCount ?? stats.totalTransactions),
+    totalAmount: numberOrZero(stats.totalAmount ?? stats.totalCollected),
+    byStatus: {
+      ...stats.byStatus,
+      PAID: paid,
+      PENDING: pending,
+      FAILED: failed,
+    },
+    latest: Array.isArray(stats.latest) ? stats.latest.map(normalizeAdminCollection) : [],
+  };
+}
+
 export async function getAdminStats() {
   return normalizePlatformStats(unwrap<PlatformStatsResponse>(await apiClient.get("/admin/stats")));
 }
@@ -666,15 +920,15 @@ export async function getAdminUsers(search = "") {
 }
 
 export async function getAdminUser(id: string) {
-  return unwrap<AdminUser>(await apiClient.get(`/admin/users/${id}`));
+  return normalizeAdminUser(unwrap<ApiAdminUser>(await apiClient.get(`/admin/users/${id}`)));
 }
 
 export async function updateAdminUserStatus(id: string, status: AdminStatus) {
-  return unwrap<AdminUser>(await apiClient.patch(`/admin/users/${id}/status`, { status }));
+  return normalizeAdminUser(unwrap<ApiAdminUser>(await apiClient.patch(`/admin/users/${id}/status`, { status })));
 }
 
 export async function updateAdminUserRole(id: string, role: AdminRole) {
-  return unwrap<AdminUser>(await apiClient.patch(`/admin/users/${id}/role`, { role }));
+  return normalizeAdminUser(unwrap<ApiAdminUser>(await apiClient.patch(`/admin/users/${id}/role`, { role })));
 }
 
 export async function deleteAdminUser(id: string) {
@@ -691,7 +945,11 @@ export async function getAdminUsersPage(params: {
   const payload = unwrap<Record<string, unknown> & { total?: number; page?: number; limit?: number }>(
     await apiClient.get("/admin/users", { params }),
   );
-  return normalizePaginated<AdminUser>(payload, "users");
+  const result = normalizePaginated<ApiAdminUser>(payload, "users");
+  return {
+    ...result,
+    items: result.items.map(normalizeAdminUser),
+  };
 }
 
 export async function getAdminBusinessesPage(params: {
@@ -703,7 +961,11 @@ export async function getAdminBusinessesPage(params: {
   const payload = unwrap<Record<string, unknown> & { total?: number; page?: number; limit?: number }>(
     await apiClient.get("/admin/businesses", { params }),
   );
-  return normalizePaginated<AdminBusiness>(payload, "businesses");
+  const result = normalizePaginated<ApiAdminBusiness>(payload, "businesses");
+  return {
+    ...result,
+    items: result.items.map(normalizeAdminBusiness),
+  };
 }
 
 export async function getAdminBusinesses() {
@@ -712,7 +974,12 @@ export async function getAdminBusinesses() {
 }
 
 export async function getAdminBusiness(id: string) {
-  return unwrap<AdminBusinessDetails>(await apiClient.get(`/admin/businesses/${id}`));
+  const business = normalizeAdminBusiness(unwrap<ApiAdminBusiness>(await apiClient.get(`/admin/businesses/${id}`)));
+  return {
+    ...business,
+    recentSales: [],
+    recentExpenses: [],
+  } satisfies AdminBusinessDetails;
 }
 
 export async function getAuditLogs(params: AuditLogsQuery = {}) {
@@ -724,23 +991,24 @@ export async function getAuditLogs(params: AuditLogsQuery = {}) {
 
 export async function getAdminPackages() {
   const payload = unwrap<AdminPackage[] | { packages?: AdminPackage[] }>(await apiClient.get("/admin/packages"));
-  return Array.isArray(payload) ? payload : payload.packages ?? [];
+  const packages = Array.isArray(payload) ? payload : payload.packages;
+  return Array.isArray(packages) ? packages.map(normalizeAdminPackage) : [];
 }
 
 export async function getAdminPackage(id: string) {
-  return unwrap<AdminPackage>(await apiClient.get(`/admin/packages/${id}`));
+  return normalizeAdminPackage(unwrap<AdminPackage>(await apiClient.get(`/admin/packages/${id}`)));
 }
 
 export async function createAdminPackage(payload: PackagePayload) {
-  return unwrap<AdminPackage>(await apiClient.post("/admin/packages", payload));
+  return normalizeAdminPackage(unwrap<AdminPackage>(await apiClient.post("/admin/packages", payload)));
 }
 
 export async function updateAdminPackage(id: string, payload: Partial<PackagePayload>) {
-  return unwrap<AdminPackage>(await apiClient.put(`/admin/packages/${id}`, payload));
+  return normalizeAdminPackage(unwrap<AdminPackage>(await apiClient.put(`/admin/packages/${id}`, payload)));
 }
 
 export async function updateAdminPackageStatus(id: string, status: PackageStatus) {
-  return unwrap<AdminPackage>(await apiClient.patch(`/admin/packages/${id}/status`, { status }));
+  return normalizeAdminPackage(unwrap<AdminPackage>(await apiClient.patch(`/admin/packages/${id}/status`, { status })));
 }
 
 export async function deleteAdminPackage(id: string) {
@@ -759,7 +1027,11 @@ export async function getAdminSubscriptions(params: {
   const payload = unwrap<Record<string, unknown> & { total?: number; page?: number; limit?: number }>(
     await apiClient.get("/admin/subscriptions", { params }),
   );
-  return normalizePaginated<AdminSubscription>(payload, "subscriptions");
+  const result = normalizePaginated<ApiAdminSubscription>(payload, "subscriptions");
+  return {
+    ...result,
+    items: result.items.map(normalizeAdminSubscription),
+  };
 }
 
 export async function assignAdminSubscription(payload: {
@@ -772,7 +1044,7 @@ export async function assignAdminSubscription(payload: {
   trialEndsAt?: string | null;
   notes?: string | null;
 }) {
-  return unwrap<AdminSubscription>(await apiClient.post("/admin/subscriptions", payload));
+  return normalizeAdminSubscription(unwrap<ApiAdminSubscription>(await apiClient.post("/admin/subscriptions", payload)));
 }
 
 export async function changeBusinessPackage(businessId: string, payload: {
@@ -784,15 +1056,15 @@ export async function changeBusinessPackage(businessId: string, payload: {
   trialEndsAt?: string | null;
   notes?: string | null;
 }) {
-  return unwrap<AdminSubscription>(await apiClient.patch(`/admin/businesses/${businessId}/package`, payload));
+  return normalizeAdminSubscription(unwrap<ApiAdminSubscription>(await apiClient.patch(`/admin/businesses/${businessId}/package`, payload)));
 }
 
 export async function updateAdminSubscriptionStatus(id: string, status: SubscriptionStatus) {
-  return unwrap<AdminSubscription>(await apiClient.patch(`/admin/subscriptions/${id}/status`, { status }));
+  return normalizeAdminSubscription(unwrap<ApiAdminSubscription>(await apiClient.patch(`/admin/subscriptions/${id}/status`, { status })));
 }
 
 export async function extendAdminSubscription(id: string, payload: { endsAt: string; notes?: string | null }) {
-  return unwrap<AdminSubscription>(await apiClient.patch(`/admin/subscriptions/${id}/extend`, payload));
+  return normalizeAdminSubscription(unwrap<ApiAdminSubscription>(await apiClient.patch(`/admin/subscriptions/${id}/extend`, payload)));
 }
 
 export async function getAdminCollections(params: {
@@ -806,11 +1078,15 @@ export async function getAdminCollections(params: {
   const payload = unwrap<Record<string, unknown> & { total?: number; page?: number; limit?: number }>(
     await apiClient.get("/admin/collections", { params }),
   );
-  return normalizePaginated<AdminCollection>(payload, "transactions");
+  const result = normalizePaginated<ApiAdminCollection>(payload, "transactions");
+  return {
+    ...result,
+    items: result.items.map(normalizeAdminCollection),
+  };
 }
 
 export async function getAdminCollectionStats() {
-  return unwrap<AdminCollectionStats>(await apiClient.get("/admin/collections/stats"));
+  return normalizeCollectionStats(unwrap<ApiAdminCollectionStats>(await apiClient.get("/admin/collections/stats")));
 }
 
 export async function getAdminLandingContent() {
@@ -933,7 +1209,15 @@ export async function updateSmsProviderConfig(payload: {
 }
 
 export async function sendConfigTestSms(payload: { phoneNumber: string; message: string }) {
-  return unwrap<SmsTestResult>(await apiClient.post("/admin/config/sms/test", payload));
+  const result = unwrap<Partial<SmsTestResult> & { message?: string }>(
+    await apiClient.post("/admin/config/sms/test", { phone: payload.phoneNumber, message: payload.message }),
+  );
+  return {
+    status: result.status ?? "SENT",
+    provider: result.provider ?? "API",
+    senderId: result.senderId ?? null,
+    phoneNumberMasked: result.phoneNumberMasked ?? payload.phoneNumber.replace(/^(.{2}).*?(.{2})$/, "$1******$2"),
+  } satisfies SmsTestResult;
 }
 
 export async function updateSmsConfig(payload: {
@@ -958,13 +1242,21 @@ export async function updateSmsTemplate(key: TemplateKey, payload: {
 }
 
 export async function sendTestSms(payload: { to: string; message: string }) {
-  return unwrap<{
-    status: "SIMULATED";
+  const result = unwrap<{
+    status?: "SIMULATED" | "SENT";
     toMasked: string | null;
-    provider: ConfigProvider;
+    provider?: ConfigProvider;
     senderId?: string | null;
     messageLength: number;
-  }>(await apiClient.post("/admin/sms/test", payload));
+    message?: string;
+  }>(await apiClient.post("/admin/sms/test", { phone: payload.to, message: payload.message }));
+  return {
+    status: result.status ?? "SIMULATED",
+    toMasked: result.toMasked ?? payload.to.replace(/^(.{2}).*?(.{2})$/, "$1******$2"),
+    provider: result.provider ?? "API",
+    senderId: result.senderId ?? null,
+    messageLength: result.messageLength ?? payload.message.length,
+  };
 }
 
 export async function getSmsTemplates() {

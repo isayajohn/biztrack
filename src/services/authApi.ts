@@ -26,6 +26,10 @@ type AuthResponse = {
   verificationEmailError?: boolean;
 };
 
+type ProfileResponse = {
+  user: ApiUser;
+};
+
 type RegisterApiResult = RegisterResult & { token: string };
 
 function unwrap<T>(response: { data: { data: T } }): T {
@@ -85,8 +89,8 @@ export async function register(data: RegisterData): Promise<RegisterApiResult> {
 }
 
 export async function getProfile(): Promise<User> {
-  const user = unwrap<ApiUser>(await apiClient.get("/auth/me"));
-  return mapApiUser(user);
+  const result = unwrap<ApiUser | ProfileResponse>(await apiClient.get("/auth/me"));
+  return mapApiUser("user" in result ? result.user : result);
 }
 
 export async function verifyEmail(token: string): Promise<User> {
