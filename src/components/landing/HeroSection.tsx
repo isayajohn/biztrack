@@ -11,11 +11,13 @@ import {
 import DashboardPreview from "./DashboardPreview";
 import { PrimaryButton, SecondaryButton } from "./LandingDesignSystem";
 
-const TRUST_INDICATORS = [
+const DEFAULT_TRUST_INDICATORS = [
   { label: "Easy to use", icon: MousePointerClick },
   { label: "Mobile friendly", icon: Smartphone },
   { label: "Secure business data", icon: LockKeyhole },
 ];
+
+const CHIP_ICONS = [MousePointerClick, Smartphone, LockKeyhole, ShieldCheck];
 
 const DEFAULT_TITLE = "Simple sales and expense tracking for growing businesses";
 const DEFAULT_SUBTITLE =
@@ -25,20 +27,34 @@ const TRUST_TEXT = "No accounting knowledge needed. Works on phone, tablet, and 
 export type HeroSectionProps = {
   title?: string;
   subtitle?: string;
+  kicker?: string;
   primaryText?: string;
   primaryUrl?: string;
   secondaryText?: string;
   secondaryUrl?: string;
+  trustText?: string;
+  imageUrl?: string;
+  trustIndicators?: Array<Record<string, unknown>> | null;
 };
 
 export default function HeroSection({
   title = DEFAULT_TITLE,
   subtitle = DEFAULT_SUBTITLE,
+  kicker = "Built for small businesses",
   primaryText = "Get Started Free",
   primaryUrl = "/register",
   secondaryText = "View Demo",
   secondaryUrl = "#dashboard-preview",
+  trustText = TRUST_TEXT,
+  imageUrl,
+  trustIndicators,
 }: HeroSectionProps) {
+  const chips = Array.isArray(trustIndicators) && trustIndicators.length > 0
+    ? trustIndicators.map((item, index) => ({
+        label: typeof item.label === "string" ? item.label : "",
+        icon: CHIP_ICONS[index % CHIP_ICONS.length],
+      })).filter((chip) => chip.label)
+    : DEFAULT_TRUST_INDICATORS;
   const heroRef = useRef<HTMLElement | null>(null);
   const secondaryButtonProps = secondaryUrl.startsWith("#")
     ? { href: secondaryUrl }
@@ -94,7 +110,7 @@ export default function HeroSection({
         <div className="max-w-2xl">
           <div className="hero-kicker mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-white px-3.5 py-1.5 text-sm font-bold text-leaf shadow-sm">
             <ShieldCheck size={15} aria-hidden="true" />
-            Built for small businesses
+            {kicker}
           </div>
 
           <h1
@@ -124,10 +140,10 @@ export default function HeroSection({
           <div className="hero-trust mt-7 border-t border-slate-200 pt-5">
             <p className="flex max-w-xl items-start gap-2 text-sm font-semibold leading-6 text-slate-700">
               <CheckCircle2 size={17} className="mt-1 shrink-0 text-leaf" aria-hidden="true" />
-              <span>{TRUST_TEXT}</span>
+              <span>{trustText}</span>
             </p>
             <div className="mt-4 flex flex-wrap gap-2.5">
-              {TRUST_INDICATORS.map(({ label, icon: Icon }) => (
+              {chips.map(({ label, icon: Icon }) => (
                 <span
                   key={label}
                   className="hero-chip inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-sm"
@@ -141,7 +157,13 @@ export default function HeroSection({
         </div>
 
         <div className="hero-preview relative order-last min-h-[390px] w-full lg:min-h-[500px] lg:self-center lg:justify-self-end">
-          <DashboardPreview variant="compact" />
+          {imageUrl ? (
+            <div className="relative h-[390px] w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_26px_70px_rgba(15,23,42,0.18)] sm:h-[430px] lg:h-[500px]">
+              <img src={imageUrl} alt="" className="h-full w-full object-cover" />
+            </div>
+          ) : (
+            <DashboardPreview variant="compact" />
+          )}
         </div>
       </div>
     </section>

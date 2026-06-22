@@ -16,6 +16,11 @@ import LandingFooter from "../components/landing/LandingFooter";
 import { getLandingPageContent } from "../services/landingApi";
 import type { PublicLandingPageContent } from "../services/landingApi";
 
+function optionalText(value?: string | null) {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : undefined;
+}
+
 export default function LandingPage() {
   const pageRef = useRef<HTMLDivElement | null>(null);
   const [content, setContent] = useState<PublicLandingPageContent | null>(null);
@@ -86,24 +91,63 @@ export default function LandingPage() {
       <LandingNavbar />
       <main>
         <HeroSection
-          title={content?.heroTitle}
-          subtitle={content?.heroSubtitle}
+          title={optionalText(content?.heroTitle)}
+          subtitle={optionalText(content?.heroSubtitle)}
+          kicker={optionalText(content?.heroKicker)}
+          primaryText={optionalText(content?.primaryButtonText)}
+          primaryUrl={optionalText(content?.primaryButtonUrl)}
+          secondaryText={optionalText(content?.secondaryButtonText)}
+          secondaryUrl={optionalText(content?.secondaryButtonUrl)}
+          trustText={optionalText(content?.heroTrustText)}
+          imageUrl={optionalText(content?.heroImageUrl)}
+          trustIndicators={content?.heroTrustIndicators}
+        />
+        <DashboardPreview />
+        <ProblemSection content={content?.problemSection} />
+        <SolutionSection content={content?.solutionSection} />
+        <FeaturesSection
+          eyebrow={content?.featuresEyebrow}
+          title={content?.featuresTitle}
+          description={content?.featuresDescription}
+          features={content?.features}
+        />
+        <HowItWorksSection content={content?.howItWorks} />
+        <PricingSection
+          eyebrow={content?.pricingEyebrow}
+          title={content?.pricingTitle}
+          description={content?.pricingDescription}
+          pricing={content?.pricing}
+        />
+        <TestimonialsSection
+          eyebrow={content?.testimonialsEyebrow}
+          title={content?.testimonialsTitle}
+          description={content?.testimonialsDescription}
+          testimonials={content?.testimonials}
+        />
+        <FAQSection
+          eyebrow={content?.faqEyebrow}
+          title={content?.faqTitle}
+          description={content?.faqDescription}
+          faqs={content?.faqs}
+        />
+        <FinalCTA
+          kicker={content?.finalCtaKicker}
+          title={content?.finalCtaTitle}
+          description={content?.finalCtaDescription}
           primaryText={content?.primaryButtonText}
           primaryUrl={content?.primaryButtonUrl}
           secondaryText={content?.secondaryButtonText}
           secondaryUrl={content?.secondaryButtonUrl}
         />
-        <DashboardPreview />
-        <ProblemSection />
-        <SolutionSection />
-        <FeaturesSection />
-        <HowItWorksSection />
-        <PricingSection />
-        <TestimonialsSection />
-        <FAQSection />
-        <FinalCTA />
       </main>
-      <LandingFooter seoDescription={content?.seoDescription} footerLinks={content?.footerLinks} />
+      <LandingFooter
+        seoDescription={content?.seoDescription}
+        footerLinks={content?.footerLinks}
+        tagline={content?.footerTagline}
+        badge={content?.footerBadge}
+        productLinks={content?.footerProductLinks}
+        companyLinks={content?.footerCompanyLinks}
+      />
     </div>
   );
 }

@@ -11,9 +11,12 @@ export default function ProtectedRoute() {
   const location = useLocation();
   if (isLoading) return <AuthLoadingScreen />;
   if (!isAuthenticated) return <Navigate to="/login" replace />;
-  if (location.pathname === "/onboarding" && user?.role === "SUPER_ADMIN") {
+
+  // Super admin: can only access /admin/* routes — redirect everything else
+  if (user?.role === "SUPER_ADMIN" && !location.pathname.startsWith("/admin")) {
     return <Navigate to="/admin" replace />;
   }
+
   if (location.pathname === "/onboarding" && user?.businessId) {
     return <Navigate to="/dashboard" replace />;
   }

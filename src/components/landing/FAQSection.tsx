@@ -29,11 +29,45 @@ const faqs = [
   },
 ];
 
-export default function FAQSection() {
+type FaqContent = {
+  question?: unknown;
+  title?: unknown;
+  answer?: unknown;
+  text?: unknown;
+};
+
+function textFrom(value: unknown) {
+  if (typeof value === "string") return value.trim();
+  if (typeof value === "number") return String(value);
+  return "";
+}
+
+function normalizeFaqs(items?: FaqContent[] | null) {
+  const dynamicFaqs = Array.isArray(items)
+    ? items
+        .map((item) => ({
+          question: textFrom(item.question) || textFrom(item.title),
+          answer: textFrom(item.answer) || textFrom(item.text),
+        }))
+        .filter((item) => item.question && item.answer)
+    : [];
+
+  return dynamicFaqs.length ? dynamicFaqs : faqs;
+}
+
+type Props = {
+  eyebrow?: string | null;
+  title?: string | null;
+  description?: string | null;
+  faqs?: FaqContent[] | null;
+};
+
+export default function FAQSection({ eyebrow, title, description, faqs: dynamicFaqs }: Props) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [query, setQuery] = useState("");
+  const visibleFaqs = normalizeFaqs(dynamicFaqs);
 
-  const filteredFaqs = faqs.filter(({ question, answer }) => {
+  const filteredFaqs = visibleFaqs.filter(({ question, answer }) => {
     const haystack = `${question} ${answer}`.toLowerCase();
     return haystack.includes(query.trim().toLowerCase());
   });
@@ -46,12 +80,12 @@ export default function FAQSection() {
     <section id="faq" className="scroll-mt-20 bg-white py-16 sm:py-20">
       <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[0.95fr_1.05fr]">
         <div>
-          <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-leaf">FAQ</p>
+          <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-leaf">{eyebrow || "FAQ"}</p>
           <h2 className="mt-3 font-display text-4xl font-extrabold leading-tight tracking-normal text-ink sm:text-5xl">
-            Frequently asked questions
+            {title || "Frequently asked questions"}
           </h2>
           <p className="mt-4 max-w-xl text-base leading-7 text-slateMuted">
-            Search common questions about using BizTrack for sales, expenses, stock, reports, and daily profit tracking.
+            {description || "Search common questions about using BizTrack for sales, expenses, stock, reports, and daily profit tracking."}
           </p>
 
           <label className="relative mt-7 block" htmlFor="faq-search">

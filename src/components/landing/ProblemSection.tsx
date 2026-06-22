@@ -1,6 +1,26 @@
 import { XCircle } from "lucide-react";
 
-const problems = [
+type ProblemItemContent = {
+  quote?: unknown;
+  detail?: unknown;
+};
+
+type Props = {
+  content?: Record<string, unknown> | null;
+};
+
+function textFrom(value: unknown) {
+  if (typeof value === "string") return value.trim();
+  if (typeof value === "number") return String(value);
+  return "";
+}
+
+const DEFAULT_EYEBROW = "Sound familiar?";
+const DEFAULT_TITLE = "Running a business blind is stressful";
+const DEFAULT_DESCRIPTION =
+  "Most small business owners face the same problems every day. BizTrack solves all of them in one place.";
+
+const DEFAULT_ITEMS = [
   {
     quote: "I don't know if I made profit today",
     detail: "Without tracking, it's impossible to tell if your business is actually growing.",
@@ -19,25 +39,39 @@ const problems = [
   },
 ];
 
-export default function ProblemSection() {
+export default function ProblemSection({ content }: Props) {
+  const record = content && typeof content === "object" && !Array.isArray(content)
+    ? content
+    : null;
+
+  const eyebrow = textFrom(record?.eyebrow) || DEFAULT_EYEBROW;
+  const title = textFrom(record?.title) || DEFAULT_TITLE;
+  const description = textFrom(record?.description) || DEFAULT_DESCRIPTION;
+
+  const rawItems = Array.isArray(record?.items) ? (record!.items as ProblemItemContent[]) : [];
+  const dynamicItems = rawItems
+    .map((item) => ({ quote: textFrom(item.quote), detail: textFrom(item.detail) }))
+    .filter((item) => item.quote);
+
+  const problems = dynamicItems.length ? dynamicItems : DEFAULT_ITEMS;
+
   return (
     <section className="bg-ink py-16 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        {/* Heading */}
         <div className="mx-auto mb-10 max-w-2xl text-center">
           <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-emerald-300">
-            Sound familiar?
+            {eyebrow}
           </p>
           <h2 className="mt-3 font-display text-3xl font-bold text-white sm:text-4xl">
-            Running a business blind is stressful
+            {title}
           </h2>
-          <p className="mt-4 text-base leading-7 text-slate-300">
-            Most small business owners face the same problems every day. BizTrack
-            solves all of them in one place.
-          </p>
+          {description && (
+            <p className="mt-4 text-base leading-7 text-slate-300">
+              {description}
+            </p>
+          )}
         </div>
 
-        {/* Problem cards */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {problems.map(({ quote, detail }) => (
             <article
@@ -50,7 +84,7 @@ export default function ProblemSection() {
               <p className="text-base font-bold italic text-white/90">
                 "{quote}"
               </p>
-              <p className="mt-3 text-sm leading-6 text-white/50">{detail}</p>
+              {detail && <p className="mt-3 text-sm leading-6 text-white/50">{detail}</p>}
             </article>
           ))}
         </div>

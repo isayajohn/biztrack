@@ -2,14 +2,26 @@ import { ClipboardList, Package, TrendingUp } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { SectionHeader } from "./LandingDesignSystem";
 
-export type HowItWorksStep = {
+type Props = {
+  content?: Record<string, unknown> | null;
+};
+
+function textFrom(value: unknown) {
+  if (typeof value === "string") return value.trim();
+  if (typeof value === "number") return String(value);
+  return "";
+}
+
+type Step = {
   number: string;
   icon: LucideIcon;
   title: string;
   description: string;
 };
 
-const HOW_IT_WORKS: HowItWorksStep[] = [
+const ICON_SEQUENCE: LucideIcon[] = [Package, ClipboardList, TrendingUp];
+
+const DEFAULT_STEPS: Step[] = [
   {
     number: "01",
     icon: Package,
@@ -33,7 +45,31 @@ const HOW_IT_WORKS: HowItWorksStep[] = [
   },
 ];
 
-export default function HowItWorksSection() {
+export default function HowItWorksSection({ content }: Props) {
+  const record = content && typeof content === "object" && !Array.isArray(content) ? content : null;
+
+  const eyebrow = textFrom(record?.eyebrow) || "How it works";
+  const title = textFrom(record?.title) || "Up and running in minutes";
+  const description = textFrom(record?.description) ||
+    "No training needed. BizTrack is designed to be simple enough that anyone can start using it immediately.";
+
+  const rawSteps = Array.isArray(record?.steps)
+    ? (record!.steps as Array<Record<string, unknown>>)
+        .map((step, index) => {
+          const stepTitle = textFrom(step.title);
+          if (!stepTitle) return null;
+          return {
+            number: textFrom(step.number) || String(index + 1).padStart(2, "0"),
+            icon: ICON_SEQUENCE[index % ICON_SEQUENCE.length],
+            title: stepTitle,
+            description: textFrom(step.description),
+          } satisfies Step;
+        })
+        .filter((step): step is Step => step !== null)
+    : [];
+
+  const steps = rawSteps.length ? rawSteps : DEFAULT_STEPS;
+
   return (
     <section
       id="how-it-works"
@@ -43,9 +79,9 @@ export default function HowItWorksSection() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeader
           id="how-it-works-heading"
-          eyebrow="How it works"
-          title="Up and running in minutes"
-          description="No training needed. BizTrack is designed to be simple enough that anyone can start using it immediately."
+          eyebrow={eyebrow}
+          title={title}
+          description={description}
           align="center"
         />
 
@@ -56,7 +92,7 @@ export default function HowItWorksSection() {
           />
 
           <div className="grid gap-5 md:grid-cols-3">
-            {HOW_IT_WORKS.map(({ number, icon: Icon, title, description }) => (
+            {steps.map(({ number, icon: Icon, title: stepTitle, description: stepDescription }) => (
               <article
                 key={number}
                 className="group relative overflow-hidden rounded-xl border border-slate-200 bg-cloud p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-emerald-200 hover:bg-white hover:shadow-card"
@@ -78,8 +114,8 @@ export default function HowItWorksSection() {
                   <p className="text-xs font-extrabold uppercase tracking-[0.08em] text-leaf">
                     Step {number}
                   </p>
-                  <h3 className="mt-2 font-display text-lg font-extrabold text-ink">{title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-slateMuted">{description}</p>
+                  <h3 className="mt-2 font-display text-lg font-extrabold text-ink">{stepTitle}</h3>
+                  <p className="mt-2 text-sm leading-6 text-slateMuted">{stepDescription}</p>
                 </div>
 
                 <span

@@ -233,15 +233,41 @@ export type LandingPageContent = {
   id?: string | null;
   heroTitle: string;
   heroSubtitle: string;
+  heroKicker?: string | null;
   primaryButtonText: string;
   primaryButtonUrl: string;
   secondaryButtonText: string;
   secondaryButtonUrl: string;
+  heroTrustText?: string | null;
+  heroImageUrl?: string | null;
+  featuresEyebrow?: string | null;
+  featuresTitle?: string | null;
+  featuresDescription?: string | null;
+  pricingEyebrow?: string | null;
+  pricingTitle?: string | null;
+  pricingDescription?: string | null;
+  testimonialsEyebrow?: string | null;
+  testimonialsTitle?: string | null;
+  testimonialsDescription?: string | null;
+  faqEyebrow?: string | null;
+  faqTitle?: string | null;
+  faqDescription?: string | null;
+  finalCtaKicker?: string | null;
+  finalCtaTitle?: string | null;
+  finalCtaDescription?: string | null;
   features: Array<Record<string, unknown>>;
   pricing: Array<Record<string, unknown>>;
   faqs: Array<Record<string, unknown>>;
   testimonials?: Array<Record<string, unknown>> | null;
   footerLinks?: Array<Record<string, unknown>> | null;
+  heroTrustIndicators?: Array<Record<string, unknown>> | null;
+  footerTagline?: string | null;
+  footerBadge?: string | null;
+  footerProductLinks?: Array<Record<string, unknown>> | null;
+  footerCompanyLinks?: Array<Record<string, unknown>> | null;
+  problemSection?: Record<string, unknown> | null;
+  solutionSection?: Record<string, unknown> | null;
+  howItWorks?: Record<string, unknown> | null;
   seoTitle?: string | null;
   seoDescription?: string | null;
   isPublished: boolean;
@@ -444,11 +470,37 @@ type ApiAppBranding = Partial<AppBranding> & {
 type ApiLandingPageContent = Partial<LandingPageContent> & {
   hero_title?: string;
   hero_subtitle?: string;
+  hero_kicker?: string | null;
   primary_button_text?: string;
   primary_button_url?: string;
   secondary_button_text?: string;
   secondary_button_url?: string;
+  hero_trust_text?: string | null;
+  hero_image_url?: string | null;
+  features_eyebrow?: string | null;
+  features_title?: string | null;
+  features_description?: string | null;
+  pricing_eyebrow?: string | null;
+  pricing_title?: string | null;
+  pricing_description?: string | null;
+  testimonials_eyebrow?: string | null;
+  testimonials_title?: string | null;
+  testimonials_description?: string | null;
+  faq_eyebrow?: string | null;
+  faq_title?: string | null;
+  faq_description?: string | null;
+  final_cta_kicker?: string | null;
+  final_cta_title?: string | null;
+  final_cta_description?: string | null;
   footer_links?: Array<Record<string, unknown>> | null;
+  hero_trust_indicators?: Array<Record<string, unknown>> | null;
+  footer_tagline?: string | null;
+  footer_badge?: string | null;
+  footer_product_links?: Array<Record<string, unknown>> | null;
+  footer_company_links?: Array<Record<string, unknown>> | null;
+  problem_section?: Record<string, unknown> | null;
+  solution_section?: Record<string, unknown> | null;
+  how_it_works?: Record<string, unknown> | null;
   seo_title?: string | null;
   seo_description?: string | null;
   is_published?: boolean | number;
@@ -563,15 +615,41 @@ const emptyLandingContent: LandingPageContent = {
   id: null,
   heroTitle: "",
   heroSubtitle: "",
+  heroKicker: "",
   primaryButtonText: "Get Started Free",
   primaryButtonUrl: "/register",
   secondaryButtonText: "View Demo",
   secondaryButtonUrl: "/demo",
+  heroTrustText: "",
+  heroImageUrl: "",
+  featuresEyebrow: "",
+  featuresTitle: "",
+  featuresDescription: "",
+  pricingEyebrow: "",
+  pricingTitle: "",
+  pricingDescription: "",
+  testimonialsEyebrow: "",
+  testimonialsTitle: "",
+  testimonialsDescription: "",
+  faqEyebrow: "",
+  faqTitle: "",
+  faqDescription: "",
+  finalCtaKicker: "",
+  finalCtaTitle: "",
+  finalCtaDescription: "",
   features: [],
   pricing: [],
   faqs: [],
   testimonials: [],
   footerLinks: [],
+  heroTrustIndicators: [],
+  footerTagline: "",
+  footerBadge: "",
+  footerProductLinks: [],
+  footerCompanyLinks: [],
+  problemSection: null,
+  solutionSection: null,
+  howItWorks: null,
   seoTitle: "",
   seoDescription: "",
   isPublished: false,
@@ -626,15 +704,41 @@ function normalizeLandingContent(content: ApiLandingPageContent | null): Landing
     id: content.id ?? null,
     heroTitle: content.heroTitle ?? content.hero_title ?? "",
     heroSubtitle: content.heroSubtitle ?? content.hero_subtitle ?? "",
+    heroKicker: content.heroKicker ?? content.hero_kicker ?? "",
     primaryButtonText: content.primaryButtonText ?? content.primary_button_text ?? "Get Started Free",
     primaryButtonUrl: content.primaryButtonUrl ?? content.primary_button_url ?? "/register",
     secondaryButtonText: content.secondaryButtonText ?? content.secondary_button_text ?? "View Demo",
     secondaryButtonUrl: content.secondaryButtonUrl ?? content.secondary_button_url ?? "/demo",
+    heroTrustText: content.heroTrustText ?? content.hero_trust_text ?? "",
+    heroImageUrl: content.heroImageUrl ?? content.hero_image_url ?? "",
+    featuresEyebrow: content.featuresEyebrow ?? content.features_eyebrow ?? "",
+    featuresTitle: content.featuresTitle ?? content.features_title ?? "",
+    featuresDescription: content.featuresDescription ?? content.features_description ?? "",
+    pricingEyebrow: content.pricingEyebrow ?? content.pricing_eyebrow ?? "",
+    pricingTitle: content.pricingTitle ?? content.pricing_title ?? "",
+    pricingDescription: content.pricingDescription ?? content.pricing_description ?? "",
+    testimonialsEyebrow: content.testimonialsEyebrow ?? content.testimonials_eyebrow ?? "",
+    testimonialsTitle: content.testimonialsTitle ?? content.testimonials_title ?? "",
+    testimonialsDescription: content.testimonialsDescription ?? content.testimonials_description ?? "",
+    faqEyebrow: content.faqEyebrow ?? content.faq_eyebrow ?? "",
+    faqTitle: content.faqTitle ?? content.faq_title ?? "",
+    faqDescription: content.faqDescription ?? content.faq_description ?? "",
+    finalCtaKicker: content.finalCtaKicker ?? content.final_cta_kicker ?? "",
+    finalCtaTitle: content.finalCtaTitle ?? content.final_cta_title ?? "",
+    finalCtaDescription: content.finalCtaDescription ?? content.final_cta_description ?? "",
     features: Array.isArray(content.features) ? content.features : [],
     pricing: Array.isArray(content.pricing) ? content.pricing : [],
     faqs: Array.isArray(content.faqs) ? content.faqs : [],
     testimonials: Array.isArray(content.testimonials) ? content.testimonials : [],
     footerLinks: Array.isArray(content.footerLinks) ? content.footerLinks : Array.isArray(content.footer_links) ? content.footer_links : [],
+    heroTrustIndicators: Array.isArray(content.heroTrustIndicators) ? content.heroTrustIndicators : Array.isArray(content.hero_trust_indicators) ? content.hero_trust_indicators : [],
+    footerTagline: content.footerTagline ?? content.footer_tagline ?? "",
+    footerBadge: content.footerBadge ?? content.footer_badge ?? "",
+    footerProductLinks: Array.isArray(content.footerProductLinks) ? content.footerProductLinks : Array.isArray(content.footer_product_links) ? content.footer_product_links : [],
+    footerCompanyLinks: Array.isArray(content.footerCompanyLinks) ? content.footerCompanyLinks : Array.isArray(content.footer_company_links) ? content.footer_company_links : [],
+    problemSection: content.problemSection ?? content.problem_section ?? null,
+    solutionSection: content.solutionSection ?? content.solution_section ?? null,
+    howItWorks: content.howItWorks ?? content.how_it_works ?? null,
     seoTitle: content.seoTitle ?? content.seo_title ?? "",
     seoDescription: content.seoDescription ?? content.seo_description ?? "",
     isPublished: Boolean(content.isPublished ?? content.is_published),

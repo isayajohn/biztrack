@@ -13,12 +13,19 @@ class Product extends Model
     public $incrementing = false;
     protected $keyType = 'string';
 
-    protected $fillable = ['business_id', 'name', 'sku', 'buying_price', 'selling_price', 'stock_quantity', 'low_stock_level', 'is_active'];
+    protected $fillable = [
+        'business_id', 'name', 'sku', 'barcode', 'brand', 'unit_type',
+        'category_id', 'supplier_id', 'buying_price', 'selling_price',
+        'stock_quantity', 'low_stock_level', 'reorder_point',
+        'expiry_date', 'image_url', 'notes', 'is_active',
+    ];
 
     protected $casts = [
         'buying_price' => 'decimal:2',
         'selling_price' => 'decimal:2',
         'is_active' => 'boolean',
+        'expiry_date' => 'date',
+        'reorder_point' => 'integer',
     ];
 
     public function business()
@@ -29,5 +36,20 @@ class Product extends Model
     public function sales()
     {
         return $this->hasMany(Sale::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class)->withDefault();
+    }
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class)->withDefault();
+    }
+
+    public function stockMovements()
+    {
+        return $this->hasMany(StockMovement::class);
     }
 }

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Mail, MapPin, Phone } from "lucide-react";
 import BrandLogo from "../BrandLogo";
 
-const PRODUCT_LINKS = [
+const DEFAULT_PRODUCT_LINKS = [
   { label: "Features", href: "#features" },
   { label: "How It Works", href: "#how-it-works" },
   { label: "Pricing", href: "#pricing" },
@@ -10,16 +10,25 @@ const PRODUCT_LINKS = [
   { label: "View Demo", href: "/demo" },
 ];
 
-const COMPANY_LINKS = [
+const DEFAULT_COMPANY_LINKS = [
   { label: "About", href: "#" },
   { label: "Blog", href: "#" },
   { label: "Careers", href: "#" },
   { label: "Contact", href: "#contact" },
 ];
 
+const DEFAULT_TAGLINE = "Simple sales and expense tracking for small businesses. Know your numbers, grow your business.";
+const DEFAULT_BADGE = "Free to get started";
+
+type NavLink = { label: string; href: string };
+
 type Props = {
   seoDescription?: string | null;
   footerLinks?: Array<Record<string, unknown>> | null;
+  tagline?: string | null;
+  badge?: string | null;
+  productLinks?: Array<Record<string, unknown>> | null;
+  companyLinks?: Array<Record<string, unknown>> | null;
 };
 
 function textFrom(record: Record<string, unknown>, keys: string[], fallback = "") {
@@ -49,6 +58,16 @@ function contactItemsFrom(footerLinks?: Array<Record<string, unknown>> | null) {
       ];
 }
 
+function navLinksFrom(defaults: NavLink[], links?: Array<Record<string, unknown>> | null): NavLink[] {
+  const dynamic = (links ?? [])
+    .map((item) => ({
+      label: textFrom(item, ["label"]),
+      href: textFrom(item, ["href"]),
+    }))
+    .filter((item) => item.label);
+  return dynamic.length ? dynamic : defaults;
+}
+
 function contactIcon(label: string) {
   const normalized = label.toLowerCase();
   if (normalized.includes("phone") || normalized.includes("call") || normalized.includes("whatsapp")) return Phone;
@@ -56,8 +75,12 @@ function contactIcon(label: string) {
   return Mail;
 }
 
-export default function LandingFooter({ seoDescription, footerLinks }: Props) {
+export default function LandingFooter({ seoDescription, footerLinks, tagline, badge, productLinks, companyLinks }: Props) {
   const contactItems = contactItemsFrom(footerLinks);
+  const productNavLinks = navLinksFrom(DEFAULT_PRODUCT_LINKS, productLinks);
+  const companyNavLinks = navLinksFrom(DEFAULT_COMPANY_LINKS, companyLinks);
+  const footerTaglineText = tagline || DEFAULT_TAGLINE;
+  const footerBadgeText = badge || DEFAULT_BADGE;
 
   return (
     <footer id="contact" className="bg-[#111815] text-white/60">
@@ -70,11 +93,10 @@ export default function LandingFooter({ seoDescription, footerLinks }: Props) {
               <BrandLogo className="h-auto w-40 max-w-full" variant="light" />
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-7 text-white/45">
-              {seoDescription ||
-                "Simple sales and expense tracking for small businesses. Know your numbers, grow your business."}
+              {footerTaglineText}
             </p>
             <span className="mt-5 inline-flex items-center gap-2 rounded-full border border-leaf/30 bg-leaf/10 px-3 py-1.5 text-xs font-semibold text-leaf">
-              Free to get started
+              {footerBadgeText}
             </span>
           </div>
 
@@ -84,7 +106,7 @@ export default function LandingFooter({ seoDescription, footerLinks }: Props) {
               Product
             </p>
             <ul className="flex flex-col gap-3">
-              {PRODUCT_LINKS.map(({ label, href }) => (
+              {productNavLinks.map(({ label, href }) => (
                 <li key={label}>
                   {href.startsWith("#") ? (
                     <a
@@ -112,7 +134,7 @@ export default function LandingFooter({ seoDescription, footerLinks }: Props) {
               Company
             </p>
             <ul className="flex flex-col gap-3">
-              {COMPANY_LINKS.map(({ label, href }) => (
+              {companyNavLinks.map(({ label, href }) => (
                 <li key={label}>
                   <a
                     href={href}

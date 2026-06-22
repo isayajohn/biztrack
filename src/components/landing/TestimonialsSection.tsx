@@ -8,6 +8,7 @@ export type Testimonial = {
   business: string;
   text: string;
   avatarSeed: string;
+  avatarUrl?: string;
   stars?: number;
 };
 
@@ -75,7 +76,47 @@ function StarRow({ count = 5 }: { count?: number }) {
   );
 }
 
-function TestimonialCard({ name, role, business, text, avatarSeed, stars }: Testimonial) {
+function textFrom(value: unknown) {
+  if (typeof value === "string") return value.trim();
+  if (typeof value === "number") return String(value);
+  return "";
+}
+
+type TestimonialContent = {
+  name?: unknown;
+  role?: unknown;
+  business?: unknown;
+  company?: unknown;
+  message?: unknown;
+  quote?: unknown;
+  text?: unknown;
+  avatarUrl?: unknown;
+  imageUrl?: unknown;
+  photoUrl?: unknown;
+};
+
+function normalizeTestimonials(items?: TestimonialContent[] | null) {
+  const dynamicTestimonials = Array.isArray(items)
+    ? items
+        .map((item, index) => {
+          const name = textFrom(item.name);
+          return {
+            name,
+            role: textFrom(item.role) || "Customer",
+            business: textFrom(item.business) || textFrom(item.company),
+            text: textFrom(item.message) || textFrom(item.quote) || textFrom(item.text),
+            avatarSeed: name || `testimonial-${index + 1}`,
+            avatarUrl: textFrom(item.avatarUrl) || textFrom(item.imageUrl) || textFrom(item.photoUrl),
+            stars: 5,
+          };
+        })
+        .filter((item) => item.name && item.text)
+    : [];
+
+  return dynamicTestimonials.length ? dynamicTestimonials : TESTIMONIALS;
+}
+
+function TestimonialCard({ name, role, business, text, avatarSeed, avatarUrl, stars }: Testimonial) {
   return (
     <article className="flex min-h-[260px] flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-card">
       <StarRow count={stars} />
@@ -84,7 +125,7 @@ function TestimonialCard({ name, role, business, text, avatarSeed, stars }: Test
       </blockquote>
       <div className="mt-4 flex items-center gap-2.5 border-t border-slate-200 pt-4">
         <img
-          src={`https://i.pravatar.cc/36?u=${avatarSeed}`}
+          src={avatarUrl || `https://i.pravatar.cc/36?u=${avatarSeed}`}
           alt={name}
           className="h-9 w-9 rounded-full object-cover"
           width={36}
@@ -101,15 +142,23 @@ function TestimonialCard({ name, role, business, text, avatarSeed, stars }: Test
   );
 }
 
-export default function TestimonialsSection() {
+type Props = {
+  eyebrow?: string | null;
+  title?: string | null;
+  description?: string | null;
+  testimonials?: TestimonialContent[] | null;
+};
+
+export default function TestimonialsSection({ eyebrow, title, description, testimonials }: Props) {
   const [startIndex, setStartIndex] = useState(0);
+  const visibleSource = useMemo(() => normalizeTestimonials(testimonials), [testimonials]);
 
   const movePrevious = () => {
-    setStartIndex((current) => (current + 1) % TESTIMONIALS.length);
+    setStartIndex((current) => (current + 1) % visibleSource.length);
   };
 
   const moveNext = () => {
-    setStartIndex((current) => (current - 1 + TESTIMONIALS.length) % TESTIMONIALS.length);
+    setStartIndex((current) => (current - 1 + visibleSource.length) % visibleSource.length);
   };
 
   useEffect(() => {
@@ -118,15 +167,15 @@ export default function TestimonialsSection() {
     }, TESTIMONIAL_INTERVAL_MS);
 
     return () => window.clearInterval(timer);
-  }, []);
+  }, [visibleSource.length]);
 
   const visibleTestimonials = useMemo(
     () =>
-      Array.from({ length: Math.min(VISIBLE_TESTIMONIALS, TESTIMONIALS.length) }, (_, index) => {
-        const testimonialIndex = (startIndex + index) % TESTIMONIALS.length;
-        return TESTIMONIALS[testimonialIndex];
+      Array.from({ length: Math.min(VISIBLE_TESTIMONIALS, visibleSource.length) }, (_, index) => {
+        const testimonialIndex = (startIndex + index) % visibleSource.length;
+        return visibleSource[testimonialIndex];
       }),
-    [startIndex],
+    [startIndex, visibleSource],
   );
 
   return (
@@ -137,8 +186,9 @@ export default function TestimonialsSection() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeader
           id="testimonials-heading"
-          eyebrow="Real stories"
-          title="What business owners say."
+          eyebrow={eyebrow || "Real stories"}
+          title={title || "What business owners say."}
+          description={description || undefined}
           align="center"
         />
 

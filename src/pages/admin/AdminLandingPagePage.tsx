@@ -3,9 +3,12 @@ import type { FormEvent, ReactNode } from "react";
 import {
   AlertCircle,
   CheckCircle2,
+  ClipboardList,
   Eye,
   FileText,
   HelpCircle,
+  ImagePlus,
+  Lightbulb,
   Loader2,
   MapPin,
   Megaphone,
@@ -16,6 +19,7 @@ import {
   Sparkles,
   Star,
   Trash2,
+  XCircle,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
@@ -30,6 +34,7 @@ type FeatureItem = {
   title: string;
   description: string;
   iconName: string;
+  imageUrl: string;
 };
 
 type PricingItem = {
@@ -50,21 +55,107 @@ type TestimonialItem = {
   name: string;
   business: string;
   message: string;
+  role: string;
+  avatarUrl: string;
 };
+
+type TrustIndicator = {
+  label: string;
+};
+
+type FooterLink = {
+  label: string;
+  href: string;
+};
+
+type ProblemItem = {
+  quote: string;
+  detail: string;
+};
+
+type SolutionRow = {
+  eyebrow: string;
+  title: string;
+  description: string;
+  bullets: string[];
+};
+
+type HowItWorksStep = {
+  number: string;
+  title: string;
+  description: string;
+};
+
+type ProblemSectionState = {
+  eyebrow: string;
+  title: string;
+  description: string;
+  items: ProblemItem[];
+};
+
+type SolutionSectionState = {
+  eyebrow: string;
+  title: string;
+  description: string;
+  rows: SolutionRow[];
+};
+
+type HowItWorksSectionState = {
+  eyebrow: string;
+  title: string;
+  description: string;
+  steps: HowItWorksStep[];
+};
+
+type LandingEditorTab =
+  | "hero"
+  | "story"
+  | "features"
+  | "pricing"
+  | "faq"
+  | "testimonials"
+  | "footer"
+  | "seo";
 
 type LandingEditorState = {
   id?: string | null;
   heroTitle: string;
   heroSubtitle: string;
+  heroKicker: string;
   primaryButtonText: string;
   primaryButtonUrl: string;
   secondaryButtonText: string;
   secondaryButtonUrl: string;
+  heroTrustText: string;
+  heroImageUrl: string;
+  featuresEyebrow: string;
+  featuresTitle: string;
+  featuresDescription: string;
+  pricingEyebrow: string;
+  pricingTitle: string;
+  pricingDescription: string;
+  testimonialsEyebrow: string;
+  testimonialsTitle: string;
+  testimonialsDescription: string;
+  faqEyebrow: string;
+  faqTitle: string;
+  faqDescription: string;
+  finalCtaKicker: string;
+  finalCtaTitle: string;
+  finalCtaDescription: string;
+  heroTrustIndicators: TrustIndicator[];
   features: FeatureItem[];
   pricing: PricingItem[];
   faqs: FaqItem[];
   testimonials: TestimonialItem[];
   footerLinks: Array<Record<string, unknown>>;
+  footerTagline: string;
+  footerBadge: string;
+  footerProductLinks: FooterLink[];
+  footerCompanyLinks: FooterLink[];
+  problemSection: ProblemSectionState;
+  solutionSection: SolutionSectionState;
+  howItWorks: HowItWorksSectionState;
   seoTitle: string;
   seoDescription: string;
   isPublished: boolean;
@@ -73,21 +164,49 @@ type LandingEditorState = {
 const fallbackState: LandingEditorState = {
   heroTitle: "",
   heroSubtitle: "",
+  heroKicker: "",
   primaryButtonText: "Get Started Free",
   primaryButtonUrl: "/register",
   secondaryButtonText: "View Demo",
   secondaryButtonUrl: "/demo",
+  heroTrustText: "",
+  heroImageUrl: "",
+  heroTrustIndicators: [],
+  featuresEyebrow: "",
+  featuresTitle: "",
+  featuresDescription: "",
+  pricingEyebrow: "",
+  pricingTitle: "",
+  pricingDescription: "",
+  testimonialsEyebrow: "",
+  testimonialsTitle: "",
+  testimonialsDescription: "",
+  faqEyebrow: "",
+  faqTitle: "",
+  faqDescription: "",
+  finalCtaKicker: "",
+  finalCtaTitle: "",
+  finalCtaDescription: "",
   features: [],
   pricing: [],
   faqs: [],
   testimonials: [],
   footerLinks: [],
+  footerTagline: "",
+  footerBadge: "",
+  footerProductLinks: [],
+  footerCompanyLinks: [],
+  problemSection: { eyebrow: "", title: "", description: "", items: [] },
+  solutionSection: { eyebrow: "", title: "", description: "", rows: [] },
+  howItWorks: { eyebrow: "", title: "", description: "", steps: [] },
   seoTitle: "",
   seoDescription: "",
   isPublished: false,
 };
 
-const emptyFeature: FeatureItem = { title: "", description: "", iconName: "" };
+const MAX_LANDING_IMAGE_BYTES = 4 * 1024 * 1024;
+
+const emptyFeature: FeatureItem = { title: "", description: "", iconName: "", imageUrl: "" };
 const emptyPricing: PricingItem = {
   name: "",
   price: "",
@@ -97,8 +216,30 @@ const emptyPricing: PricingItem = {
   buttonUrl: "/register",
 };
 const emptyFaq: FaqItem = { question: "", answer: "" };
-const emptyTestimonial: TestimonialItem = { name: "", business: "", message: "" };
+const emptyTestimonial: TestimonialItem = { name: "", business: "", message: "", role: "", avatarUrl: "" };
 const emptyFooterLink: Record<string, unknown> = { label: "", value: "", href: "" };
+const emptyTrustIndicator: TrustIndicator = { label: "" };
+const emptyFooterNavLink: FooterLink = { label: "", href: "" };
+const emptyProblemItem: ProblemItem = { quote: "", detail: "" };
+const emptySolutionRow: SolutionRow = { eyebrow: "", title: "", description: "", bullets: [""] };
+const emptyHowItWorksStep: HowItWorksStep = { number: "", title: "", description: "" };
+const DEFAULT_REQUIRED_LANDING_COPY = {
+  heroTitle: "Simple sales and expense tracking for growing businesses",
+  heroSubtitle: "Track sales, expenses, products, inventory, and profit from one easy dashboard built for small business owners.",
+  primaryButtonText: "Get Started Free",
+  primaryButtonUrl: "/register",
+  secondaryButtonText: "View Demo",
+  secondaryButtonUrl: "/demo",
+};
+
+function readFileAsDataUrl(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result ?? ""));
+    reader.onerror = () => reject(new Error("Could not read the selected image."));
+    reader.readAsDataURL(file);
+  });
+}
 
 function textFrom(record: Record<string, unknown>, keys: string[], fallback = "") {
   for (const key of keys) {
@@ -117,19 +258,53 @@ function stringListFrom(value: unknown) {
   return Array.isArray(value) ? value.map((item) => String(item ?? "")).filter(Boolean) : [];
 }
 
+function sectionHeadingFrom(sec: unknown) {
+  if (!sec || typeof sec !== "object" || Array.isArray(sec)) {
+    return { eyebrow: "", title: "", description: "" };
+  }
+  const record = sec as Record<string, unknown>;
+  return {
+    eyebrow: textFrom(record, ["eyebrow"]),
+    title: textFrom(record, ["title"]),
+    description: textFrom(record, ["description"]),
+  };
+}
+
 function editorFromContent(content: LandingPageContent): LandingEditorState {
   return {
     id: content.id,
     heroTitle: content.heroTitle ?? "",
     heroSubtitle: content.heroSubtitle ?? "",
+    heroKicker: content.heroKicker ?? "",
     primaryButtonText: content.primaryButtonText ?? "",
     primaryButtonUrl: content.primaryButtonUrl ?? "",
     secondaryButtonText: content.secondaryButtonText ?? "",
     secondaryButtonUrl: content.secondaryButtonUrl ?? "",
+    heroTrustText: content.heroTrustText ?? "",
+    heroImageUrl: content.heroImageUrl ?? "",
+    heroTrustIndicators: arrayFrom(content.heroTrustIndicators).map((item) => ({
+      label: textFrom(item, ["label"]),
+    })),
+    featuresEyebrow: content.featuresEyebrow ?? "",
+    featuresTitle: content.featuresTitle ?? "",
+    featuresDescription: content.featuresDescription ?? "",
+    pricingEyebrow: content.pricingEyebrow ?? "",
+    pricingTitle: content.pricingTitle ?? "",
+    pricingDescription: content.pricingDescription ?? "",
+    testimonialsEyebrow: content.testimonialsEyebrow ?? "",
+    testimonialsTitle: content.testimonialsTitle ?? "",
+    testimonialsDescription: content.testimonialsDescription ?? "",
+    faqEyebrow: content.faqEyebrow ?? "",
+    faqTitle: content.faqTitle ?? "",
+    faqDescription: content.faqDescription ?? "",
+    finalCtaKicker: content.finalCtaKicker ?? "",
+    finalCtaTitle: content.finalCtaTitle ?? "",
+    finalCtaDescription: content.finalCtaDescription ?? "",
     features: arrayFrom(content.features).map((feature) => ({
       title: textFrom(feature, ["title", "name"]),
       description: textFrom(feature, ["description", "text"]),
       iconName: textFrom(feature, ["iconName", "icon"]),
+      imageUrl: textFrom(feature, ["imageUrl", "image", "photoUrl"]),
     })),
     pricing: arrayFrom(content.pricing).map((plan) => ({
       name: textFrom(plan, ["name", "title"]),
@@ -147,8 +322,59 @@ function editorFromContent(content: LandingPageContent): LandingEditorState {
       name: textFrom(testimonial, ["name"]),
       business: textFrom(testimonial, ["business", "company"]),
       message: textFrom(testimonial, ["message", "quote", "text"]),
+      role: textFrom(testimonial, ["role", "title"]),
+      avatarUrl: textFrom(testimonial, ["avatarUrl", "imageUrl", "photoUrl"]),
     })),
     footerLinks: arrayFrom(content.footerLinks),
+    footerTagline: content.footerTagline ?? "",
+    footerBadge: content.footerBadge ?? "",
+    footerProductLinks: arrayFrom(content.footerProductLinks).map((item) => ({
+      label: textFrom(item, ["label"]),
+      href: textFrom(item, ["href"]),
+    })),
+    footerCompanyLinks: arrayFrom(content.footerCompanyLinks).map((item) => ({
+      label: textFrom(item, ["label"]),
+      href: textFrom(item, ["href"]),
+    })),
+    problemSection: (() => {
+      const sec = content.problemSection;
+      if (!sec || typeof sec !== "object" || Array.isArray(sec)) return fallbackState.problemSection;
+      const record = sec as Record<string, unknown>;
+      return {
+        ...sectionHeadingFrom(record),
+        items: arrayFrom(record.items).map((item) => ({
+          quote: textFrom(item, ["quote"]),
+          detail: textFrom(item, ["detail"]),
+        })),
+      };
+    })(),
+    solutionSection: (() => {
+      const sec = content.solutionSection;
+      if (!sec || typeof sec !== "object" || Array.isArray(sec)) return fallbackState.solutionSection;
+      const record = sec as Record<string, unknown>;
+      return {
+        ...sectionHeadingFrom(record),
+        rows: arrayFrom(record.rows).map((row) => ({
+          eyebrow: textFrom(row, ["eyebrow"]),
+          title: textFrom(row, ["title"]),
+          description: textFrom(row, ["description"]),
+          bullets: stringListFrom(row.bullets).length ? stringListFrom(row.bullets) : [""],
+        })),
+      };
+    })(),
+    howItWorks: (() => {
+      const sec = content.howItWorks;
+      if (!sec || typeof sec !== "object" || Array.isArray(sec)) return fallbackState.howItWorks;
+      const record = sec as Record<string, unknown>;
+      return {
+        ...sectionHeadingFrom(record),
+        steps: arrayFrom(record.steps).map((step) => ({
+          number: textFrom(step, ["number"]),
+          title: textFrom(step, ["title"]),
+          description: textFrom(step, ["description"]),
+        })),
+      };
+    })(),
     seoTitle: content.seoTitle ?? "",
     seoDescription: content.seoDescription ?? "",
     isPublished: Boolean(content.isPublished),
@@ -158,18 +384,37 @@ function editorFromContent(content: LandingPageContent): LandingEditorState {
 function payloadFromState(state: LandingEditorState, isPublished: boolean): LandingPageContent {
   return {
     id: state.id,
-    heroTitle: state.heroTitle.trim(),
-    heroSubtitle: state.heroSubtitle.trim(),
-    primaryButtonText: state.primaryButtonText.trim(),
-    primaryButtonUrl: state.primaryButtonUrl.trim(),
-    secondaryButtonText: state.secondaryButtonText.trim(),
-    secondaryButtonUrl: state.secondaryButtonUrl.trim(),
+    heroTitle: state.heroTitle.trim() || DEFAULT_REQUIRED_LANDING_COPY.heroTitle,
+    heroSubtitle: state.heroSubtitle.trim() || DEFAULT_REQUIRED_LANDING_COPY.heroSubtitle,
+    heroKicker: state.heroKicker.trim() || null,
+    primaryButtonText: state.primaryButtonText.trim() || DEFAULT_REQUIRED_LANDING_COPY.primaryButtonText,
+    primaryButtonUrl: state.primaryButtonUrl.trim() || DEFAULT_REQUIRED_LANDING_COPY.primaryButtonUrl,
+    secondaryButtonText: state.secondaryButtonText.trim() || DEFAULT_REQUIRED_LANDING_COPY.secondaryButtonText,
+    secondaryButtonUrl: state.secondaryButtonUrl.trim() || DEFAULT_REQUIRED_LANDING_COPY.secondaryButtonUrl,
+    heroTrustText: state.heroTrustText.trim() || null,
+    heroImageUrl: state.heroImageUrl.trim() || null,
+    featuresEyebrow: state.featuresEyebrow.trim() || null,
+    featuresTitle: state.featuresTitle.trim() || null,
+    featuresDescription: state.featuresDescription.trim() || null,
+    pricingEyebrow: state.pricingEyebrow.trim() || null,
+    pricingTitle: state.pricingTitle.trim() || null,
+    pricingDescription: state.pricingDescription.trim() || null,
+    testimonialsEyebrow: state.testimonialsEyebrow.trim() || null,
+    testimonialsTitle: state.testimonialsTitle.trim() || null,
+    testimonialsDescription: state.testimonialsDescription.trim() || null,
+    faqEyebrow: state.faqEyebrow.trim() || null,
+    faqTitle: state.faqTitle.trim() || null,
+    faqDescription: state.faqDescription.trim() || null,
+    finalCtaKicker: state.finalCtaKicker.trim() || null,
+    finalCtaTitle: state.finalCtaTitle.trim() || null,
+    finalCtaDescription: state.finalCtaDescription.trim() || null,
     features: state.features
       .filter((feature) => feature.title.trim() || feature.description.trim())
       .map((feature) => ({
         title: feature.title.trim(),
         description: feature.description.trim(),
         iconName: feature.iconName.trim() || undefined,
+        imageUrl: feature.imageUrl.trim() || undefined,
       })),
     pricing: state.pricing
       .filter((plan) => plan.name.trim() || plan.price.trim())
@@ -190,6 +435,8 @@ function payloadFromState(state: LandingEditorState, isPublished: boolean): Land
         name: testimonial.name.trim(),
         business: testimonial.business.trim(),
         message: testimonial.message.trim(),
+        role: testimonial.role.trim() || undefined,
+        avatarUrl: testimonial.avatarUrl.trim() || undefined,
       })),
     footerLinks: state.footerLinks
       .map((item) => ({
@@ -198,6 +445,50 @@ function payloadFromState(state: LandingEditorState, isPublished: boolean): Land
         href: textFrom(item, ["href", "url"]).trim(),
       }))
       .filter((item) => item.label || item.value || item.href),
+    heroTrustIndicators: state.heroTrustIndicators
+      .filter((item) => item.label.trim())
+      .map((item) => ({ label: item.label.trim() })),
+    footerTagline: state.footerTagline.trim() || null,
+    footerBadge: state.footerBadge.trim() || null,
+    footerProductLinks: state.footerProductLinks
+      .filter((item) => item.label.trim() || item.href.trim())
+      .map((item) => ({ label: item.label.trim(), href: item.href.trim() })),
+    footerCompanyLinks: state.footerCompanyLinks
+      .filter((item) => item.label.trim() || item.href.trim())
+      .map((item) => ({ label: item.label.trim(), href: item.href.trim() })),
+    problemSection: {
+      eyebrow: state.problemSection.eyebrow.trim() || undefined,
+      title: state.problemSection.title.trim() || undefined,
+      description: state.problemSection.description.trim() || undefined,
+      items: state.problemSection.items
+        .filter((item) => item.quote.trim() || item.detail.trim())
+        .map((item) => ({ quote: item.quote.trim(), detail: item.detail.trim() })),
+    },
+    solutionSection: {
+      eyebrow: state.solutionSection.eyebrow.trim() || undefined,
+      title: state.solutionSection.title.trim() || undefined,
+      description: state.solutionSection.description.trim() || undefined,
+      rows: state.solutionSection.rows
+        .filter((row) => row.title.trim())
+        .map((row) => ({
+          eyebrow: row.eyebrow.trim() || undefined,
+          title: row.title.trim(),
+          description: row.description.trim(),
+          bullets: row.bullets.map((b) => b.trim()).filter(Boolean),
+        })),
+    },
+    howItWorks: {
+      eyebrow: state.howItWorks.eyebrow.trim() || undefined,
+      title: state.howItWorks.title.trim() || undefined,
+      description: state.howItWorks.description.trim() || undefined,
+      steps: state.howItWorks.steps
+        .filter((step) => step.title.trim())
+        .map((step) => ({
+          number: step.number.trim() || undefined,
+          title: step.title.trim(),
+          description: step.description.trim(),
+        })),
+    },
     seoTitle: state.seoTitle.trim() || null,
     seoDescription: state.seoDescription.trim() || null,
     isPublished,
@@ -205,25 +496,61 @@ function payloadFromState(state: LandingEditorState, isPublished: boolean): Land
 }
 
 function validateState(state: LandingEditorState) {
-  if (state.heroTitle.trim().length < 2) return "Hero title is required.";
-  if (state.heroSubtitle.trim().length < 2) return "Hero subtitle is required.";
-  if (!state.primaryButtonText.trim() || !state.primaryButtonUrl.trim()) return "Primary button text and URL are required.";
-  if (!state.secondaryButtonText.trim() || !state.secondaryButtonUrl.trim()) return "Secondary button text and URL are required.";
-  if (state.features.some((feature) => !feature.title.trim() || !feature.description.trim())) {
+  for (const tab of ["hero", "story", "features", "pricing", "faq", "testimonials", "footer", "seo"] satisfies LandingEditorTab[]) {
+    const tabError = validateTab(state, tab);
+    if (tabError) return tabError;
+  }
+  return null;
+}
+
+function validateTab(state: LandingEditorState, tab: LandingEditorTab) {
+  if (tab === "hero") {
+    if (state.heroTitle.trim().length < 2) return "Hero title is required.";
+    if (state.heroSubtitle.trim().length < 2) return "Hero subtitle is required.";
+    if (!state.primaryButtonText.trim() || !state.primaryButtonUrl.trim()) return "Primary button text and URL are required.";
+    if (!state.secondaryButtonText.trim() || !state.secondaryButtonUrl.trim()) return "Secondary button text and URL are required.";
+  }
+
+  if (tab === "story") {
+    if (state.problemSection.items.some((item) => !item.quote.trim() || !item.detail.trim())) {
+      return "Every problem card needs a quote and detail.";
+    }
+    if (state.solutionSection.rows.some((row) => !row.title.trim() || !row.description.trim())) {
+      return "Every solution row needs a title and description.";
+    }
+    if (state.howItWorks.steps.some((step) => !step.title.trim() || !step.description.trim())) {
+      return "Every how-it-works step needs a title and description.";
+    }
+  }
+
+  if (tab === "features" && state.features.some((feature) => !feature.title.trim() || !feature.description.trim())) {
     return "Every feature needs a title and description.";
   }
-  if (state.pricing.some((plan) => !plan.name.trim() || !plan.price.trim() || !plan.description.trim())) {
+
+  if (tab === "pricing" && state.pricing.some((plan) => !plan.name.trim() || !plan.price.trim() || !plan.description.trim())) {
     return "Every pricing card needs a name, price, and description.";
   }
-  if (state.faqs.some((faq) => !faq.question.trim() || !faq.answer.trim())) {
+
+  if (tab === "faq" && state.faqs.some((faq) => !faq.question.trim() || !faq.answer.trim())) {
     return "Every FAQ needs a question and answer.";
   }
-  if (state.testimonials.some((testimonial) => !testimonial.name.trim() || !testimonial.message.trim())) {
+
+  if (tab === "testimonials" && state.testimonials.some((testimonial) => !testimonial.name.trim() || !testimonial.message.trim())) {
     return "Every testimonial needs a name and message.";
   }
-  if (state.footerLinks.some((item) => !textFrom(item, ["label", "title", "type"]).trim() || !textFrom(item, ["value", "text", "href", "url"]).trim())) {
-    return "Every footer contact item needs a label and value.";
+
+  if (tab === "footer") {
+    if (state.footerLinks.some((item) => !textFrom(item, ["label", "title", "type"]).trim() || !textFrom(item, ["value", "text", "href", "url"]).trim())) {
+      return "Every footer contact item needs a label and value.";
+    }
+    if (state.footerProductLinks.some((item) => !item.label.trim() || !item.href.trim())) {
+      return "Every footer product link needs a label and URL.";
+    }
+    if (state.footerCompanyLinks.some((item) => !item.label.trim() || !item.href.trim())) {
+      return "Every footer company link needs a label and URL.";
+    }
   }
+
   return null;
 }
 
@@ -245,6 +572,8 @@ export default function AdminLandingPagePage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [activeTab, setActiveTab] = useState<LandingEditorTab>("hero");
+  const [savingTab, setSavingTab] = useState<LandingEditorTab | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -266,13 +595,41 @@ export default function AdminLandingPagePage() {
   }, []);
 
   const statusText = useMemo(() => (state.isPublished ? "Published" : "Draft"), [state.isPublished]);
+  const editorTabs = useMemo(
+    () => [
+      { id: "hero" as const, label: "Hero", icon: <Megaphone size={16} aria-hidden="true" /> },
+      { id: "story" as const, label: "Story", icon: <Lightbulb size={16} aria-hidden="true" /> },
+      { id: "features" as const, label: "Features", icon: <Sparkles size={16} aria-hidden="true" /> },
+      { id: "pricing" as const, label: "Pricing", icon: <FileText size={16} aria-hidden="true" /> },
+      { id: "faq" as const, label: "FAQ", icon: <HelpCircle size={16} aria-hidden="true" /> },
+      { id: "testimonials" as const, label: "Stories", icon: <Star size={16} aria-hidden="true" /> },
+      { id: "footer" as const, label: "Footer", icon: <MapPin size={16} aria-hidden="true" /> },
+      { id: "seo" as const, label: "SEO & CTA", icon: <Search size={16} aria-hidden="true" /> },
+    ],
+    [],
+  );
+  const activeTabLabel = editorTabs.find((tab) => tab.id === activeTab)?.label ?? "Section";
 
   function update<K extends keyof LandingEditorState>(key: K, value: LandingEditorState[K]) {
     setState((current) => ({ ...current, [key]: value }));
   }
 
-  async function saveContent(isPublished: boolean, successText: string) {
-    const validationError = validateState(state);
+  async function imageFromFile(file: File) {
+    if (!file.type.startsWith("image/")) {
+      setMessage({ type: "error", text: "Choose a valid image file." });
+      return null;
+    }
+
+    if (file.size > MAX_LANDING_IMAGE_BYTES) {
+      setMessage({ type: "error", text: "Image must be under 4 MB." });
+      return null;
+    }
+
+    return readFileAsDataUrl(file);
+  }
+
+  async function saveContent(isPublished: boolean, successText: string, validationScope: LandingEditorTab | "all" = "all") {
+    const validationError = validationScope === "all" ? validateState(state) : validateTab(state, validationScope);
     if (validationError) {
       setMessage({ type: "error", text: validationError });
       return null;
@@ -287,14 +644,32 @@ export default function AdminLandingPagePage() {
   async function saveDraft(event: FormEvent) {
     event.preventDefault();
     setIsSaving(true);
+    setSavingTab(activeTab);
     setMessage(null);
 
     try {
-      await saveContent(false, "Landing page draft saved.");
+      await saveContent(false, `${activeTabLabel} saved.`, activeTab);
     } catch (error) {
       setMessage({ type: "error", text: getApiErrorMessage(error) });
     } finally {
       setIsSaving(false);
+      setSavingTab(null);
+    }
+  }
+
+  async function saveTab(tab: LandingEditorTab) {
+    setIsSaving(true);
+    setSavingTab(tab);
+    setMessage(null);
+
+    try {
+      const tabLabel = editorTabs.find((item) => item.id === tab)?.label ?? "Section";
+      await saveContent(false, `${tabLabel} saved.`, tab);
+    } catch (error) {
+      setMessage({ type: "error", text: getApiErrorMessage(error) });
+    } finally {
+      setIsSaving(false);
+      setSavingTab(null);
     }
   }
 
@@ -348,7 +723,7 @@ export default function AdminLandingPagePage() {
             className="inline-flex items-center justify-center gap-2 rounded-lg border border-leaf/20 bg-mint px-4 py-2.5 text-sm font-extrabold text-leaf hover:bg-leaf/10 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSaving ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : <Save size={16} aria-hidden="true" />}
-            Save Draft
+            Save {activeTabLabel}
           </button>
           <button
             type="button"
@@ -374,14 +749,231 @@ export default function AdminLandingPagePage() {
           </div>
         ) : (
           <form id="landing-page-form" onSubmit={saveDraft} className="space-y-4">
+            <div className="sticky top-0 z-20 overflow-x-auto border-b border-ink/10 bg-cloud/95 py-2 backdrop-blur">
+              <div className="flex min-w-max gap-2">
+                {editorTabs.map((tab) => {
+                  const isActive = activeTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border px-3 py-2 text-sm font-extrabold transition-colors ${
+                        isActive
+                          ? "border-leaf bg-leaf text-white shadow-sm"
+                          : "border-ink/10 bg-white text-ink/55 hover:bg-[#f4f0e8]"
+                      }`}
+                    >
+                      {tab.icon}
+                      {tab.label}
+                    </button>
+                  );
+                })}
+                <button
+                  type="button"
+                  onClick={() => void saveTab(activeTab)}
+                  disabled={isSaving || isPublishing}
+                  className="ml-2 inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-leaf/20 bg-mint px-3 py-2 text-sm font-extrabold text-leaf hover:bg-leaf/10 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {savingTab === activeTab ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : <Save size={16} aria-hidden="true" />}
+                  Save {activeTabLabel}
+                </button>
+              </div>
+            </div>
+
+            {activeTab === "hero" && (
             <EditorSection title="Hero section" icon={<Megaphone size={18} aria-hidden="true" />}>
               <div className="grid gap-4 lg:grid-cols-2">
+                <TextField label="Hero kicker" value={state.heroKicker} onChange={(value) => update("heroKicker", value)} placeholder="Built for small businesses" />
                 <TextField label="Hero title" value={state.heroTitle} onChange={(value) => update("heroTitle", value)} required />
                 <TextField label="Primary button text" value={state.primaryButtonText} onChange={(value) => update("primaryButtonText", value)} required />
                 <TextArea label="Hero subtitle" value={state.heroSubtitle} onChange={(value) => update("heroSubtitle", value)} rows={3} required className="lg:col-span-2" />
                 <TextField label="Primary button URL" value={state.primaryButtonUrl} onChange={(value) => update("primaryButtonUrl", value)} required />
                 <TextField label="Secondary button text" value={state.secondaryButtonText} onChange={(value) => update("secondaryButtonText", value)} required />
                 <TextField label="Secondary button URL" value={state.secondaryButtonUrl} onChange={(value) => update("secondaryButtonUrl", value)} required />
+                <TextArea label="Trust text" value={state.heroTrustText} onChange={(value) => update("heroTrustText", value)} rows={2} className="lg:col-span-2" />
+              </div>
+              <div className="mt-4 rounded-lg border border-ink/8 bg-[#fbfaf6] p-3">
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <p className="text-xs font-extrabold uppercase tracking-[0.06em] text-ink/35">Trust indicator chips</p>
+                  <button
+                    type="button"
+                    onClick={() => update("heroTrustIndicators", [...state.heroTrustIndicators, { ...emptyTrustIndicator }])}
+                    className="inline-flex items-center gap-1 rounded-lg border border-ink/10 bg-white px-2 py-1.5 text-xs font-extrabold text-ink/55 hover:bg-[#f4f0e8]"
+                  >
+                    <Plus size={13} aria-hidden="true" />
+                    Add chip
+                  </button>
+                </div>
+                <div className="grid gap-2">
+                  {state.heroTrustIndicators.map((indicator, index) => (
+                    <div key={index} className="grid gap-2 sm:grid-cols-[1fr_auto]">
+                      <input
+                        value={indicator.label}
+                        onChange={(e) => update("heroTrustIndicators", state.heroTrustIndicators.map((it, i) => i === index ? { ...it, label: e.target.value } : it))}
+                        placeholder="e.g. Easy to use"
+                        className="rounded-lg border border-ink/15 bg-white px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => update("heroTrustIndicators", state.heroTrustIndicators.filter((_, i) => i !== index))}
+                        className="inline-flex items-center justify-center rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-red-600 hover:bg-red-100"
+                        aria-label="Remove chip"
+                      >
+                        <Trash2 size={15} aria-hidden="true" />
+                      </button>
+                    </div>
+                  ))}
+                  {!state.heroTrustIndicators.length && (
+                    <p className="text-xs text-ink/35">No chips yet. Defaults will be shown.</p>
+                  )}
+                </div>
+              </div>
+              <div className="grid gap-4 lg:grid-cols-2 mt-4">
+                <ImageField
+                  label="Hero picture"
+                  value={state.heroImageUrl}
+                  onChange={(value) => update("heroImageUrl", value)}
+                  onFile={async (file) => {
+                    const dataUrl = await imageFromFile(file);
+                    if (dataUrl) update("heroImageUrl", dataUrl);
+                  }}
+                  onClear={() => update("heroImageUrl", "")}
+                />
+              </div>
+            </EditorSection>
+            )}
+
+            {activeTab === "story" && (
+            <>
+            {/* Problem section */}
+            <section className="rounded-lg border border-ink/10 bg-white p-4 shadow-sm">
+              <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div className="flex items-start gap-2">
+                  <span className="mt-0.5 text-leaf"><XCircle size={18} aria-hidden="true" /></span>
+                  <div>
+                    <h2 className="font-display text-base font-bold text-ink">Problem section</h2>
+                    <p className="mt-1 text-sm font-semibold text-ink/45">Highlight the pain points your product solves. Leave empty to use default content.</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => update("problemSection", { ...state.problemSection, items: [...state.problemSection.items, { ...emptyProblemItem }] })}
+                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-leaf/20 bg-mint px-3 py-2 text-sm font-extrabold text-leaf hover:bg-leaf/10"
+                >
+                  <Plus size={16} aria-hidden="true" />
+                  Add problem card
+                </button>
+              </div>
+              <div className="mb-4 grid gap-4 lg:grid-cols-3">
+                <TextField label="Eyebrow" value={state.problemSection.eyebrow} onChange={(v) => update("problemSection", { ...state.problemSection, eyebrow: v })} placeholder="Sound familiar?" />
+                <TextField label="Heading" value={state.problemSection.title} onChange={(v) => update("problemSection", { ...state.problemSection, title: v })} placeholder="Running a business blind is stressful" />
+                <TextArea label="Subheading" value={state.problemSection.description} onChange={(v) => update("problemSection", { ...state.problemSection, description: v })} rows={2} />
+              </div>
+              <div className="grid gap-3">
+                {state.problemSection.items.map((item, index) => (
+                  <RepeaterCard
+                    key={index}
+                    title={`Problem ${index + 1}`}
+                    onDelete={() => update("problemSection", { ...state.problemSection, items: state.problemSection.items.filter((_, i) => i !== index) })}
+                  >
+                    <div className="grid gap-3">
+                      <TextField label="Quote" value={item.quote} onChange={(v) => updateProblemItem(index, "quote", v)} placeholder="I don't know if I made profit today" />
+                      <TextArea label="Detail" value={item.detail} onChange={(v) => updateProblemItem(index, "detail", v)} rows={2} />
+                    </div>
+                  </RepeaterCard>
+                ))}
+                {!state.problemSection.items.length && <EmptyList label="No problem cards yet. Default content will be shown on the public page." />}
+              </div>
+            </section>
+
+            {/* Solution section */}
+            <section className="rounded-lg border border-ink/10 bg-white p-4 shadow-sm">
+              <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div className="flex items-start gap-2">
+                  <span className="mt-0.5 text-leaf"><Lightbulb size={18} aria-hidden="true" /></span>
+                  <div>
+                    <h2 className="font-display text-base font-bold text-ink">Solution section</h2>
+                    <p className="mt-1 text-sm font-semibold text-ink/45">Alternating rows showcasing how your product addresses each problem. Leave empty to use defaults.</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => update("solutionSection", { ...state.solutionSection, rows: [...state.solutionSection.rows, { ...emptySolutionRow, bullets: [""] }] })}
+                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-leaf/20 bg-mint px-3 py-2 text-sm font-extrabold text-leaf hover:bg-leaf/10"
+                >
+                  <Plus size={16} aria-hidden="true" />
+                  Add row
+                </button>
+              </div>
+              <div className="mb-4 grid gap-4 lg:grid-cols-3">
+                <TextField label="Eyebrow" value={state.solutionSection.eyebrow} onChange={(v) => update("solutionSection", { ...state.solutionSection, eyebrow: v })} placeholder="The solution" />
+                <TextField label="Heading" value={state.solutionSection.title} onChange={(v) => update("solutionSection", { ...state.solutionSection, title: v })} placeholder="BizTrack gives you the full picture." />
+                <TextArea label="Subheading" value={state.solutionSection.description} onChange={(v) => update("solutionSection", { ...state.solutionSection, description: v })} rows={2} />
+              </div>
+              <div className="grid gap-3">
+                {state.solutionSection.rows.map((row, rowIndex) => (
+                  <RepeaterCard
+                    key={rowIndex}
+                    title={`Row ${rowIndex + 1}`}
+                    onDelete={() => update("solutionSection", { ...state.solutionSection, rows: state.solutionSection.rows.filter((_, i) => i !== rowIndex) })}
+                  >
+                    <div className="grid gap-3 lg:grid-cols-2">
+                      <TextField label="Eyebrow" value={row.eyebrow} onChange={(v) => updateSolutionRow(rowIndex, "eyebrow", v)} placeholder="Money in" />
+                      <TextField label="Title" value={row.title} onChange={(v) => updateSolutionRow(rowIndex, "title", v)} required />
+                      <TextArea label="Description" value={row.description} onChange={(v) => updateSolutionRow(rowIndex, "description", v)} rows={2} className="lg:col-span-2" />
+                    </div>
+                    <div className="mt-3 rounded-lg bg-[#fbfaf6] p-3">
+                      <div className="mb-2 flex items-center justify-between gap-2">
+                        <p className="text-xs font-extrabold uppercase tracking-[0.06em] text-ink/35">Bullet points</p>
+                        <button
+                          type="button"
+                          onClick={() => updateSolutionRowBullets(rowIndex, [...row.bullets, ""])}
+                          className="inline-flex items-center gap-1 rounded-lg border border-ink/10 bg-white px-2 py-1.5 text-xs font-extrabold text-ink/55 hover:bg-[#f4f0e8]"
+                        >
+                          <Plus size={13} aria-hidden="true" />
+                          Add bullet
+                        </button>
+                      </div>
+                      <div className="grid gap-2">
+                        {row.bullets.map((bullet, bulletIndex) => (
+                          <div key={bulletIndex} className="grid gap-2 sm:grid-cols-[1fr_auto]">
+                            <input
+                              value={bullet}
+                              onChange={(e) => {
+                                const next = [...row.bullets];
+                                next[bulletIndex] = e.target.value;
+                                updateSolutionRowBullets(rowIndex, next);
+                              }}
+                              className="rounded-lg border border-ink/15 bg-white px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => updateSolutionRowBullets(rowIndex, row.bullets.filter((_, i) => i !== bulletIndex))}
+                              className="inline-flex items-center justify-center rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-red-600 hover:bg-red-100"
+                              aria-label="Remove bullet"
+                            >
+                              <Trash2 size={15} aria-hidden="true" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </RepeaterCard>
+                ))}
+                {!state.solutionSection.rows.length && <EmptyList label="No solution rows yet. Default content will be shown on the public page." />}
+              </div>
+            </section>
+            </>
+            )}
+
+            {activeTab === "features" && (
+            <>
+            <EditorSection title="Features heading" icon={<FileText size={18} aria-hidden="true" />}>
+              <div className="grid gap-4 lg:grid-cols-3">
+                <TextField label="Features eyebrow" value={state.featuresEyebrow} onChange={(value) => update("featuresEyebrow", value)} />
+                <TextField label="Features title" value={state.featuresTitle} onChange={(value) => update("featuresTitle", value)} />
+                <TextArea label="Features description" value={state.featuresDescription} onChange={(value) => update("featuresDescription", value)} rows={2} />
               </div>
             </EditorSection>
 
@@ -411,6 +1003,16 @@ export default function AdminLandingPagePage() {
                       onChange={(value) => updateFeature(index, "iconName", value)}
                       placeholder="ReceiptText"
                     />
+                    <ImageField
+                      label="Feature picture"
+                      value={feature.imageUrl}
+                      onChange={(value) => updateFeature(index, "imageUrl", value)}
+                      onFile={async (file) => {
+                        const dataUrl = await imageFromFile(file);
+                        if (dataUrl) updateFeature(index, "imageUrl", dataUrl);
+                      }}
+                      onClear={() => updateFeature(index, "imageUrl", "")}
+                    />
                     <TextArea
                       label="Description"
                       value={feature.description}
@@ -424,7 +1026,64 @@ export default function AdminLandingPagePage() {
               ))}
               {!state.features.length && <EmptyList label="No features yet." />}
             </DynamicSection>
+            </>
+            )}
 
+            {activeTab === "story" && (
+            <>
+            {/* How It Works section */}
+            <section className="rounded-lg border border-ink/10 bg-white p-4 shadow-sm">
+              <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div className="flex items-start gap-2">
+                  <span className="mt-0.5 text-leaf"><ClipboardList size={18} aria-hidden="true" /></span>
+                  <div>
+                    <h2 className="font-display text-base font-bold text-ink">How it works</h2>
+                    <p className="mt-1 text-sm font-semibold text-ink/45">Numbered steps showing users how to get started. Leave empty to use default content.</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => update("howItWorks", { ...state.howItWorks, steps: [...state.howItWorks.steps, { ...emptyHowItWorksStep, number: String(state.howItWorks.steps.length + 1).padStart(2, "0") }] })}
+                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-leaf/20 bg-mint px-3 py-2 text-sm font-extrabold text-leaf hover:bg-leaf/10"
+                >
+                  <Plus size={16} aria-hidden="true" />
+                  Add step
+                </button>
+              </div>
+              <div className="mb-4 grid gap-4 lg:grid-cols-3">
+                <TextField label="Eyebrow" value={state.howItWorks.eyebrow} onChange={(v) => update("howItWorks", { ...state.howItWorks, eyebrow: v })} placeholder="How it works" />
+                <TextField label="Heading" value={state.howItWorks.title} onChange={(v) => update("howItWorks", { ...state.howItWorks, title: v })} placeholder="Up and running in minutes" />
+                <TextArea label="Subheading" value={state.howItWorks.description} onChange={(v) => update("howItWorks", { ...state.howItWorks, description: v })} rows={2} />
+              </div>
+              <div className="grid gap-3">
+                {state.howItWorks.steps.map((step, index) => (
+                  <RepeaterCard
+                    key={index}
+                    title={`Step ${index + 1}`}
+                    onDelete={() => update("howItWorks", { ...state.howItWorks, steps: state.howItWorks.steps.filter((_, i) => i !== index) })}
+                  >
+                    <div className="grid gap-3 lg:grid-cols-[80px_1fr]">
+                      <TextField label="Step number" value={step.number} onChange={(v) => updateHowItWorksStep(index, "number", v)} placeholder="01" />
+                      <TextField label="Title" value={step.title} onChange={(v) => updateHowItWorksStep(index, "title", v)} required />
+                      <TextArea label="Description" value={step.description} onChange={(v) => updateHowItWorksStep(index, "description", v)} rows={2} className="lg:col-span-2" />
+                    </div>
+                  </RepeaterCard>
+                ))}
+                {!state.howItWorks.steps.length && <EmptyList label="No steps yet. Default content will be shown on the public page." />}
+              </div>
+            </section>
+            </>
+            )}
+
+            {activeTab === "pricing" && (
+            <>
+            <EditorSection title="Pricing heading" icon={<FileText size={18} aria-hidden="true" />}>
+              <div className="grid gap-4 lg:grid-cols-3">
+                <TextField label="Pricing eyebrow" value={state.pricingEyebrow} onChange={(value) => update("pricingEyebrow", value)} />
+                <TextField label="Pricing title" value={state.pricingTitle} onChange={(value) => update("pricingTitle", value)} />
+                <TextArea label="Pricing description" value={state.pricingDescription} onChange={(value) => update("pricingDescription", value)} rows={2} />
+              </div>
+            </EditorSection>
             <DynamicSection
               title="Pricing section"
               description="Manage public pricing cards and their call-to-action links."
@@ -485,7 +1144,18 @@ export default function AdminLandingPagePage() {
               ))}
               {!state.pricing.length && <EmptyList label="No pricing cards yet." />}
             </DynamicSection>
+            </>
+            )}
 
+            {activeTab === "faq" && (
+            <>
+            <EditorSection title="FAQ heading" icon={<HelpCircle size={18} aria-hidden="true" />}>
+              <div className="grid gap-4 lg:grid-cols-3">
+                <TextField label="FAQ eyebrow" value={state.faqEyebrow} onChange={(value) => update("faqEyebrow", value)} />
+                <TextField label="FAQ title" value={state.faqTitle} onChange={(value) => update("faqTitle", value)} />
+                <TextArea label="FAQ description" value={state.faqDescription} onChange={(value) => update("faqDescription", value)} rows={2} />
+              </div>
+            </EditorSection>
             <DynamicSection
               title="FAQ section"
               description="Questions and answers displayed near the bottom of the public page."
@@ -507,7 +1177,18 @@ export default function AdminLandingPagePage() {
               ))}
               {!state.faqs.length && <EmptyList label="No FAQs yet." />}
             </DynamicSection>
+            </>
+            )}
 
+            {activeTab === "testimonials" && (
+            <>
+            <EditorSection title="Testimonials heading" icon={<Star size={18} aria-hidden="true" />}>
+              <div className="grid gap-4 lg:grid-cols-3">
+                <TextField label="Testimonials eyebrow" value={state.testimonialsEyebrow} onChange={(value) => update("testimonialsEyebrow", value)} />
+                <TextField label="Testimonials title" value={state.testimonialsTitle} onChange={(value) => update("testimonialsTitle", value)} />
+                <TextArea label="Testimonials description" value={state.testimonialsDescription} onChange={(value) => update("testimonialsDescription", value)} rows={2} />
+              </div>
+            </EditorSection>
             <DynamicSection
               title="Testimonials"
               description="Optional customer quotes for the public landing page."
@@ -524,13 +1205,28 @@ export default function AdminLandingPagePage() {
                   <div className="grid gap-3 lg:grid-cols-2">
                     <TextField label="Name" value={testimonial.name} onChange={(value) => updateTestimonial(index, "name", value)} required />
                     <TextField label="Business" value={testimonial.business} onChange={(value) => updateTestimonial(index, "business", value)} />
+                    <TextField label="Role" value={testimonial.role} onChange={(value) => updateTestimonial(index, "role", value)} placeholder="Owner" />
+                    <ImageField
+                      label="Avatar"
+                      value={testimonial.avatarUrl}
+                      onChange={(value) => updateTestimonial(index, "avatarUrl", value)}
+                      onFile={async (file) => {
+                        const dataUrl = await imageFromFile(file);
+                        if (dataUrl) updateTestimonial(index, "avatarUrl", dataUrl);
+                      }}
+                      onClear={() => updateTestimonial(index, "avatarUrl", "")}
+                    />
                     <TextArea label="Message" value={testimonial.message} onChange={(value) => updateTestimonial(index, "message", value)} rows={3} required className="lg:col-span-2" />
                   </div>
                 </RepeaterCard>
               ))}
               {!state.testimonials.length && <EmptyList label="No testimonials yet." />}
             </DynamicSection>
+            </>
+            )}
 
+            {activeTab === "footer" && (
+            <>
             <DynamicSection
               title="Footer contact"
               description="Manage the contact details shown in the public footer."
@@ -571,12 +1267,77 @@ export default function AdminLandingPagePage() {
               {!state.footerLinks.length && <EmptyList label="No footer contacts yet. Defaults will be shown on the public page." />}
             </DynamicSection>
 
+            <EditorSection title="Footer settings" icon={<MapPin size={18} aria-hidden="true" />}>
+              <div className="grid gap-4 lg:grid-cols-2">
+                <TextArea label="Footer tagline" value={state.footerTagline} onChange={(value) => update("footerTagline", value)} rows={2} className="lg:col-span-2" />
+                <TextField label="Footer badge text" value={state.footerBadge} onChange={(value) => update("footerBadge", value)} placeholder="Free to get started" />
+              </div>
+            </EditorSection>
+
+            <DynamicSection
+              title="Footer product links"
+              description="Navigation links shown in the Product column of the footer."
+              icon={<FileText size={18} aria-hidden="true" />}
+              addLabel="Add link"
+              onAdd={() => update("footerProductLinks", [...state.footerProductLinks, { ...emptyFooterNavLink }])}
+            >
+              {state.footerProductLinks.map((item, index) => (
+                <RepeaterCard
+                  key={index}
+                  title={`Link ${index + 1}`}
+                  onDelete={() => update("footerProductLinks", state.footerProductLinks.filter((_, i) => i !== index))}
+                >
+                  <div className="grid gap-3 lg:grid-cols-2">
+                    <TextField label="Label" value={item.label} onChange={(v) => update("footerProductLinks", state.footerProductLinks.map((it, i) => i === index ? { ...it, label: v } : it))} placeholder="Features" />
+                    <TextField label="URL / anchor" value={item.href} onChange={(v) => update("footerProductLinks", state.footerProductLinks.map((it, i) => i === index ? { ...it, href: v } : it))} placeholder="#features" />
+                  </div>
+                </RepeaterCard>
+              ))}
+              {!state.footerProductLinks.length && <EmptyList label="No product links yet. Defaults will be shown." />}
+            </DynamicSection>
+
+            <DynamicSection
+              title="Footer company links"
+              description="Navigation links shown in the Company column of the footer."
+              icon={<FileText size={18} aria-hidden="true" />}
+              addLabel="Add link"
+              onAdd={() => update("footerCompanyLinks", [...state.footerCompanyLinks, { ...emptyFooterNavLink }])}
+            >
+              {state.footerCompanyLinks.map((item, index) => (
+                <RepeaterCard
+                  key={index}
+                  title={`Link ${index + 1}`}
+                  onDelete={() => update("footerCompanyLinks", state.footerCompanyLinks.filter((_, i) => i !== index))}
+                >
+                  <div className="grid gap-3 lg:grid-cols-2">
+                    <TextField label="Label" value={item.label} onChange={(v) => update("footerCompanyLinks", state.footerCompanyLinks.map((it, i) => i === index ? { ...it, label: v } : it))} placeholder="About" />
+                    <TextField label="URL / anchor" value={item.href} onChange={(v) => update("footerCompanyLinks", state.footerCompanyLinks.map((it, i) => i === index ? { ...it, href: v } : it))} placeholder="#" />
+                  </div>
+                </RepeaterCard>
+              ))}
+              {!state.footerCompanyLinks.length && <EmptyList label="No company links yet. Defaults will be shown." />}
+            </DynamicSection>
+            </>
+            )}
+
+            {activeTab === "seo" && (
+            <>
+            <EditorSection title="Final CTA" icon={<Send size={18} aria-hidden="true" />}>
+              <div className="grid gap-4 lg:grid-cols-2">
+                <TextField label="Final CTA kicker" value={state.finalCtaKicker} onChange={(value) => update("finalCtaKicker", value)} />
+                <TextField label="Final CTA title" value={state.finalCtaTitle} onChange={(value) => update("finalCtaTitle", value)} />
+                <TextArea label="Final CTA description" value={state.finalCtaDescription} onChange={(value) => update("finalCtaDescription", value)} rows={3} className="lg:col-span-2" />
+              </div>
+            </EditorSection>
+
             <EditorSection title="SEO" icon={<Search size={18} aria-hidden="true" />}>
               <div className="grid gap-4 lg:grid-cols-2">
                 <TextField label="SEO title" value={state.seoTitle} onChange={(value) => update("seoTitle", value)} />
                 <TextArea label="SEO description" value={state.seoDescription} onChange={(value) => update("seoDescription", value)} rows={3} className="lg:col-span-2" />
               </div>
             </EditorSection>
+            </>
+            )}
           </form>
         )}
       </div>
@@ -623,6 +1384,34 @@ export default function AdminLandingPagePage() {
       "footerLinks",
       state.footerLinks.map((item, itemIndex) => (itemIndex === index ? { ...item, [key]: value } : item)),
     );
+  }
+
+  function updateProblemItem<K extends keyof ProblemItem>(index: number, key: K, value: string) {
+    update("problemSection", {
+      ...state.problemSection,
+      items: state.problemSection.items.map((item, i) => (i === index ? { ...item, [key]: value } : item)),
+    });
+  }
+
+  function updateSolutionRow<K extends keyof Omit<SolutionRow, "bullets">>(index: number, key: K, value: string) {
+    update("solutionSection", {
+      ...state.solutionSection,
+      rows: state.solutionSection.rows.map((row, i) => (i === index ? { ...row, [key]: value } : row)),
+    });
+  }
+
+  function updateSolutionRowBullets(rowIndex: number, bullets: string[]) {
+    update("solutionSection", {
+      ...state.solutionSection,
+      rows: state.solutionSection.rows.map((row, i) => (i === rowIndex ? { ...row, bullets } : row)),
+    });
+  }
+
+  function updateHowItWorksStep<K extends keyof HowItWorksStep>(index: number, key: K, value: string) {
+    update("howItWorks", {
+      ...state.howItWorks,
+      steps: state.howItWorks.steps.map((step, i) => (i === index ? { ...step, [key]: value } : step)),
+    });
   }
 }
 
@@ -749,6 +1538,67 @@ function TextArea({
         className="mt-1 w-full rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
       />
     </label>
+  );
+}
+
+function ImageField({
+  label,
+  value,
+  onChange,
+  onFile,
+  onClear,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  onFile: (file: File) => void | Promise<void>;
+  onClear: () => void;
+}) {
+  return (
+    <div className="text-sm font-bold text-ink/65">
+      <span>{label}</span>
+      <div className="mt-1 grid gap-2">
+        {value ? (
+          <div className="overflow-hidden rounded-lg border border-ink/10 bg-white">
+            <img src={value} alt="" className="h-32 w-full object-cover" />
+          </div>
+        ) : (
+          <div className="grid h-32 place-items-center rounded-lg border border-dashed border-ink/15 bg-[#fbfaf6] text-xs font-extrabold text-ink/35">
+            No image selected
+          </div>
+        )}
+        <input
+          value={value.startsWith("data:") ? "" : value}
+          onChange={(event) => onChange(event.target.value)}
+          placeholder="Paste image URL or upload a file"
+          className="w-full rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+        />
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-leaf/20 bg-mint px-3 py-2 text-xs font-extrabold text-leaf hover:bg-leaf/10">
+            <ImagePlus size={14} aria-hidden="true" />
+            Upload image
+            <input
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file) void onFile(file);
+                event.target.value = "";
+              }}
+              className="hidden"
+            />
+          </label>
+          <button
+            type="button"
+            onClick={onClear}
+            disabled={!value}
+            className="inline-flex items-center justify-center rounded-lg border border-ink/10 bg-white px-3 py-2 text-xs font-extrabold text-ink/55 hover:bg-[#f4f0e8] disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Clear
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 

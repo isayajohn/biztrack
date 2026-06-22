@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Business;
 use App\Models\Expense;
+use App\Models\InventoryNotification;
 use App\Models\Product;
 use App\Models\Sale;
+use App\Models\StockMovement;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -195,6 +197,56 @@ class ReportController extends Controller
                 ]),
             ],
         ]);
+    }
+
+    public function inventoryDashboard(): JsonResponse
+    {
+        $business = Business::where('user_id', auth()->id())->first();
+        if (!$business) {
+            return response()->json(['success' => true, 'data' => [
+                'totalProducts' => 0, 'activeProducts' => 0, 'lowStockItems' => 0,
+                'outOfStockItems' => 0, 'expiredItems' => 0, 'nearExpiryItems' => 0,
+                'totalStockValue' => 0, 'totalRetailValue' => 0, 'todayMovements' => 0,
+                'unreadNotifications' => 0, 'topProducts' => [],
+            ]]);
+        }
+
+        $topProducts = Sale::where('sales.business_id', $business->id)
+            ->join('products', 'sales.product_id', '=', 'products.id')
+            ->select('sales.product_id', 'products.name as product_name',
+                DB::raw('SUM(sales.quantity) as total_qty'),
+                DB::raw('SUM(sales.total_amount) as revenue'))
+            ->groupBy('sales.product_id', 'products.name')
+            ->orderByDesc('total_qty')
+            ->take(5)
+            ->get()
+            ->map(fn($r) => [
+                'productId' => $r->product_id,
+                'productName' => $r->product_name,
+                'totalQty' => (int) $r->total_qty,
+                'revenue' => (float) $r->revenue,
+            ]);
+
+        return response()->json(['success' => true, 'data' => [
+            'totalProducts' => Product::where('business_id', $business->id)->count(),
+            'activeProducts' => Product::where('business_id', $business->id)->where('is_active', true)->count(),
+            'lowStockItems' => Product::where('business_id', $business->id)
+                ->whereRaw('stock_quantity <= reorder_point AND stock_quantity > 0 AND is_active = 1')->count(),
+            'outOfStockItems' => Product::where('business_id', $business->id)->where('stock_quantity', 0)->count(),
+            'expiredItems' => Product::where('business_id', $business->id)
+                ->whereNotNull('expiry_date')->where('expiry_date', '<', now())->count(),
+            'nearExpiryItems' => Product::where('business_id', $business->id)
+                ->whereNotNull('expiry_date')->whereBetween('expiry_date', [now(), now()->addDays(30)])->count(),
+            'totalStockValue' => (float) Product::where('business_id', $business->id)
+                ->selectRaw('COALESCE(SUM(stock_quantity * buying_price), 0) as val')->value('val'),
+            'totalRetailValue' => (float) Product::where('business_id', $business->id)
+                ->selectRaw('COALESCE(SUM(stock_quantity * selling_price), 0) as val')->value('val'),
+            'todayMovements' => StockMovement::where('business_id', $business->id)
+                ->whereDate('created_at', today())->count(),
+            'unreadNotifications' => InventoryNotification::where('business_id', $business->id)
+                ->where('is_read', false)->count(),
+            'topProducts' => $topProducts,
+        ]]);
     }
 
     private function emptyDashboard(): array

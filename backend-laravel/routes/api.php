@@ -20,6 +20,12 @@ use App\Http\Controllers\Api\SecurityConfigController;
 use App\Http\Controllers\Api\SmsConfigController;
 use App\Http\Controllers\Api\SmsTemplateController;
 use App\Http\Controllers\Api\SubscriptionController;
+use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\SupplierController;
+use App\Http\Controllers\Api\StockController;
+use App\Http\Controllers\Api\PurchaseController;
+use App\Http\Controllers\Api\DamagedStockController;
+use App\Http\Controllers\Api\InventoryNotificationController;
 use Illuminate\Support\Facades\Route;
 
 // Health check
@@ -100,6 +106,62 @@ Route::middleware('jwt.auth')->group(function () {
 
     // Reports
     Route::get('/reports', [ReportController::class, 'getReports']);
+    Route::get('/reports/inventory-dashboard', [ReportController::class, 'inventoryDashboard']);
+
+    // Categories
+    Route::prefix('categories')->group(function () {
+        Route::get('/', [CategoryController::class, 'listCategories']);
+        Route::post('/', [CategoryController::class, 'createCategory']);
+        Route::put('/{id}', [CategoryController::class, 'updateCategory']);
+        Route::delete('/{id}', [CategoryController::class, 'deleteCategory']);
+    });
+
+    // Suppliers
+    Route::prefix('suppliers')->group(function () {
+        Route::get('/', [SupplierController::class, 'listSuppliers']);
+        Route::post('/', [SupplierController::class, 'createSupplier']);
+        Route::get('/{id}', [SupplierController::class, 'getSupplier']);
+        Route::put('/{id}', [SupplierController::class, 'updateSupplier']);
+        Route::delete('/{id}', [SupplierController::class, 'deleteSupplier']);
+    });
+
+    // Stock
+    Route::prefix('stock')->group(function () {
+        Route::post('/in', [StockController::class, 'stockIn']);
+        Route::post('/out', [StockController::class, 'stockOut']);
+        Route::get('/movements', [StockController::class, 'getMovements']);
+        Route::get('/low-stock', [StockController::class, 'getLowStock']);
+        Route::get('/expired', [StockController::class, 'getExpired']);
+        Route::post('/adjustment', [StockController::class, 'createAdjustment']);
+        Route::put('/adjustment/{id}/approve', [StockController::class, 'approveAdjustment']);
+        Route::put('/adjustment/{id}/reject', [StockController::class, 'rejectAdjustment']);
+    });
+
+    // Purchases
+    Route::prefix('purchases')->group(function () {
+        Route::get('/', [PurchaseController::class, 'listPurchases']);
+        Route::post('/', [PurchaseController::class, 'createPurchase']);
+        Route::get('/{id}', [PurchaseController::class, 'getPurchase']);
+        Route::put('/{id}', [PurchaseController::class, 'updatePurchase']);
+        Route::put('/{id}/receive', [PurchaseController::class, 'receivePurchase']);
+        Route::delete('/{id}', [PurchaseController::class, 'deletePurchase']);
+    });
+
+    // Damaged stock
+    Route::prefix('damaged-stock')->group(function () {
+        Route::get('/', [DamagedStockController::class, 'list']);
+        Route::post('/', [DamagedStockController::class, 'create']);
+        Route::put('/{id}/approve', [DamagedStockController::class, 'approve']);
+        Route::put('/{id}/reject', [DamagedStockController::class, 'reject']);
+    });
+
+    // Notifications
+    Route::prefix('notifications')->group(function () {
+        Route::get('/', [InventoryNotificationController::class, 'list']);
+        Route::get('/unread-count', [InventoryNotificationController::class, 'getUnreadCount']);
+        Route::put('/mark-all-read', [InventoryNotificationController::class, 'markAllRead']);
+        Route::put('/{id}/read', [InventoryNotificationController::class, 'markRead']);
+    });
 
     // Subscriptions
     Route::prefix('subscriptions')->group(function () {

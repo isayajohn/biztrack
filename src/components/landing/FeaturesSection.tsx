@@ -5,8 +5,25 @@ import {
   BarChart3,
   FileText,
   Smartphone,
+  Sparkles,
 } from "lucide-react";
 import { FeatureCard, SectionHeader } from "./LandingDesignSystem";
+
+type FeatureContent = {
+  title?: unknown;
+  description?: unknown;
+  iconName?: unknown;
+  imageUrl?: unknown;
+};
+
+const iconMap = {
+  BarChart3,
+  Boxes,
+  FileText,
+  ReceiptText,
+  Smartphone,
+  WalletCards,
+};
 
 const features = [
   {
@@ -45,22 +62,55 @@ const features = [
     description:
       "Built for phones first. Use BizTrack on your Android or iPhone with no downloads required.",
   },
-];
+].map((feature) => ({ ...feature, imageUrl: "" }));
 
-export default function FeaturesSection() {
+function textFrom(value: unknown) {
+  if (typeof value === "string") return value.trim();
+  if (typeof value === "number") return String(value);
+  return "";
+}
+
+function normalizeFeatures(items?: FeatureContent[] | null) {
+  const dynamicFeatures = Array.isArray(items)
+    ? items
+        .map((item) => {
+          const iconName = textFrom(item.iconName);
+          return {
+            icon: iconMap[iconName as keyof typeof iconMap] ?? Sparkles,
+            title: textFrom(item.title),
+            description: textFrom(item.description),
+            imageUrl: textFrom(item.imageUrl),
+          };
+        })
+        .filter((item) => item.title && item.description)
+    : [];
+
+  return dynamicFeatures.length ? dynamicFeatures : features;
+}
+
+type Props = {
+  eyebrow?: string | null;
+  title?: string | null;
+  description?: string | null;
+  features?: FeatureContent[] | null;
+};
+
+export default function FeaturesSection({ eyebrow, title, description, features: dynamicFeatures }: Props) {
+  const visibleFeatures = normalizeFeatures(dynamicFeatures);
+
   return (
     <section id="features" className="scroll-mt-20 bg-white py-16 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeader
-          eyebrow="Everything you need"
-          title="Powerful features, simple enough for anyone"
-          description="BizTrack packs everything a small business owner needs into a clean, easy-to-use interface."
+          eyebrow={eyebrow || "Everything you need"}
+          title={title || "Powerful features, simple enough for anyone"}
+          description={description || "BizTrack packs everything a small business owner needs into a clean, easy-to-use interface."}
           align="center"
         />
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map(({ icon, title, description }) => (
-            <FeatureCard key={title} icon={icon} title={title} description={description} />
+          {visibleFeatures.map(({ icon, title, description, imageUrl }) => (
+            <FeatureCard key={title} icon={icon} title={title} description={description} imageUrl={imageUrl} />
           ))}
         </div>
       </div>

@@ -28,6 +28,14 @@ import ReportsPage from "./pages/ReportsPage";
 import SubscriptionPage from "./pages/SubscriptionPage";
 import SettingsPage from "./pages/SettingsPage";
 import OnboardingPage from "./pages/OnboardingPage";
+import CategoriesPage from "./pages/CategoriesPage";
+import SuppliersPage from "./pages/SuppliersPage";
+import PurchasesPage from "./pages/PurchasesPage";
+import StockMovementsPage from "./pages/StockMovementsPage";
+import StockInPage from "./pages/StockInPage";
+import DamagedStockPage from "./pages/DamagedStockPage";
+import InventoryReportsPage from "./pages/InventoryReportsPage";
+import NotificationsPage from "./pages/NotificationsPage";
 import AdminAuditLogsPage from "./pages/admin/AdminAuditLogsPage";
 import AdminBusinessDetailPage from "./pages/admin/AdminBusinessDetailPage";
 import AdminBusinessesPage from "./pages/admin/AdminBusinessesPage";
@@ -87,6 +95,15 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 <Route path="/reports" element={<ReportsPage />} />
                 <Route path="/subscription" element={<SubscriptionPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
+                {/* Inventory module */}
+                <Route path="/inventory/categories" element={<CategoriesPage />} />
+                <Route path="/inventory/suppliers" element={<SuppliersPage />} />
+                <Route path="/inventory/purchases" element={<PurchasesPage />} />
+                <Route path="/inventory/stock-in" element={<StockInPage />} />
+                <Route path="/inventory/stock-movements" element={<StockMovementsPage />} />
+                <Route path="/inventory/damaged-stock" element={<DamagedStockPage />} />
+                <Route path="/inventory/reports" element={<InventoryReportsPage />} />
+                <Route path="/notifications" element={<NotificationsPage />} />
               </Route>
             </Route>
 

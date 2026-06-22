@@ -59,13 +59,22 @@ class ProductController extends Controller
         if (!$business) return response()->json(['success' => false, 'error' => 'Business not found'], 404);
 
         $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'sku' => 'nullable|string',
-            'buyingPrice' => 'required|numeric|min:0',
+            'name'         => 'required|string|max:255',
+            'sku'          => 'nullable|string',
+            'barcode'      => 'nullable|string|max:255',
+            'brand'        => 'nullable|string|max:255',
+            'unitType'     => 'nullable|in:pcs,box,kg,litre,pack,dozen',
+            'categoryId'   => 'nullable|uuid',
+            'supplierId'   => 'nullable|uuid',
+            'buyingPrice'  => 'required|numeric|min:0',
             'sellingPrice' => 'required|numeric|min:0',
-            'stockQuantity' => 'integer|min:0',
-            'lowStockLevel' => 'integer|min:0',
-            'isActive' => 'boolean',
+            'stockQuantity'=> 'integer|min:0',
+            'lowStockLevel'=> 'integer|min:0',
+            'reorderPoint' => 'sometimes|integer|min:0',
+            'expiryDate'   => 'nullable|date',
+            'imageUrl'     => 'nullable|string|max:1000',
+            'notes'        => 'nullable|string',
+            'isActive'     => 'boolean',
         ]);
 
         if (!empty($data['sku'])) {
@@ -74,15 +83,24 @@ class ProductController extends Controller
         }
 
         $product = Product::create([
-            'id' => Str::uuid(),
-            'business_id' => $business->id,
-            'name' => $data['name'],
-            'sku' => $data['sku'] ?? null,
-            'buying_price' => $data['buyingPrice'],
+            'id'            => Str::uuid()->toString(),
+            'business_id'   => $business->id,
+            'name'          => $data['name'],
+            'sku'           => $data['sku'] ?? null,
+            'barcode'       => $data['barcode'] ?? null,
+            'brand'         => $data['brand'] ?? null,
+            'unit_type'     => $data['unitType'] ?? 'pcs',
+            'category_id'   => $data['categoryId'] ?? null,
+            'supplier_id'   => $data['supplierId'] ?? null,
+            'buying_price'  => $data['buyingPrice'],
             'selling_price' => $data['sellingPrice'],
-            'stock_quantity' => $data['stockQuantity'] ?? 0,
+            'stock_quantity'=> $data['stockQuantity'] ?? 0,
             'low_stock_level' => $data['lowStockLevel'] ?? 0,
-            'is_active' => $data['isActive'] ?? true,
+            'reorder_point' => $data['reorderPoint'] ?? 0,
+            'expiry_date'   => $data['expiryDate'] ?? null,
+            'image_url'     => $data['imageUrl'] ?? null,
+            'notes'         => $data['notes'] ?? null,
+            'is_active'     => $data['isActive'] ?? true,
         ]);
 
         AuditService::log([
@@ -115,23 +133,41 @@ class ProductController extends Controller
         if (!$product) return response()->json(['success' => false, 'error' => 'Product not found'], 404);
 
         $data = $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'sku' => 'nullable|string',
-            'buyingPrice' => 'sometimes|numeric|min:0',
+            'name'         => 'sometimes|string|max:255',
+            'sku'          => 'nullable|string',
+            'barcode'      => 'nullable|string|max:255',
+            'brand'        => 'nullable|string|max:255',
+            'unitType'     => 'nullable|in:pcs,box,kg,litre,pack,dozen',
+            'categoryId'   => 'nullable|uuid',
+            'supplierId'   => 'nullable|uuid',
+            'buyingPrice'  => 'sometimes|numeric|min:0',
             'sellingPrice' => 'sometimes|numeric|min:0',
-            'stockQuantity' => 'sometimes|integer|min:0',
-            'lowStockLevel' => 'sometimes|integer|min:0',
-            'isActive' => 'sometimes|boolean',
+            'stockQuantity'=> 'sometimes|integer|min:0',
+            'lowStockLevel'=> 'sometimes|integer|min:0',
+            'reorderPoint' => 'sometimes|integer|min:0',
+            'expiryDate'   => 'nullable|date',
+            'imageUrl'     => 'nullable|string|max:1000',
+            'notes'        => 'nullable|string',
+            'isActive'     => 'sometimes|boolean',
         ]);
 
         $product->update([
-            'name' => $data['name'] ?? $product->name,
-            'sku' => array_key_exists('sku', $data) ? $data['sku'] : $product->sku,
-            'buying_price' => $data['buyingPrice'] ?? $product->buying_price,
+            'name'          => $data['name'] ?? $product->name,
+            'sku'           => array_key_exists('sku', $data) ? $data['sku'] : $product->sku,
+            'barcode'       => array_key_exists('barcode', $data) ? $data['barcode'] : $product->barcode,
+            'brand'         => array_key_exists('brand', $data) ? $data['brand'] : $product->brand,
+            'unit_type'     => $data['unitType'] ?? $product->unit_type,
+            'category_id'   => array_key_exists('categoryId', $data) ? $data['categoryId'] : $product->category_id,
+            'supplier_id'   => array_key_exists('supplierId', $data) ? $data['supplierId'] : $product->supplier_id,
+            'buying_price'  => $data['buyingPrice'] ?? $product->buying_price,
             'selling_price' => $data['sellingPrice'] ?? $product->selling_price,
-            'stock_quantity' => $data['stockQuantity'] ?? $product->stock_quantity,
+            'stock_quantity'  => $data['stockQuantity'] ?? $product->stock_quantity,
             'low_stock_level' => $data['lowStockLevel'] ?? $product->low_stock_level,
-            'is_active' => $data['isActive'] ?? $product->is_active,
+            'reorder_point'   => $data['reorderPoint'] ?? $product->reorder_point,
+            'expiry_date'     => array_key_exists('expiryDate', $data) ? $data['expiryDate'] : $product->expiry_date,
+            'image_url'       => array_key_exists('imageUrl', $data) ? $data['imageUrl'] : $product->image_url,
+            'notes'           => array_key_exists('notes', $data) ? $data['notes'] : $product->notes,
+            'is_active'       => $data['isActive'] ?? $product->is_active,
         ]);
 
         AuditService::log([

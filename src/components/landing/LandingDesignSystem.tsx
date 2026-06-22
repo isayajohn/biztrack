@@ -121,14 +121,19 @@ type FeatureCardProps = {
   icon: LucideIcon;
   title: string;
   description: string;
+  imageUrl?: string;
 };
 
-export function FeatureCard({ icon: Icon, title, description }: FeatureCardProps) {
+export function FeatureCard({ icon: Icon, title, description, imageUrl }: FeatureCardProps) {
   return (
     <MotionPanel className="group flex h-full flex-col rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-200 hover:border-emerald-200 hover:shadow-card">
-      <span className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-lg bg-mint text-leaf ring-1 ring-emerald-100">
-        <AnimatedIcon icon={Icon} size={22} />
-      </span>
+      {imageUrl ? (
+        <img src={imageUrl} alt="" className="mb-4 h-32 w-full rounded-lg object-cover ring-1 ring-slate-200" />
+      ) : (
+        <span className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-lg bg-mint text-leaf ring-1 ring-emerald-100">
+          <AnimatedIcon icon={Icon} size={22} />
+        </span>
+      )}
       <h3 className="font-display text-lg font-bold text-ink">{title}</h3>
       <p className="mt-2.5 text-sm leading-6 text-slateMuted">{description}</p>
     </MotionPanel>

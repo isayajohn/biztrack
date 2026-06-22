@@ -13,6 +13,17 @@ type Plan = {
   cta: string;
   highlighted: boolean;
   badge?: string;
+  to: string;
+};
+
+type PricingContent = {
+  name?: unknown;
+  title?: unknown;
+  price?: unknown;
+  description?: unknown;
+  features?: unknown;
+  buttonText?: unknown;
+  buttonUrl?: unknown;
 };
 
 function limitLabel(label: string, value: number) {
@@ -50,15 +61,61 @@ function packageCta(plan: PublicPackage) {
   return plan.trialDays > 0 ? "Start Trial" : "Get Started";
 }
 
+function textFrom(value: unknown) {
+  if (typeof value === "string") return value.trim();
+  if (typeof value === "number") return String(value);
+  return "";
+}
+
+function featureListFrom(value: unknown) {
+  return Array.isArray(value) ? value.map(textFrom).filter(Boolean) : [];
+}
+
+function contentPlansFrom(items?: PricingContent[] | null): Plan[] {
+  if (!Array.isArray(items)) return [];
+
+  return items
+    .map((item, index) => {
+      const name = textFrom(item.name) || textFrom(item.title);
+      const price = textFrom(item.price);
+      return {
+        name,
+        slug: name.toLowerCase().replace(/[^a-z0-9]+/g, "-") || `plan-${index + 1}`,
+        price,
+        period: price.toLowerCase() === "free" ? "forever" : "month",
+        description: textFrom(item.description),
+        features: featureListFrom(item.features),
+        cta: textFrom(item.buttonText) || "Get Started",
+        to: textFrom(item.buttonUrl) || "/register",
+        highlighted: index === 1,
+        badge: index === 1 ? "Most Popular" : undefined,
+      };
+    })
+    .filter((plan) => plan.name && plan.price && plan.description);
+}
+
 function packageDescription(plan: PublicPackage) {
   return plan.description || "Configured by admin with package-specific limits and feature access.";
 }
 
-export default function PricingSection() {
+type Props = {
+  eyebrow?: string | null;
+  title?: string | null;
+  description?: string | null;
+  pricing?: PricingContent[] | null;
+};
+
+export default function PricingSection({ eyebrow, title, description, pricing }: Props) {
   const [packages, setPackages] = useState<PublicPackage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const contentPlans = useMemo(() => contentPlansFrom(pricing), [pricing]);
 
   useEffect(() => {
+    if (contentPlans.length > 0) {
+      setIsLoading(false);
+      return undefined;
+    }
+
     let alive = true;
 
     getPublicPackages()
@@ -75,9 +132,11 @@ export default function PricingSection() {
     return () => {
       alive = false;
     };
-  }, []);
+  }, [contentPlans.length]);
 
   const plans = useMemo<Plan[]>(() => {
+    if (contentPlans.length > 0) return contentPlans;
+
     const highlightedPackage =
       packages.find((plan) => plan.slug.toLowerCase() === "pro") ??
       packages.find((plan) => plan.priceMonthly > 0) ??
@@ -94,19 +153,20 @@ export default function PricingSection() {
         description: packageDescription(plan),
         features: packageFeatures(plan),
         cta: packageCta(plan),
+        to: `/register?package=${encodeURIComponent(plan.slug)}`,
         highlighted,
         badge: highlighted && packages.length > 1 ? "Most Popular" : undefined,
       };
     });
-  }, [packages]);
+  }, [contentPlans, packages]);
 
   return (
     <section id="pricing" className="scroll-mt-20 bg-cloud py-16 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeader
-          eyebrow="Pricing"
-          title="Start free, scale when you're ready"
-          description="No hidden fees. No contracts. Cancel anytime."
+          eyebrow={eyebrow || "Pricing"}
+          title={title || "Start free, scale when you're ready"}
+          description={description || "No hidden fees. No contracts. Cancel anytime."}
           align="center"
         />
 
@@ -122,7 +182,7 @@ export default function PricingSection() {
               <PricingCard
                 key={plan.slug}
                 {...plan}
-                to={`/register?package=${encodeURIComponent(plan.slug)}`}
+                to={plan.to}
               />
             ))}
           </div>
