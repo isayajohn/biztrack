@@ -6,6 +6,8 @@ import {
   getProductById,
   updateProduct,
 } from "../services/productService";
+import { getCategories, getSuppliers } from "../services/inventoryApi";
+import type { Category, Supplier } from "../services/inventoryApi";
 import { getApiErrorMessage } from "../services/apiClient";
 import type { ProductFormData } from "../types/product";
 import { formatCurrency } from "../utils/format";
@@ -70,6 +72,8 @@ function inputCls(hasError?: boolean) {
 const EMPTY_FORM: ProductFormData = {
   name: "",
   sku: "",
+  categoryId: "",
+  supplierId: "",
   buyingPrice: "",
   sellingPrice: "",
   stock: "",
@@ -96,6 +100,18 @@ export default function ProductFormPage({ embedded = false, onClose, onSaved }: 
   const [isLoading, setIsLoading] = useState(isEdit);
   const [submitError, setSubmitError] = useState("");
   const [notFound, setNotFound] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+
+  // Load categories and suppliers for dropdowns
+  useEffect(() => {
+    Promise.all([getCategories(), getSuppliers()])
+      .then(([cats, sups]) => {
+        setCategories(cats.filter((c) => c.isActive));
+        setSuppliers(sups.filter((s) => s.isActive));
+      })
+      .catch(() => {});
+  }, []);
 
   // Load existing product for edit
   useEffect(() => {
@@ -112,6 +128,8 @@ export default function ProductFormPage({ embedded = false, onClose, onSaved }: 
         setFields({
           name: product.name,
           sku: product.sku ?? "",
+          categoryId: product.categoryId ?? "",
+          supplierId: product.supplierId ?? "",
           buyingPrice: String(product.buyingPrice),
           sellingPrice: String(product.sellingPrice),
           stock: String(product.stock),
@@ -145,17 +163,23 @@ export default function ProductFormPage({ embedded = false, onClose, onSaved }: 
       ? ((margin! / buyNum) * 100).toFixed(1)
       : null;
 
-  // Field updater
+  // Field updater for inputs
   const set =
     (key: keyof ProductFormData) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value =
-        key === "isActive" ? (e.target as HTMLInputElement).checked : e.target.value;
+      const value = key === "isActive" ? e.target.checked : e.target.value;
       setFields((prev) => ({ ...prev, [key]: value }));
       if (errors[key]) setErrors((prev) => ({ ...prev, [key]: undefined }));
     };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Field updater for selects
+  const setSelect =
+    (key: keyof ProductFormData) =>
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      setFields((prev) => ({ ...prev, [key]: e.target.value }));
+    };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const errs = validate(fields);
     if (Object.keys(errs).length > 0) {
@@ -169,6 +193,8 @@ export default function ProductFormPage({ embedded = false, onClose, onSaved }: 
       const data = {
         name: fields.name.trim(),
         sku: fields.sku.trim() || undefined,
+        categoryId: fields.categoryId || null,
+        supplierId: fields.supplierId || null,
         buyingPrice: parseFloat(fields.buyingPrice),
         sellingPrice: parseFloat(fields.sellingPrice),
         stock: parseInt(fields.stock, 10),
@@ -286,6 +312,54 @@ export default function ProductFormPage({ embedded = false, onClose, onSaved }: 
               onChange={set("sku")}
               className={inputCls()}
             />
+          </div>
+
+          {/* Category + Supplier */}
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <div>
+              <label
+                htmlFor="categoryId"
+                className="mb-1.5 block text-sm font-semibold text-ink"
+              >
+                Category{" "}
+                <span className="font-normal text-ink/40">(optional)</span>
+              </label>
+              <select
+                id="categoryId"
+                value={fields.categoryId}
+                onChange={setSelect("categoryId")}
+                className={inputCls()}
+              >
+                <option value="">— No category —</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label
+                htmlFor="supplierId"
+                className="mb-1.5 block text-sm font-semibold text-ink"
+              >
+                Supplier{" "}
+                <span className="font-normal text-ink/40">(optional)</span>
+              </label>
+              <select
+                id="supplierId"
+                value={fields.supplierId}
+                onChange={setSelect("supplierId")}
+                className={inputCls()}
+              >
+                <option value="">— No supplier —</option>
+                {suppliers.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </section>
 

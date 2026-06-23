@@ -2,6 +2,10 @@ export type Product = {
   id: string;
   name: string;
   sku?: string;
+  categoryId?: string | null;
+  category?: { id: string; name: string } | null;
+  supplierId?: string | null;
+  supplier?: { id: string; name: string } | null;
   buyingPrice: number;
   sellingPrice: number;
   stock: number;
@@ -14,6 +18,8 @@ export type Product = {
 export type ProductFormData = {
   name: string;
   sku: string;
+  categoryId: string;
+  supplierId: string;
   buyingPrice: string;
   sellingPrice: string;
   stock: string;

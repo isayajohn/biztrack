@@ -40,7 +40,7 @@ class ProductController extends Controller
         $total = $query->count();
         $page = (int) $request->get('page', 1);
         $limit = (int) $request->get('limit', 50);
-        $products = $query->orderByDesc('created_at')->skip(($page - 1) * $limit)->take($limit)->get();
+        $products = $query->with(['category', 'supplier'])->orderByDesc('created_at')->skip(($page - 1) * $limit)->take($limit)->get();
 
         return response()->json([
             'success' => true,
@@ -118,7 +118,7 @@ class ProductController extends Controller
         $business = $this->getBusiness();
         if (!$business) return response()->json(['success' => false, 'error' => 'Not found'], 404);
 
-        $product = Product::where('id', $id)->where('business_id', $business->id)->first();
+        $product = Product::with(['category', 'supplier'])->where('id', $id)->where('business_id', $business->id)->first();
         if (!$product) return response()->json(['success' => false, 'error' => 'Product not found'], 404);
 
         return response()->json(['success' => true, 'data' => $this->formatProduct($product)]);
@@ -202,11 +202,16 @@ class ProductController extends Controller
 
     private function formatProduct(Product $p): array
     {
+        $p->loadMissing(['category', 'supplier']);
         return [
             'id' => $p->id,
             'businessId' => $p->business_id,
             'name' => $p->name,
             'sku' => $p->sku,
+            'categoryId' => $p->category_id,
+            'category' => $p->category_id ? ['id' => $p->category->id, 'name' => $p->category->name] : null,
+            'supplierId' => $p->supplier_id,
+            'supplier' => $p->supplier_id ? ['id' => $p->supplier->id, 'name' => $p->supplier->name] : null,
             'buyingPrice' => (float) $p->buying_price,
             'sellingPrice' => (float) $p->selling_price,
             'stockQuantity' => $p->stock_quantity,

@@ -155,8 +155,13 @@ function ProductCard({
         </div>
       </div>
 
-      {/* Stock */}
-      <div className="mt-3 flex items-center gap-2">
+      {/* Category + Stock */}
+      <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+        {p.category && (
+          <span className="rounded-full bg-[#f4f0e8] px-2 py-0.5 text-[10px] font-bold text-ink/60">
+            {p.category.name}
+          </span>
+        )}
         <span className="text-sm font-semibold text-ink/70">
           Stock: <span className="font-bold text-ink">{p.stock}</span>
         </span>
@@ -229,11 +234,20 @@ function ProductRow({
 
   return (
     <TableRow hover sx={{ "&:last-child td": { borderBottom: 0 } }}>
-      <TableCell sx={{ py: 1.5, pl: 2, width: "24%" }}>
+      <TableCell sx={{ py: 1.5, pl: 2, width: "22%" }}>
         <p className="truncate font-bold text-ink">{p.name}</p>
       </TableCell>
-      <TableCell sx={{ py: 1.5, width: "12%" }} className="truncate text-sm text-ink/70">
+      <TableCell sx={{ py: 1.5, width: "10%" }} className="truncate text-sm text-ink/70">
         {p.sku ?? <span className="text-ink/30">—</span>}
+      </TableCell>
+      <TableCell sx={{ py: 1.5, width: "12%" }}>
+        {p.category ? (
+          <span className="rounded-full bg-[#f4f0e8] px-2 py-0.5 text-[10px] font-bold text-ink/60">
+            {p.category.name}
+          </span>
+        ) : (
+          <span className="text-ink/30">—</span>
+        )}
       </TableCell>
       <TableCell align="right" sx={{ py: 1.5, width: "13%" }} className="whitespace-nowrap text-sm font-semibold text-ink">
         {fmt(p.buyingPrice)}
@@ -528,6 +542,9 @@ export default function ProductsPage() {
                     </TableCell>
                     <TableCell sx={{ py: 1.25 }} className="text-xs font-bold uppercase tracking-wide text-ink/45">
                     SKU
+                    </TableCell>
+                    <TableCell sx={{ py: 1.25 }} className="text-xs font-bold uppercase tracking-wide text-ink/45">
+                    Category
                     </TableCell>
                     <TableCell align="right" sx={{ py: 1.25 }} className="text-xs font-bold uppercase tracking-wide text-ink/45">
                     Buy Price

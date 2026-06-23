@@ -33,10 +33,13 @@ export async function getProductById(id: string): Promise<Product | undefined> {
 export async function createProduct(
   data: Omit<Product, "id" | "createdAt" | "updatedAt">,
 ): Promise<Product> {
+  const { category: _c, supplier: _s, ...rest } = data;
   const product = unwrap<ApiProduct>(
     await apiClient.post("/products", {
-      ...data,
+      ...rest,
       stockQuantity: data.stock,
+      categoryId: data.categoryId ?? null,
+      supplierId: data.supplierId ?? null,
     }),
   );
   return normalizeProduct(product);
@@ -46,10 +49,13 @@ export async function updateProduct(
   id: string,
   data: Partial<Omit<Product, "id" | "createdAt">>,
 ): Promise<Product | null> {
+  const { category: _c, supplier: _s, ...rest } = data;
   const product = unwrap<ApiProduct>(
     await apiClient.put(`/products/${id}`, {
-      ...data,
+      ...rest,
       ...(data.stock !== undefined ? { stockQuantity: data.stock } : {}),
+      categoryId: data.categoryId ?? null,
+      supplierId: data.supplierId ?? null,
     }),
   );
   return normalizeProduct(product);
