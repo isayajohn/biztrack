@@ -29,7 +29,7 @@ class AuthApi {
         'email': email,
         'password': password,
         'password_confirmation': password,
-        'business_name': businessName,
+        'businessName': businessName,
         'currency': currency,
         'country': country,
       },

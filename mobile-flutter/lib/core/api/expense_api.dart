@@ -12,8 +12,8 @@ class ExpenseApi {
           .map((e) => Expense.fromJson(e as Map<String, dynamic>))
           .toList();
     }
-    if (data is Map && data.containsKey('data')) {
-      final inner = data['data'];
+    if (data is Map) {
+      final inner = data['expenses'] ?? data['data'];
       if (inner is List) {
         return inner
             .map((e) => Expense.fromJson(e as Map<String, dynamic>))

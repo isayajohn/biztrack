@@ -7,15 +7,15 @@ const kBg = Color(0xFFF7F5EE);
 const kMuted = Color(0xFF6B7280);
 
 // API host selection:
-//   Physical Android/iOS device → uses Mac LAN IP below (change if your IP differs)
+//   Physical Android/iOS device → uses Mac mDNS hostname (works on any network, never changes)
 //   Android emulator            → flutter run --dart-define=BIZTRACK_API_BASE_URL=http://10.0.2.2:8000/api
 //   iOS simulator               → flutter run --dart-define=BIZTRACK_API_BASE_URL=http://127.0.0.1:8000/api
-const _kLanIp = '192.168.1.163'; // Mac LAN IP — update if it changes
+const _kMdnsHost = 'Isayas-MacBook-Pro.local'; // Mac mDNS hostname — always works on same WiFi
 
 String get kApiBaseUrl {
   const override = String.fromEnvironment('BIZTRACK_API_BASE_URL');
   if (override.isNotEmpty) return override;
-  return 'http://$_kLanIp:8000/api';
+  return 'http://$_kMdnsHost:8000/api';
 }
 
 ThemeData buildAppTheme() {

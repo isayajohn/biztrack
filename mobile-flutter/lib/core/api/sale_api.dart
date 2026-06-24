@@ -10,8 +10,8 @@ class SaleApi {
     if (data is List) {
       return data.map((e) => Sale.fromJson(e as Map<String, dynamic>)).toList();
     }
-    if (data is Map && data.containsKey('data')) {
-      final inner = data['data'];
+    if (data is Map) {
+      final inner = data['sales'] ?? data['data'];
       if (inner is List) {
         return inner.map((e) => Sale.fromJson(e as Map<String, dynamic>)).toList();
       }

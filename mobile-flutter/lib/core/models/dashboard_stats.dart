@@ -18,21 +18,29 @@ class DashboardStats {
   });
 
   factory DashboardStats.fromJson(Map<String, dynamic> json) {
+    // Backend returns nested shape: { revenue: { current }, expenses: { current },
+    // sales: { current }, profit: { current }, products: { total, lowStock } }
+    final revenue = json['revenue'] is Map ? json['revenue'] as Map : null;
+    final expenses = json['expenses'] is Map ? json['expenses'] as Map : null;
+    final sales = json['sales'] is Map ? json['sales'] as Map : null;
+    final profit = json['profit'] is Map ? json['profit'] as Map : null;
+    final products = json['products'] is Map ? json['products'] as Map : null;
+
     return DashboardStats(
       totalSales: _toDouble(
-          json['total_sales'] ?? json['totalSales'] ?? json['sales_total'] ?? 0),
+          revenue?['current'] ?? json['total_sales'] ?? json['totalSales'] ?? 0),
       totalExpenses: _toDouble(
-          json['total_expenses'] ?? json['totalExpenses'] ?? json['expenses_total'] ?? 0),
+          expenses?['current'] ?? json['total_expenses'] ?? json['totalExpenses'] ?? 0),
       profit: _toDouble(
-          json['profit'] ?? json['net_profit'] ?? json['netProfit'] ?? 0),
+          profit?['current'] ?? json['net_profit'] ?? json['netProfit'] ?? 0),
       salesCount: _toInt(
-          json['sales_count'] ?? json['salesCount'] ?? json['total_sales_count'] ?? 0),
+          sales?['current'] ?? json['sales_count'] ?? json['salesCount'] ?? 0),
       expensesCount: _toInt(
-          json['expenses_count'] ?? json['expensesCount'] ?? json['total_expenses_count'] ?? 0),
+          expenses?['current'] ?? json['expenses_count'] ?? json['expensesCount'] ?? 0),
       lowStockCount: _toInt(
-          json['low_stock_count'] ?? json['lowStockCount'] ?? json['low_stock'] ?? 0),
+          products?['lowStock'] ?? json['low_stock_count'] ?? json['lowStockCount'] ?? 0),
       totalProducts: _toInt(
-          json['total_products'] ?? json['totalProducts'] ?? 0),
+          products?['total'] ?? json['total_products'] ?? json['totalProducts'] ?? 0),
     );
   }
 

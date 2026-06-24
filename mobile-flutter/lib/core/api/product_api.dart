@@ -12,8 +12,8 @@ class ProductApi {
           .map((e) => Product.fromJson(e as Map<String, dynamic>))
           .toList();
     }
-    if (data is Map && data.containsKey('data')) {
-      final inner = data['data'];
+    if (data is Map) {
+      final inner = data['products'] ?? data['data'];
       if (inner is List) {
         return inner
             .map((e) => Product.fromJson(e as Map<String, dynamic>))

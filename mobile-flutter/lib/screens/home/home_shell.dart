@@ -31,8 +31,7 @@ class HomeShell extends StatelessWidget {
             backgroundColor: Colors.white,
             selectedItemColor: kPrimaryGreen,
             unselectedItemColor: kMuted,
-            selectedLabelStyle: const TextStyle(
-                fontSize: 11, fontWeight: FontWeight.w600),
+            selectedLabelStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
             unselectedLabelStyle: const TextStyle(fontSize: 11),
             elevation: 0,
             items: const [
@@ -52,14 +51,14 @@ class HomeShell extends StatelessWidget {
                 label: 'Expenses',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.inventory_2_outlined),
-                activeIcon: Icon(Icons.inventory_2_rounded),
-                label: 'Products',
+                icon: Icon(Icons.warehouse_outlined),
+                activeIcon: Icon(Icons.warehouse_rounded),
+                label: 'Inventory',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.settings_outlined),
-                activeIcon: Icon(Icons.settings_rounded),
-                label: 'Settings',
+                icon: Icon(Icons.more_horiz_rounded),
+                activeIcon: Icon(Icons.more_horiz_rounded),
+                label: 'More',
               ),
             ],
           ),

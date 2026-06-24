@@ -18,17 +18,26 @@ class ReportData {
   });
 
   factory ReportData.fromJson(Map<String, dynamic> json) {
+    // Backend returns: { summary: { totalRevenue, totalExpenses, profit, totalSales (count), totalExpenseCount }, topProducts: [] }
+    final summary = json['summary'] is Map ? json['summary'] as Map : null;
+
     List<Map<String, dynamic>> products = [];
-    final raw = json['top_products'] ?? json['topProducts'] ?? json['products'] ?? [];
+    final raw = json['topProducts'] ?? json['top_products'] ?? json['products'] ?? [];
     if (raw is List) {
       products = raw.map((e) => Map<String, dynamic>.from(e as Map)).toList();
     }
+
     return ReportData(
-      totalSales: _toDouble(json['total_sales'] ?? json['totalSales'] ?? 0),
-      totalExpenses: _toDouble(json['total_expenses'] ?? json['totalExpenses'] ?? 0),
-      netProfit: _toDouble(json['net_profit'] ?? json['netProfit'] ?? json['profit'] ?? 0),
-      salesCount: _toInt(json['sales_count'] ?? json['salesCount'] ?? 0),
-      expensesCount: _toInt(json['expenses_count'] ?? json['expensesCount'] ?? 0),
+      totalSales: _toDouble(
+          summary?['totalRevenue'] ?? json['total_sales'] ?? json['totalSales'] ?? 0),
+      totalExpenses: _toDouble(
+          summary?['totalExpenses'] ?? json['total_expenses'] ?? json['totalExpenses'] ?? 0),
+      netProfit: _toDouble(
+          summary?['profit'] ?? json['net_profit'] ?? json['netProfit'] ?? 0),
+      salesCount: _toInt(
+          summary?['totalSales'] ?? json['sales_count'] ?? json['salesCount'] ?? 0),
+      expensesCount: _toInt(
+          summary?['totalExpenseCount'] ?? json['expenses_count'] ?? json['expensesCount'] ?? 0),
       topProducts: products,
     );
   }

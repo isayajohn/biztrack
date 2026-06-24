@@ -212,7 +212,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               value: stats.totalProducts.toString(),
               icon: Icons.inventory_2_rounded,
               iconColor: Colors.blue.shade600,
-              onTap: () => context.go('/products'),
+              onTap: () => context.go('/inventory'),
             ),
             StatCard(
               title: 'Low Stock',
@@ -220,7 +220,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               icon: Icons.warning_amber_rounded,
               iconColor: stats.lowStockCount > 0 ? Colors.red.shade500 : kMuted,
               valueColor: stats.lowStockCount > 0 ? Colors.red.shade600 : kDark,
-              onTap: () => context.go('/products'),
+              onTap: () => context.push('/inventory/low-stock'),
             ),
           ],
         ),
