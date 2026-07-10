@@ -59,7 +59,7 @@ const RANGE_OPTIONS: { key: ReportRangePreset; label: string }[] = [
   { key: "custom", label: "Custom" },
 ];
 
-const PIE_COLORS = ["#1f8a5b", "#c86b3c", "#f8b84e", "#2563eb", "#7c3aed", "#e11d48"];
+const PIE_COLORS = ["#12b890", "#c86b3c", "#f8b84e", "#2563eb", "#7c3aed", "#e11d48"];
 
 type TooltipEntry = { name: string; value: number; color: string };
 type ReportTableRow = {
@@ -198,7 +198,7 @@ function PerformanceList({
           {rows.map((row, index) => (
             <div
               key={row.productId}
-              className="flex items-center justify-between gap-3 rounded-xl border border-ink/8 bg-[#fbfaf6] px-3 py-2.5"
+              className="flex items-center justify-between gap-3 rounded-xl border border-ink/8 bg-[#f7faf9] px-3 py-2.5"
             >
               <div className="min-w-0">
                 <p className="truncate text-sm font-bold text-ink">
@@ -324,7 +324,7 @@ export default function ReportsPage() {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="font-display text-xl font-bold text-ink">Reports</h1>
-            <span className="rounded-full bg-[#f4f0e8] px-2.5 py-0.5 text-xs font-bold text-ink/60">
+            <span className="rounded-full bg-[#eef8f4] px-2.5 py-0.5 text-xs font-bold text-ink/60">
               {rangeLabel}
             </span>
           </div>
@@ -338,7 +338,7 @@ export default function ReportsPage() {
             type="button"
             onClick={handleExportCsv}
             disabled={!hasTransactions}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-ink/15 bg-white px-3.5 py-2 text-xs font-bold text-ink transition-colors hover:bg-[#f4f0e8] disabled:cursor-not-allowed disabled:opacity-45"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-ink/15 bg-white px-3.5 py-2 text-xs font-bold text-ink transition-colors hover:bg-[#eef8f4] disabled:cursor-not-allowed disabled:opacity-45"
           >
             <Download size={14} aria-hidden="true" />
             Export CSV
@@ -366,7 +366,7 @@ export default function ReportsPage() {
                 "shrink-0 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors",
                 range.preset === option.key
                   ? "bg-ink text-white"
-                  : "border border-ink/10 bg-white text-ink/60 hover:bg-[#f4f0e8]",
+                  : "border border-ink/10 bg-white text-ink/60 hover:bg-[#eef8f4]",
               ].join(" ")}
             >
               {option.label}
@@ -453,13 +453,13 @@ export default function ReportsPage() {
           label="Sales count"
           value={String(report.summary.numberOfSales)}
           icon={FileText}
-          iconClass="bg-[#f4f0e8] text-ink/60"
+          iconClass="bg-[#eef8f4] text-ink/60"
         />
         <StatCard
           label="Expense count"
           value={String(report.summary.numberOfExpenses)}
           icon={FileText}
-          iconClass="bg-[#f4f0e8] text-ink/60"
+          iconClass="bg-[#eef8f4] text-ink/60"
         />
       </section>
 
@@ -487,7 +487,7 @@ export default function ReportsPage() {
                 {report.lowStockProducts.map((product) => (
                   <div
                     key={product.id}
-                    className="flex items-center justify-between gap-3 rounded-xl border border-ink/8 bg-[#fbfaf6] px-3 py-2.5"
+                    className="flex items-center justify-between gap-3 rounded-xl border border-ink/8 bg-[#f7faf9] px-3 py-2.5"
                   >
                     <div className="min-w-0">
                       <p className="truncate text-sm font-bold text-ink">{product.name}</p>
@@ -521,7 +521,7 @@ export default function ReportsPage() {
               <YAxis tick={{ fontSize: 11, fill: "#17211b80" }} axisLine={false} tickLine={false} />
               <Tooltip content={<ChartTooltip currency={currency} />} />
               <Legend wrapperStyle={{ fontSize: 12, fontWeight: 700 }} />
-              <Bar dataKey="sales" name="Sales" fill="#1f8a5b" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="sales" name="Sales" fill="#12b890" radius={[4, 4, 0, 0]} />
               <Bar dataKey="expenses" name="Expenses" fill="#c86b3c" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -545,7 +545,7 @@ export default function ReportsPage() {
                 type="monotone"
                 dataKey="grossProfit"
                 name="Gross profit"
-                stroke="#1f8a5b"
+                stroke="#12b890"
                 fill="#e9f7ef"
                 strokeWidth={2}
               />
@@ -614,7 +614,7 @@ export default function ReportsPage() {
             <TableContainer>
               <Table aria-label="Report transactions table">
                 <TableHead>
-                  <TableRow className="bg-[#fbfaf6]">
+                  <TableRow className="bg-[#f7faf9]">
                     <TableCell sx={{ py: 1.25, pl: 2 }} className="text-xs font-bold uppercase tracking-wide text-ink/45">
                       Date
                     </TableCell>

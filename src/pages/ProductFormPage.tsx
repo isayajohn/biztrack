@@ -63,7 +63,7 @@ function inputCls(hasError?: boolean) {
     "transition-all focus:ring-2",
     hasError
       ? "border-red-400 bg-red-50/40 focus:border-red-400 focus:ring-red-200/50"
-      : "border-ink/15 bg-[#fbfaf6] focus:border-leaf focus:ring-leaf/15",
+      : "border-ink/15 bg-[#f7faf9] focus:border-leaf focus:ring-leaf/15",
   ].join(" ");
 }
 
@@ -552,14 +552,14 @@ export default function ProductFormPage({ embedded = false, onClose, onSaved }: 
             <button
               type="button"
               onClick={onClose}
-              className="flex items-center justify-center rounded-xl border border-ink/15 px-5 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-[#f4f0e8]"
+              className="flex items-center justify-center rounded-xl border border-ink/15 px-5 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-[#eef8f4]"
             >
               Cancel
             </button>
           ) : (
             <Link
               to="/products"
-              className="flex items-center justify-center rounded-xl border border-ink/15 px-5 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-[#f4f0e8]"
+              className="flex items-center justify-center rounded-xl border border-ink/15 px-5 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-[#eef8f4]"
             >
               Cancel
             </Link>

@@ -60,7 +60,7 @@ function DashboardMock({ compact = false }: { compact?: boolean }) {
                 Revenue this week
               </p>
             </div>
-            <div className="flex shrink-0 items-center gap-1.5 rounded-lg bg-mint px-2.5 py-1.5 ring-1 ring-emerald-100">
+            <div className="flex shrink-0 items-center gap-1.5 rounded-lg bg-mint px-2.5 py-1.5 ring-1 ring-leaf/15">
               <TrendingUp size={14} className="text-leaf" aria-hidden="true" />
               <span className="text-xs font-bold text-leaf">Up 18%</span>
             </div>
@@ -72,7 +72,7 @@ function DashboardMock({ compact = false }: { compact?: boolean }) {
                 <div
                   className={[
                     "animate-bar w-full rounded-t-md transition-all",
-                    i === 5 ? "bg-leaf" : "bg-emerald-100",
+                    i === 5 ? "bg-leaf" : "bg-leaf/15",
                   ].join(" ")}
                   style={{ height: `${compact ? Math.max(28, height - 18) : height}px` }}
                 />
@@ -94,7 +94,7 @@ function LaptopMockup() {
       <div className="rounded-[1.35rem] border border-slate-300 bg-slate-950 p-2 shadow-[0_26px_70px_rgba(15,23,42,0.26)]">
         <div className="overflow-hidden rounded-xl bg-white">
           <div className="grid min-h-[300px] grid-cols-[72px_1fr] bg-cloud sm:grid-cols-[112px_1fr]">
-            <aside className="bg-[#11241d] px-3 py-4 text-white">
+            <aside className="bg-[#073d33] px-3 py-4 text-white">
               <p className="text-[10px] font-extrabold uppercase tracking-wider text-white/45">BizTrack</p>
               <div className="mt-5 space-y-2">
                 {[
@@ -148,7 +148,7 @@ function LaptopMockup() {
                     {BAR_HEIGHTS.map((height, index) => (
                       <div
                         key={BAR_DAYS[index]}
-                        className={["flex-1 rounded-t-md", index === 5 ? "bg-leaf" : "bg-emerald-100"].join(" ")}
+                        className={["flex-1 rounded-t-md", index === 5 ? "bg-leaf" : "bg-leaf/15"].join(" ")}
                         style={{ height: `${height}%` }}
                       />
                     ))}
@@ -187,7 +187,7 @@ function PhoneMockup() {
   return (
     <div className="relative mx-auto h-[390px] w-[188px] rounded-[2.2rem] bg-slate-950 p-2 shadow-[0_26px_70px_rgba(15,23,42,0.28)]">
       <div className="absolute left-1/2 top-2 z-10 h-5 w-20 -translate-x-1/2 rounded-b-2xl bg-slate-950" />
-      <div className="flex h-full flex-col overflow-hidden rounded-[1.75rem] bg-[#f4fbf7]">
+      <div className="flex h-full flex-col overflow-hidden rounded-[1.75rem] bg-[#effbf7]">
         <div className="bg-leaf px-4 pb-5 pt-8 text-white">
           <div className="flex items-center justify-between">
             <div>
@@ -205,7 +205,7 @@ function PhoneMockup() {
         <div className="-mt-4 grid grid-cols-2 gap-2 px-3">
           {[
             ["Sales", "$248", "text-leaf"],
-            ["Expenses", "$71", "text-clay"],
+            ["Expenses", "$71", "text-[#0b9279]"],
           ].map(([label, value, color]) => (
             <div key={label} className="rounded-xl bg-white p-3 shadow-card">
               <p className="text-[9px] font-bold text-ink/45">{label}</p>
@@ -223,14 +223,14 @@ function PhoneMockup() {
             {BAR_HEIGHTS.map((height, index) => (
               <div
                 key={BAR_DAYS[index]}
-                className={["flex-1 rounded-t", index === 5 ? "bg-leaf" : "bg-emerald-100"].join(" ")}
+                className={["flex-1 rounded-t", index === 5 ? "bg-leaf" : "bg-leaf/15"].join(" ")}
                 style={{ height: `${height}%` }}
               />
             ))}
           </div>
         </div>
 
-        <div className="mx-3 mt-3 rounded-xl border border-orange-200 bg-orange-50 px-3 py-2 text-[10px] font-extrabold text-clay">
+        <div className="mx-3 mt-3 rounded-xl border border-leaf/20 bg-mint px-3 py-2 text-[10px] font-extrabold text-[#0b9279]">
           Low stock: Rice 5kg, Sugar 1kg
         </div>
       </div>

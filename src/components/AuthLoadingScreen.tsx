@@ -3,7 +3,7 @@ import BrandLogo from "./BrandLogo";
 
 export default function AuthLoadingScreen() {
   return (
-    <div className="grid min-h-screen place-items-center bg-[#fbfaf6] px-4 text-ink">
+    <div className="grid min-h-screen place-items-center bg-[#f7faf9] px-4 text-ink">
       <div className="flex flex-col items-center gap-4">
         <BrandLogo className="h-auto w-52 max-w-full" />
         <div className="flex items-center gap-2 text-sm font-bold text-ink/60">

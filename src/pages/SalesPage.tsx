@@ -10,6 +10,7 @@ import {
   CircleDollarSign,
   Pencil,
   Plus,
+  Printer,
   Search,
   Trash2,
   X,
@@ -128,7 +129,7 @@ function SaleCard({
       </div>
 
       {/* Amounts */}
-      <div className="mt-3 grid grid-cols-3 divide-x divide-ink/8 rounded-lg border border-ink/8 bg-[#fbfaf6]">
+      <div className="mt-3 grid grid-cols-3 divide-x divide-ink/8 rounded-lg border border-ink/8 bg-[#f7faf9]">
         <div className="px-3 py-2">
           <p className="text-[10px] font-semibold text-ink/45">Qty</p>
           <p className="text-sm font-bold text-ink">{s.quantity}</p>
@@ -166,7 +167,7 @@ function SaleCard({
               </button>
               <button
                 onClick={onCancelDelete}
-                className="rounded-lg border border-ink/15 px-3 py-1.5 text-xs font-bold text-ink/60 hover:bg-[#f4f0e8] transition-colors"
+                className="rounded-lg border border-ink/15 px-3 py-1.5 text-xs font-bold text-ink/60 hover:bg-[#eef8f4] transition-colors"
               >
                 Cancel
               </button>
@@ -174,9 +175,10 @@ function SaleCard({
           </div>
         ) : (
           <div className="flex gap-2">
+            <Link to={`/sales/${s.id}/receipt`} className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-leaf/20 py-2 text-xs font-bold text-leaf hover:bg-mint transition-colors"><Printer size={13} /> Receipt</Link>
             <Link
               to={`/sales/${s.id}/edit`}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-ink/15 py-2 text-xs font-bold text-ink hover:bg-[#f4f0e8] transition-colors"
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-ink/15 py-2 text-xs font-bold text-ink hover:bg-[#eef8f4] transition-colors"
             >
               <Pencil size={13} aria-hidden="true" />
               Edit
@@ -246,16 +248,17 @@ function SaleRow({
             </button>
             <button
               onClick={onCancelDelete}
-              className="rounded-lg border border-ink/15 px-2 py-1 text-xs font-bold text-ink/50 hover:bg-[#f4f0e8] transition-colors"
+              className="rounded-lg border border-ink/15 px-2 py-1 text-xs font-bold text-ink/50 hover:bg-[#eef8f4] transition-colors"
             >
               Cancel
             </button>
           </div>
         ) : (
           <div className="flex items-center justify-end gap-1.5">
+            <Link to={`/sales/${s.id}/receipt`} className="grid h-8 w-8 place-items-center rounded-lg border border-leaf/20 text-leaf hover:bg-mint transition-colors" aria-label={`Print ${s.productName} receipt`}><Printer size={14} /></Link>
             <Link
               to={`/sales/${s.id}/edit`}
-              className="grid h-8 w-8 place-items-center rounded-lg border border-ink/15 text-ink/50 hover:bg-[#f4f0e8] hover:text-ink transition-colors"
+              className="grid h-8 w-8 place-items-center rounded-lg border border-ink/15 text-ink/50 hover:bg-[#eef8f4] hover:text-ink transition-colors"
               aria-label={`Edit ${s.productName} sale`}
             >
               <Pencil size={14} aria-hidden="true" />
@@ -375,7 +378,7 @@ export default function SalesPage() {
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <h1 className="font-display text-xl font-bold text-ink">Sales</h1>
-          <span className="rounded-full bg-[#f4f0e8] px-2.5 py-0.5 text-xs font-bold text-ink/60">
+          <span className="rounded-full bg-[#eef8f4] px-2.5 py-0.5 text-xs font-bold text-ink/60">
             {sales.length}
           </span>
         </div>
@@ -401,7 +404,7 @@ export default function SalesPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by product name…"
-            className="w-full rounded-xl border border-ink/15 bg-[#fbfaf6] py-2.5 pl-10 pr-4 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+            className="w-full rounded-xl border border-ink/15 bg-[#f7faf9] py-2.5 pl-10 pr-4 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
           />
           {search && (
             <button
@@ -424,7 +427,7 @@ export default function SalesPage() {
                 "flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors",
                 dateFilter === key
                   ? "bg-ink text-white"
-                  : "border border-ink/10 bg-white text-ink/60 hover:bg-[#f4f0e8]",
+                  : "border border-ink/10 bg-white text-ink/60 hover:bg-[#eef8f4]",
               ].join(" ")}
             >
               {label}
@@ -442,7 +445,7 @@ export default function SalesPage() {
                 "flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors",
                 paymentFilter === key
                   ? "bg-ink text-white"
-                  : "border border-ink/10 bg-white text-ink/60 hover:bg-[#f4f0e8]",
+                  : "border border-ink/10 bg-white text-ink/60 hover:bg-[#eef8f4]",
               ].join(" ")}
             >
               {label}
@@ -492,7 +495,7 @@ export default function SalesPage() {
       ) : filtered.length === 0 ? (
         /* Empty state */
         <div className="mt-10 flex flex-col items-center gap-4 text-center">
-          <span className="grid h-14 w-14 place-items-center rounded-2xl bg-[#f4f0e8] text-ink/30">
+          <span className="grid h-14 w-14 place-items-center rounded-2xl bg-[#eef8f4] text-ink/30">
             <CircleDollarSign size={26} aria-hidden="true" />
           </span>
           <p className="text-sm font-semibold text-ink/45">{emptyMessage}</p>
@@ -536,7 +539,7 @@ export default function SalesPage() {
             <TableContainer>
               <Table aria-label="Sales table" sx={{ tableLayout: "fixed" }}>
                 <TableHead>
-                  <TableRow className="bg-[#fbfaf6]">
+                  <TableRow className="bg-[#f7faf9]">
                     <TableCell sx={{ py: 1.25, pl: 2 }} className="text-xs font-bold uppercase tracking-wide text-ink/45">
                     Product
                     </TableCell>

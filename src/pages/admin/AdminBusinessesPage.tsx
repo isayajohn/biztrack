@@ -27,7 +27,7 @@ function formatDate(value?: string | null) {
 
 function CountryBadge({ country }: { country: string }) {
   return (
-    <span className="inline-flex rounded-full border border-ink/10 bg-[#f4f0e8] px-2 py-1 text-[11px] font-extrabold text-ink/60">
+    <span className="inline-flex rounded-full border border-ink/10 bg-[#eef8f4] px-2 py-1 text-[11px] font-extrabold text-ink/60">
       {country}
     </span>
   );
@@ -89,7 +89,7 @@ function ViewLink({ id }: { id: string }) {
   return (
     <Link
       to={`/admin/businesses/${id}`}
-      className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-ink/15 px-2.5 py-1.5 text-xs font-bold text-ink/60 transition-colors hover:bg-[#f4f0e8]"
+      className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-ink/15 px-2.5 py-1.5 text-xs font-bold text-ink/60 transition-colors hover:bg-[#eef8f4]"
     >
       <Eye size={13} aria-hidden="true" />
       View
@@ -111,35 +111,35 @@ function BusinessMobileCard({ business }: { business: AdminBusiness }) {
       </div>
 
       <dl className="mt-3 grid grid-cols-3 gap-2 text-xs">
-        <div className="rounded-lg bg-[#fbfaf6] p-2">
+        <div className="rounded-lg bg-[#f7faf9] p-2">
           <dt className="font-bold text-ink/35">Products</dt>
           <dd className="mt-0.5 font-extrabold text-ink">{business._count.products}</dd>
         </div>
-        <div className="rounded-lg bg-[#fbfaf6] p-2">
+        <div className="rounded-lg bg-[#f7faf9] p-2">
           <dt className="font-bold text-ink/35">Sales</dt>
           <dd className="mt-0.5 font-extrabold text-leaf">{business._count.sales}</dd>
         </div>
-        <div className="rounded-lg bg-[#fbfaf6] p-2">
+        <div className="rounded-lg bg-[#f7faf9] p-2">
           <dt className="font-bold text-ink/35">Expenses</dt>
           <dd className="mt-0.5 font-extrabold text-clay">{business._count.expenses}</dd>
         </div>
-        <div className="col-span-3 rounded-lg bg-[#fbfaf6] p-2">
+        <div className="col-span-3 rounded-lg bg-[#f7faf9] p-2">
           <dt className="font-bold text-ink/35">Total sales</dt>
           <dd className="mt-0.5 font-extrabold text-leaf">
             {formatCurrency(business.totalSalesAmount, business.currency)}
           </dd>
         </div>
-        <div className="col-span-3 rounded-lg bg-[#fbfaf6] p-2">
+        <div className="col-span-3 rounded-lg bg-[#f7faf9] p-2">
           <dt className="font-bold text-ink/35">Total expenses</dt>
           <dd className="mt-0.5 font-extrabold text-clay">
             {formatCurrency(business.totalExpensesAmount, business.currency)}
           </dd>
         </div>
-        <div className="col-span-2 rounded-lg bg-[#fbfaf6] p-2">
+        <div className="col-span-2 rounded-lg bg-[#f7faf9] p-2">
           <dt className="font-bold text-ink/35">Created</dt>
           <dd className="mt-0.5 font-extrabold text-ink">{formatDate(business.createdAt)}</dd>
         </div>
-        <div className="rounded-lg bg-[#fbfaf6] p-2">
+        <div className="rounded-lg bg-[#f7faf9] p-2">
           <dt className="font-bold text-ink/35">Currency</dt>
           <dd className="mt-0.5 font-extrabold text-ink">{business.currency}</dd>
         </div>
@@ -214,14 +214,14 @@ export default function AdminBusinessesPage() {
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Search business name..."
-            className="w-full rounded-lg border border-ink/15 bg-[#fbfaf6] py-2.5 pl-10 pr-4 text-sm font-medium text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+            className="w-full rounded-lg border border-ink/15 bg-[#f7faf9] py-2.5 pl-10 pr-4 text-sm font-medium text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
           />
         </div>
         <input
           value={country}
           onChange={(event) => setCountry(event.target.value)}
           placeholder="Filter by country"
-          className="w-full rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2.5 text-sm font-medium text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+          className="w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2.5 text-sm font-medium text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
         />
       </div>
 
@@ -232,7 +232,7 @@ export default function AdminBusinessesPage() {
           <TableContainer>
             <Table aria-label="Admin businesses table">
               <TableHead>
-                <TableRow className="bg-[#fbfaf6]">
+                <TableRow className="bg-[#f7faf9]">
                   <TableCell>Business name</TableCell>
                   <TableCell>Owner name</TableCell>
                   <TableCell>Owner email</TableCell>

@@ -92,7 +92,7 @@ function StatusBadge({ status }: { status: SubscriptionStatus }) {
         : status === "TRIAL"
           ? "border-sky-200 bg-sky-50 text-sky-700"
           : status === "CANCELLED"
-            ? "border-ink/10 bg-[#f4f0e8] text-ink/55"
+            ? "border-ink/10 bg-[#eef8f4] text-ink/55"
             : "border-red-200 bg-red-50 text-red-600";
 
   return <span className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-extrabold ${classes}`}>{status}</span>;
@@ -313,7 +313,7 @@ export default function AdminSubscriptionsPage() {
           {isBusinessScoped && (
             <Link
               to={`/admin/businesses/${routeBusinessId}`}
-              className="mb-3 inline-flex items-center gap-1.5 rounded-lg border border-ink/15 bg-white px-3 py-2 text-xs font-bold text-ink/60 transition-colors hover:bg-[#f4f0e8]"
+              className="mb-3 inline-flex items-center gap-1.5 rounded-lg border border-ink/15 bg-white px-3 py-2 text-xs font-bold text-ink/60 transition-colors hover:bg-[#eef8f4]"
             >
               <ArrowLeft size={14} aria-hidden="true" />
               Business
@@ -347,11 +347,11 @@ export default function AdminSubscriptionsPage() {
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
                   placeholder="Search by business name..."
-                  className="w-full rounded-lg border border-ink/15 bg-[#fbfaf6] py-2.5 pl-9 pr-3 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                  className="w-full rounded-lg border border-ink/15 bg-[#f7faf9] py-2.5 pl-9 pr-3 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
                 />
               </div>
             ) : (
-              <div className="rounded-lg bg-[#fbfaf6] px-3 py-2.5 text-sm font-bold text-ink/60">
+              <div className="rounded-lg bg-[#f7faf9] px-3 py-2.5 text-sm font-bold text-ink/60">
                 Showing this business only
               </div>
             )}
@@ -385,7 +385,7 @@ export default function AdminSubscriptionsPage() {
             <>
               <div className="hidden overflow-x-auto xl:block">
                 <table className="min-w-full divide-y divide-ink/10 text-left text-sm">
-                  <thead className="bg-[#fbfaf6] text-xs font-extrabold uppercase tracking-[0.05em] text-ink/45">
+                  <thead className="bg-[#f7faf9] text-xs font-extrabold uppercase tracking-[0.05em] text-ink/45">
                     <tr>
                       <th className="px-4 py-3">Business name</th>
                       <th className="px-4 py-3">Owner email</th>
@@ -502,7 +502,7 @@ function FilterSelect({
     <select
       value={value}
       onChange={(event) => onChange(event.target.value)}
-      className="w-full rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2.5 text-sm font-bold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+      className="w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2.5 text-sm font-bold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
     >
       <option value="">{label}</option>
       {children}
@@ -580,7 +580,7 @@ function SubscriptionCard({
 
 function InfoItem({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg bg-[#fbfaf6] p-3">
+    <div className="rounded-lg bg-[#f7faf9] p-3">
       <dt className="text-[11px] font-extrabold uppercase tracking-[0.06em] text-ink/35">{label}</dt>
       <dd className="mt-1 font-extrabold text-ink">{value}</dd>
     </div>
@@ -616,7 +616,7 @@ function SubscriptionActions({
   return (
     <div className={`flex flex-col gap-2 ${compact ? "" : "items-end"}`}>
       <div className={`flex flex-wrap gap-2 ${compact ? "" : "justify-end"}`}>
-        <button type="button" onClick={onChangePackage} disabled={isSaving} className={`${actionBase} border-ink/10 text-ink/60 hover:bg-[#f4f0e8]`}>
+        <button type="button" onClick={onChangePackage} disabled={isSaving} className={`${actionBase} border-ink/10 text-ink/60 hover:bg-[#eef8f4]`}>
           <Pencil size={14} aria-hidden="true" />
           Change
         </button>
@@ -638,13 +638,13 @@ function SubscriptionActions({
           type="date"
           value={extendDate}
           onChange={(event) => onExtendDateChange(event.target.value)}
-          className="rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+          className="rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
         />
         <button
           type="button"
           onClick={onExtend}
           disabled={isSaving}
-          className="inline-flex items-center justify-center gap-2 rounded-lg border border-ink/15 bg-white px-3 py-2 text-sm font-bold text-ink/60 transition-colors hover:bg-[#f4f0e8] disabled:opacity-60"
+          className="inline-flex items-center justify-center gap-2 rounded-lg border border-ink/15 bg-white px-3 py-2 text-sm font-bold text-ink/60 transition-colors hover:bg-[#eef8f4] disabled:opacity-60"
         >
           <CalendarPlus size={15} aria-hidden="true" />
           Extend
@@ -696,7 +696,7 @@ function AssignPackageModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-ink/10 p-2 text-ink/50 hover:bg-[#f4f0e8]"
+            className="rounded-lg border border-ink/10 p-2 text-ink/50 hover:bg-[#eef8f4]"
             aria-label="Close"
           >
             <X size={16} aria-hidden="true" />
@@ -711,7 +711,7 @@ function AssignPackageModal({
                 value={form.businessId}
                 onChange={(event) => update("businessId", event.target.value)}
                 required
-                className="mt-1 w-full rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                className="mt-1 w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
               >
                 <option value="">Choose business</option>
                 {businesses.map((business) => (
@@ -729,7 +729,7 @@ function AssignPackageModal({
               value={form.packageId}
               onChange={(event) => update("packageId", event.target.value)}
               required
-              className="mt-1 w-full rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+              className="mt-1 w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
             >
               <option value="">Choose package</option>
               {packages.map((plan) => (
@@ -755,7 +755,7 @@ function AssignPackageModal({
               value={form.notes}
               onChange={(event) => update("notes", event.target.value)}
               rows={3}
-              className="mt-1 w-full rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+              className="mt-1 w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
             />
           </label>
         </div>
@@ -765,7 +765,7 @@ function AssignPackageModal({
             type="button"
             onClick={onClose}
             disabled={isSaving}
-            className="rounded-lg border border-ink/10 px-4 py-2.5 text-sm font-extrabold text-ink/60 hover:bg-[#f4f0e8] disabled:opacity-60"
+            className="rounded-lg border border-ink/10 px-4 py-2.5 text-sm font-extrabold text-ink/60 hover:bg-[#eef8f4] disabled:opacity-60"
           >
             Cancel
           </button>
@@ -800,7 +800,7 @@ function SelectField({
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="mt-1 w-full rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+        className="mt-1 w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
       >
         {children}
       </select>
@@ -827,7 +827,7 @@ function DateField({
         value={value}
         required={required}
         onChange={(event) => onChange(event.target.value)}
-        className="mt-1 w-full rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+        className="mt-1 w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
       />
     </label>
   );
@@ -857,7 +857,7 @@ function ConfirmModal({
             type="button"
             onClick={onCancel}
             disabled={isWorking}
-            className="rounded-lg border border-ink/10 px-4 py-2.5 text-sm font-extrabold text-ink/60 hover:bg-[#f4f0e8] disabled:opacity-60"
+            className="rounded-lg border border-ink/10 px-4 py-2.5 text-sm font-extrabold text-ink/60 hover:bg-[#eef8f4] disabled:opacity-60"
           >
             Keep subscription
           </button>

@@ -13,6 +13,7 @@ import {
   ShoppingCart,
   Tag,
   Truck,
+  Users,
   WalletCards,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -31,6 +32,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Sales", to: "/sales", icon: CircleDollarSign, section: "Business" },
   { label: "Expenses", to: "/expenses", icon: WalletCards, section: "Business" },
   { label: "Products", to: "/products", icon: Boxes, section: "Business" },
+  { label: "Customers", to: "/customers", icon: Users, section: "Business" },
   { label: "Reports", to: "/reports", icon: BarChart3, section: "Business" },
 
   // Inventory

@@ -196,7 +196,7 @@ export default function TestimonialsSection({ eyebrow, title, description, testi
           <button
             type="button"
             onClick={movePrevious}
-            className="absolute left-0 top-1/2 z-10 inline-flex h-11 w-11 -translate-x-3 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white text-ink shadow-sm transition-all hover:-translate-y-[calc(50%+0.125rem)] hover:border-emerald-200 hover:text-leaf hover:shadow-card focus:outline-none focus:ring-4 focus:ring-leaf/15 sm:-translate-x-5 lg:-translate-x-6"
+            className="absolute left-0 top-1/2 z-10 inline-flex h-11 w-11 -translate-x-3 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white text-ink shadow-sm transition-all hover:-translate-y-[calc(50%+0.125rem)] hover:border-leaf/30 hover:text-leaf hover:shadow-card focus:outline-none focus:ring-4 focus:ring-leaf/15 sm:-translate-x-5 lg:-translate-x-6"
             aria-label="Previous testimonials"
           >
             <ChevronLeft size={20} aria-hidden="true" />
@@ -204,7 +204,7 @@ export default function TestimonialsSection({ eyebrow, title, description, testi
           <button
             type="button"
             onClick={moveNext}
-            className="absolute right-0 top-1/2 z-10 inline-flex h-11 w-11 translate-x-3 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white text-ink shadow-sm transition-all hover:-translate-y-[calc(50%+0.125rem)] hover:border-emerald-200 hover:text-leaf hover:shadow-card focus:outline-none focus:ring-4 focus:ring-leaf/15 sm:translate-x-5 lg:translate-x-6"
+            className="absolute right-0 top-1/2 z-10 inline-flex h-11 w-11 translate-x-3 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white text-ink shadow-sm transition-all hover:-translate-y-[calc(50%+0.125rem)] hover:border-leaf/30 hover:text-leaf hover:shadow-card focus:outline-none focus:ring-4 focus:ring-leaf/15 sm:translate-x-5 lg:translate-x-6"
             aria-label="Next testimonials"
           >
             <ChevronRight size={20} aria-hidden="true" />

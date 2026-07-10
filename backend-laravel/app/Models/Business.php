@@ -13,7 +13,9 @@ class Business extends Model
     public $incrementing = false;
     protected $keyType = 'string';
 
-    protected $fillable = ['user_id', 'name', 'currency', 'country'];
+    protected $fillable = ['user_id', 'name', 'currency', 'country', 'tax_name', 'tax_number', 'default_tax_rate'];
+
+    protected $casts = ['default_tax_rate' => 'decimal:2'];
 
     public function user()
     {
@@ -33,6 +35,11 @@ class Business extends Model
     public function expenses()
     {
         return $this->hasMany(Expense::class);
+    }
+
+    public function customers()
+    {
+        return $this->hasMany(Customer::class);
     }
 
     public function subscriptions()

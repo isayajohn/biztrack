@@ -56,7 +56,7 @@ function badgeClass(kind: "role" | "status", value: AdminRole | AdminStatus) {
   if (kind === "role") {
     return value === "SUPER_ADMIN"
       ? "border-leaf/20 bg-mint text-leaf"
-      : "border-ink/10 bg-[#f4f0e8] text-ink/60";
+      : "border-ink/10 bg-[#eef8f4] text-ink/60";
   }
 
   return value === "ACTIVE"
@@ -177,7 +177,7 @@ function ActionButton({
       ? "border-leaf/20 text-leaf hover:bg-mint"
       : tone === "clay"
         ? "border-clay/20 text-clay hover:bg-orange-50"
-        : "border-ink/15 text-ink/60 hover:bg-[#f4f0e8]";
+        : "border-ink/15 text-ink/60 hover:bg-[#eef8f4]";
 
   return (
     <button
@@ -217,7 +217,7 @@ function ConfirmationModal({
             type="button"
             onClick={onCancel}
             disabled={isSubmitting}
-            className="rounded-lg p-2 text-ink/45 transition-colors hover:bg-[#f4f0e8] hover:text-ink"
+            className="rounded-lg p-2 text-ink/45 transition-colors hover:bg-[#eef8f4] hover:text-ink"
             aria-label="Close confirmation"
           >
             <X size={17} aria-hidden="true" />
@@ -229,7 +229,7 @@ function ConfirmationModal({
             type="button"
             onClick={onCancel}
             disabled={isSubmitting}
-            className="rounded-lg border border-ink/15 bg-white px-4 py-2 text-sm font-bold text-ink/60 transition-colors hover:bg-[#f4f0e8] disabled:cursor-not-allowed disabled:opacity-60"
+            className="rounded-lg border border-ink/15 bg-white px-4 py-2 text-sm font-bold text-ink/60 transition-colors hover:bg-[#eef8f4] disabled:cursor-not-allowed disabled:opacity-60"
           >
             Cancel
           </button>
@@ -276,7 +276,7 @@ function UserDetailsModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-2 text-ink/45 transition-colors hover:bg-[#f4f0e8] hover:text-ink"
+            className="rounded-lg p-2 text-ink/45 transition-colors hover:bg-[#eef8f4] hover:text-ink"
             aria-label="Close details"
           >
             <X size={17} aria-hidden="true" />
@@ -284,7 +284,7 @@ function UserDetailsModal({
         </div>
 
         {isLoading ? (
-          <div className="mt-5 flex items-center gap-2 rounded-lg border border-ink/10 bg-[#fbfaf6] px-4 py-6 text-sm font-semibold text-ink/45">
+          <div className="mt-5 flex items-center gap-2 rounded-lg border border-ink/10 bg-[#f7faf9] px-4 py-6 text-sm font-semibold text-ink/45">
             <Loader2 size={16} className="animate-spin" aria-hidden="true" />
             Loading user details...
           </div>
@@ -295,27 +295,27 @@ function UserDetailsModal({
         ) : user ? (
           <>
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-lg border border-ink/10 bg-[#fbfaf6] p-3">
+              <div className="rounded-lg border border-ink/10 bg-[#f7faf9] p-3">
                 <p className="text-xs font-bold uppercase text-ink/40">Role</p>
                 <div className="mt-2"><RoleBadge role={user.role} /></div>
               </div>
-              <div className="rounded-lg border border-ink/10 bg-[#fbfaf6] p-3">
+              <div className="rounded-lg border border-ink/10 bg-[#f7faf9] p-3">
                 <p className="text-xs font-bold uppercase text-ink/40">Status</p>
                 <div className="mt-2"><StatusBadge status={user.status} /></div>
               </div>
-              <div className="rounded-lg border border-ink/10 bg-[#fbfaf6] p-3">
+              <div className="rounded-lg border border-ink/10 bg-[#f7faf9] p-3">
                 <p className="text-xs font-bold uppercase text-ink/40">Businesses count</p>
                 <p className="mt-1 text-xl font-extrabold text-ink">{user.businessCount ?? user.businesses?.length ?? 0}</p>
               </div>
-              <div className="rounded-lg border border-ink/10 bg-[#fbfaf6] p-3">
+              <div className="rounded-lg border border-ink/10 bg-[#f7faf9] p-3">
                 <p className="text-xs font-bold uppercase text-ink/40">Last login</p>
                 <p className="mt-1 text-sm font-extrabold text-ink">{formatDate(user.lastLoginAt)}</p>
               </div>
-              <div className="rounded-lg border border-ink/10 bg-[#fbfaf6] p-3">
+              <div className="rounded-lg border border-ink/10 bg-[#f7faf9] p-3">
                 <p className="text-xs font-bold uppercase text-ink/40">Created</p>
                 <p className="mt-1 text-sm font-extrabold text-ink">{formatDate(user.createdAt)}</p>
               </div>
-              <div className="rounded-lg border border-ink/10 bg-[#fbfaf6] p-3">
+              <div className="rounded-lg border border-ink/10 bg-[#f7faf9] p-3">
                 <p className="text-xs font-bold uppercase text-ink/40">Updated</p>
                 <p className="mt-1 text-sm font-extrabold text-ink">{formatDate(user.updatedAt)}</p>
               </div>
@@ -335,7 +335,7 @@ function UserDetailsModal({
                   ))}
                 </div>
               ) : (
-                <p className="mt-2 rounded-lg border border-dashed border-ink/15 bg-[#fbfaf6] px-3 py-4 text-sm font-semibold text-ink/45">
+                <p className="mt-2 rounded-lg border border-dashed border-ink/15 bg-[#f7faf9] px-3 py-4 text-sm font-semibold text-ink/45">
                   This user has no businesses yet.
                 </p>
               )}
@@ -623,13 +623,13 @@ export default function AdminUsersPage() {
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Search name or email..."
-            className="w-full rounded-lg border border-ink/15 bg-[#fbfaf6] py-2.5 pl-10 pr-4 text-sm font-medium text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+            className="w-full rounded-lg border border-ink/15 bg-[#f7faf9] py-2.5 pl-10 pr-4 text-sm font-medium text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
           />
         </div>
         <select
           value={role}
           onChange={(event) => setRole(event.target.value as "" | AdminRole)}
-          className="rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2.5 text-sm font-bold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+          className="rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2.5 text-sm font-bold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
         >
           <option value="">All roles</option>
           <option value="USER">USER</option>
@@ -638,7 +638,7 @@ export default function AdminUsersPage() {
         <select
           value={status}
           onChange={(event) => setStatus(event.target.value as "" | AdminStatus)}
-          className="rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2.5 text-sm font-bold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+          className="rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2.5 text-sm font-bold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
         >
           <option value="">All statuses</option>
           <option value="ACTIVE">ACTIVE</option>
@@ -654,7 +654,7 @@ export default function AdminUsersPage() {
           <TableContainer>
             <Table aria-label="Admin users table">
               <TableHead>
-                <TableRow className="bg-[#fbfaf6]">
+                <TableRow className="bg-[#f7faf9]">
                   <TableCell>Name</TableCell>
                   <TableCell>Email</TableCell>
                   <TableCell>Role</TableCell>
@@ -718,15 +718,15 @@ export default function AdminUsersPage() {
                     </div>
                   </div>
                   <dl className="mt-3 grid grid-cols-2 gap-2 text-xs">
-                    <div className="rounded-lg bg-[#fbfaf6] p-2">
+                    <div className="rounded-lg bg-[#f7faf9] p-2">
                       <dt className="font-bold text-ink/35">Businesses</dt>
                       <dd className="mt-0.5 font-extrabold text-ink">{adminUser.businessCount ?? 0}</dd>
                     </div>
-                    <div className="rounded-lg bg-[#fbfaf6] p-2">
+                    <div className="rounded-lg bg-[#f7faf9] p-2">
                       <dt className="font-bold text-ink/35">Created</dt>
                       <dd className="mt-0.5 font-extrabold text-ink">{formatDate(adminUser.createdAt)}</dd>
                     </div>
-                    <div className="col-span-2 rounded-lg bg-[#fbfaf6] p-2">
+                    <div className="col-span-2 rounded-lg bg-[#f7faf9] p-2">
                       <dt className="font-bold text-ink/35">Last login</dt>
                       <dd className="mt-0.5 font-extrabold text-ink">{formatDate(adminUser.lastLoginAt)}</dd>
                     </div>

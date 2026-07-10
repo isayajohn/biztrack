@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import {
   AlertTriangle,
@@ -6,6 +6,7 @@ import {
   Download,
   LogOut,
   Save,
+  ReceiptText,
   Settings,
   Trash2,
   Upload,
@@ -16,7 +17,7 @@ import type { LucideIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth, type User } from "../auth/AuthContext";
 import { getApiErrorMessage } from "../services/apiClient";
-import { updateBusinessProfile } from "../services/authApi";
+import { getBusinessProfile, updateBusinessProfile } from "../services/authApi";
 import { createExpense, deleteExpense, getExpenses } from "../services/expenseService";
 import { createProduct, deleteProduct, getProducts } from "../services/productService";
 import { createSale, deleteSale, getSales } from "../services/saleService";
@@ -71,6 +72,9 @@ type SettingsFields = {
   phone: string;
   country: string;
   currency: string;
+  taxName: string;
+  taxNumber: string;
+  defaultTaxRate: string;
   defaultPaymentMethod: PaymentMethod;
   lowStockAlerts: boolean;
   dateFormat: string;
@@ -88,6 +92,9 @@ function readSettings(user: User | null): SettingsFields {
     phone: "",
     country: user?.country ?? "Tanzania",
     currency: user?.currency ?? "USD",
+    taxName: "VAT",
+    taxNumber: "",
+    defaultTaxRate: "0",
     defaultPaymentMethod: "Cash",
     lowStockAlerts: true,
     dateFormat: "MMM d, yyyy",
@@ -103,6 +110,8 @@ function validate(fields: SettingsFields): FieldErrors {
   if (!fields.phone.trim()) errors.phone = "Phone is required.";
   if (!fields.country) errors.country = "Country is required.";
   if (!fields.currency) errors.currency = "Currency is required.";
+  const taxRate = Number(fields.defaultTaxRate);
+  if (Number.isNaN(taxRate) || taxRate < 0 || taxRate > 100) errors.defaultTaxRate = "Tax rate must be between 0 and 100%.";
   if (!fields.defaultPaymentMethod) {
     errors.defaultPaymentMethod = "Default payment method is required.";
   }
@@ -115,7 +124,7 @@ function inputCls(hasError?: boolean) {
     "w-full rounded-xl border px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:ring-2",
     hasError
       ? "border-red-400 bg-red-50/40 focus:border-red-400 focus:ring-red-200/50"
-      : "border-ink/15 bg-[#fbfaf6] focus:border-leaf focus:ring-leaf/15",
+      : "border-ink/15 bg-[#f7faf9] focus:border-leaf focus:ring-leaf/15",
   ].join(" ");
 }
 
@@ -133,7 +142,7 @@ function SectionCard({
   return (
     <section className="rounded-xl border border-ink/10 bg-white p-4 shadow-sm sm:p-5">
       <div className="flex items-start gap-3">
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-[#f4f0e8] text-ink/60">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-[#eef8f4] text-ink/60">
           <Icon size={17} aria-hidden="true" />
         </span>
         <div>
@@ -174,6 +183,17 @@ export default function SettingsPage() {
   const [successMessage, setSuccessMessage] = useState("");
   const [dataMessage, setDataMessage] = useState("");
 
+  useEffect(() => {
+    getBusinessProfile()
+      .then((business) => setFields((current) => ({
+        ...current,
+        taxName: business.taxName ?? "VAT",
+        taxNumber: business.taxNumber ?? "",
+        defaultTaxRate: String(business.defaultTaxRate ?? 0),
+      })))
+      .catch(() => undefined);
+  }, []);
+
   const setField =
     <K extends keyof SettingsFields>(key: K) =>
     (value: SettingsFields[K]) => {
@@ -207,6 +227,9 @@ export default function SettingsPage() {
         phone: cleaned.phone,
         country: cleaned.country,
         currency: cleaned.currency,
+        taxName: cleaned.taxName.trim() || "VAT",
+        taxNumber: cleaned.taxNumber.trim(),
+        defaultTaxRate: Number(cleaned.defaultTaxRate || 0),
       });
       updateUser({
         businessName: cleaned.businessName,
@@ -332,7 +355,7 @@ export default function SettingsPage() {
     <div className="mx-auto max-w-5xl px-4 py-5 sm:px-6">
       <div className="flex items-center gap-3">
         <h1 className="font-display text-xl font-bold text-ink">Settings</h1>
-        <span className="rounded-full bg-[#f4f0e8] px-2.5 py-0.5 text-xs font-bold text-ink/60">
+        <span className="rounded-full bg-[#eef8f4] px-2.5 py-0.5 text-xs font-bold text-ink/60">
           API
         </span>
       </div>
@@ -420,6 +443,24 @@ export default function SettingsPage() {
         </SectionCard>
 
         <SectionCard
+          title="Tax & VAT"
+          subtitle="Default tax details used on new invoices and receipts."
+          icon={ReceiptText}
+        >
+          <div className="grid gap-4 md:grid-cols-3">
+            <Field label="Tax name" error={errors.taxName}>
+              <input value={fields.taxName} onChange={(event) => setField("taxName")(event.target.value)} className={inputCls(!!errors.taxName)} placeholder="VAT" />
+            </Field>
+            <Field label="Tax registration number" error={errors.taxNumber}>
+              <input value={fields.taxNumber} onChange={(event) => setField("taxNumber")(event.target.value)} className={inputCls(!!errors.taxNumber)} placeholder="Optional" />
+            </Field>
+            <Field label="Default tax rate (%)" error={errors.defaultTaxRate}>
+              <input type="number" min="0" max="100" step="0.01" value={fields.defaultTaxRate} onChange={(event) => setField("defaultTaxRate")(event.target.value)} className={inputCls(!!errors.defaultTaxRate)} />
+            </Field>
+          </div>
+        </SectionCard>
+
+        <SectionCard
           title="App preferences"
           subtitle="Defaults used when recording activity."
           icon={Settings}
@@ -453,7 +494,7 @@ export default function SettingsPage() {
                 ))}
               </select>
             </Field>
-            <div className="rounded-xl border border-ink/10 bg-[#fbfaf6] p-3">
+            <div className="rounded-xl border border-ink/10 bg-[#f7faf9] p-3">
               <label className="flex items-start gap-3">
                 <input
                   type="checkbox"
@@ -490,7 +531,7 @@ export default function SettingsPage() {
           icon={WalletCards}
         >
           {dataMessage && (
-            <div className="mb-3 flex items-center gap-2 rounded-xl border border-ink/10 bg-[#fbfaf6] px-4 py-3 text-sm font-bold text-ink/60">
+            <div className="mb-3 flex items-center gap-2 rounded-xl border border-ink/10 bg-[#f7faf9] px-4 py-3 text-sm font-bold text-ink/60">
               <AlertTriangle size={16} aria-hidden="true" />
               {dataMessage}
             </div>
@@ -499,7 +540,7 @@ export default function SettingsPage() {
             <button
               type="button"
               onClick={handleExportAll}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-ink/15 bg-white px-4 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-[#f4f0e8]"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-ink/15 bg-white px-4 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-[#eef8f4]"
             >
               <Download size={15} aria-hidden="true" />
               Export JSON
@@ -507,7 +548,7 @@ export default function SettingsPage() {
             <button
               type="button"
               onClick={handleImportClick}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-ink/15 bg-white px-4 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-[#f4f0e8]"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-ink/15 bg-white px-4 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-[#eef8f4]"
             >
               <Upload size={15} aria-hidden="true" />
               Import JSON

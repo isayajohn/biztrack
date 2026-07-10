@@ -13,6 +13,9 @@ import { PAYMENT_METHODS } from "../types/sale";
 import type { Product } from "../types/product";
 import type { Sale } from "../types/sale";
 import { formatCurrency } from "../utils/format";
+import { getCustomers } from "../services/customerApi";
+import type { Customer } from "../services/customerApi";
+import { getBusinessProfile } from "../services/authApi";
 
 // ─── Validation ───────────────────────────────────────────────────────────────
 
@@ -48,6 +51,18 @@ function validate(
     e.saleDate = "Sale date is required.";
   }
 
+  const subtotal = (Number.isNaN(qty) ? 0 : qty) * (Number.isNaN(price) ? 0 : price);
+  const discount = Number(f.discount || 0);
+  const taxRate = Number(f.taxRate || 0);
+  const taxAmount = (subtotal - discount) * taxRate / 100;
+  const paid = f.paidAmount === "" && f.paymentMethod !== "Credit"
+    ? subtotal - discount + taxAmount
+    : Number(f.paidAmount || 0);
+  if (discount < 0 || discount > subtotal) e.discount = "Discount must be between 0 and the subtotal.";
+  if (taxRate < 0 || taxRate > 100) e.taxRate = "Tax rate must be between 0 and 100%.";
+  if (paid < 0 || paid > subtotal - discount + taxAmount) e.paidAmount = "Paid amount cannot exceed the amount due.";
+  if (subtotal - discount + taxAmount - paid > 0 && !f.customerId) e.customerId = "Select a customer for an unpaid or credit sale.";
+
   return e;
 }
 
@@ -59,7 +74,7 @@ function inputCls(hasError?: boolean) {
     "transition-all focus:ring-2",
     hasError
       ? "border-red-400 bg-red-50/40 focus:border-red-400 focus:ring-red-200/50"
-      : "border-ink/15 bg-[#fbfaf6] focus:border-leaf focus:ring-leaf/15",
+      : "border-ink/15 bg-[#f7faf9] focus:border-leaf focus:ring-leaf/15",
   ].join(" ");
 }
 
@@ -68,9 +83,14 @@ function inputCls(hasError?: boolean) {
 const todayIso = new Date().toISOString().split("T")[0];
 
 const EMPTY_FORM: SaleFormData = {
+  customerId: "",
   productId: "",
   quantity: "",
   unitPrice: "",
+  discount: "0",
+  taxRate: "0",
+  paidAmount: "",
+  paymentDueDate: "",
   paymentMethod: "Cash",
   saleDate: todayIso,
   notes: "",
@@ -90,6 +110,7 @@ export default function SaleFormPage({ embedded = false, onClose, onSaved }: Emb
   const isEdit = !!id;
 
   const [products, setProducts] = useState<Product[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [fields, setFields] = useState<SaleFormData>(EMPTY_FORM);
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSaving, setIsSaving] = useState(false);
@@ -101,10 +122,11 @@ export default function SaleFormPage({ embedded = false, onClose, onSaved }: Emb
   useEffect(() => {
     let alive = true;
     setIsLoading(true);
-    Promise.all([getProducts(), isEdit ? getSaleById(id) : Promise.resolve(undefined)])
-      .then(([nextProducts, sale]) => {
+    Promise.all([getProducts(), getCustomers({ isActive: true }), getBusinessProfile(), isEdit ? getSaleById(id) : Promise.resolve(undefined)])
+      .then(([nextProducts, customerResult, business, sale]) => {
         if (!alive) return;
         setProducts(nextProducts);
+        setCustomers(customerResult.customers);
         if (isEdit) {
           if (!sale) {
             setNotFound(true);
@@ -112,13 +134,20 @@ export default function SaleFormPage({ embedded = false, onClose, onSaved }: Emb
           }
           setOriginalSale(sale);
           setFields({
+            customerId: sale.customerId ?? "",
             productId: sale.productId,
             quantity: String(sale.quantity),
             unitPrice: String(sale.unitPrice),
+            discount: String(sale.discount ?? 0),
+            taxRate: String(sale.taxRate ?? 0),
+            paidAmount: String(sale.paidAmount ?? sale.totalAmount),
+            paymentDueDate: sale.paymentDueDate ?? "",
             paymentMethod: sale.paymentMethod,
             saleDate: sale.saleDate,
             notes: sale.notes ?? "",
           });
+        } else {
+          setFields((current) => ({ ...current, taxRate: String(business.defaultTaxRate ?? 0) }));
         }
       })
       .catch(() => {
@@ -160,6 +189,14 @@ export default function SaleFormPage({ embedded = false, onClose, onSaved }: Emb
     !isNaN(qtyNum) && !isNaN(priceNum) && qtyNum > 0 && priceNum > 0
       ? qtyNum * priceNum
       : null;
+  const discountNum = Number(fields.discount || 0);
+  const taxRateNum = Number(fields.taxRate || 0);
+  const taxAmount = computedTotal === null ? 0 : Math.max(0, computedTotal - discountNum) * taxRateNum / 100;
+  const netTotal = computedTotal === null ? null : Math.max(0, computedTotal - discountNum + taxAmount);
+  const paidNum = fields.paidAmount === "" && fields.paymentMethod !== "Credit"
+    ? netTotal ?? 0
+    : Number(fields.paidAmount || 0);
+  const balanceDue = netTotal === null ? 0 : Math.max(0, netTotal - paidNum);
 
   // Handle product selection — auto-fill unit price
   const handleProductChange = (productId: string) => {
@@ -191,7 +228,16 @@ export default function SaleFormPage({ embedded = false, onClose, onSaved }: Emb
     };
 
   const setPaymentMethod = (method: PaymentMethod) => {
-    setFields((prev) => ({ ...prev, paymentMethod: method }));
+    setFields((prev) => {
+      const subtotal = Number(prev.quantity || 0) * Number(prev.unitPrice || 0);
+      const amountDue = Math.max(0, subtotal - Number(prev.discount || 0));
+      const tax = amountDue * Number(prev.taxRate || 0) / 100;
+      return {
+        ...prev,
+        paymentMethod: method,
+        paidAmount: method === "Credit" ? "0" : String(amountDue + tax),
+      };
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -211,11 +257,18 @@ export default function SaleFormPage({ embedded = false, onClose, onSaved }: Emb
       const product = products.find((p) => p.id === fields.productId)!;
 
       const data = {
+        customerId: fields.customerId || undefined,
         productId: fields.productId,
         productName: product.name,
         quantity: qty,
         unitPrice: price,
         totalAmount: qty * price,
+        discount: Number(fields.discount || 0),
+        taxRate: Number(fields.taxRate || 0),
+        paidAmount: fields.paidAmount === "" && fields.paymentMethod !== "Credit"
+          ? Math.max(0, qty * price - Number(fields.discount || 0) + taxAmount)
+          : Number(fields.paidAmount || 0),
+        paymentDueDate: fields.paymentDueDate || undefined,
         paymentMethod: fields.paymentMethod,
         saleDate: fields.saleDate,
         notes: fields.notes.trim() || undefined,
@@ -351,7 +404,7 @@ export default function SaleFormPage({ embedded = false, onClose, onSaved }: Emb
           </div>
 
           {/* Quantity + Unit price */}
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div className="mt-4 grid gap-4 sm:grid-cols-3">
             {/* Quantity */}
             <div>
               <label
@@ -435,13 +488,10 @@ export default function SaleFormPage({ embedded = false, onClose, onSaved }: Emb
 
           {/* Total amount preview */}
           {computedTotal !== null && (
-            <div className="mt-4 flex items-center justify-between rounded-xl bg-mint px-4 py-3">
-              <p className="text-xs font-semibold text-ink/55">
-                Total amount
-              </p>
-              <p className="text-base font-bold text-leaf">
-                {formatCurrency(computedTotal)}
-              </p>
+            <div className="mt-4 grid grid-cols-3 gap-3 rounded-xl bg-mint px-4 py-3">
+              <div><p className="text-xs font-semibold text-ink/55">Subtotal</p><p className="text-base font-bold text-ink">{formatCurrency(computedTotal)}</p></div>
+              <div><p className="text-xs font-semibold text-ink/55">Amount due</p><p className="text-base font-bold text-leaf">{formatCurrency(netTotal ?? 0)}</p></div>
+              <div><p className="text-xs font-semibold text-ink/55">Balance</p><p className={`text-base font-bold ${balanceDue > 0 ? "text-red-600" : "text-leaf"}`}>{formatCurrency(balanceDue)}</p></div>
             </div>
           )}
         </section>
@@ -449,6 +499,15 @@ export default function SaleFormPage({ embedded = false, onClose, onSaved }: Emb
         {/* ── Payment & date card ── */}
         <section className="rounded-xl border border-ink/10 bg-white p-5 shadow-sm">
           <h2 className="mb-4 text-sm font-bold text-ink">Payment & date</h2>
+
+          <div className="mb-4">
+            <label htmlFor="customerId" className="mb-1.5 block text-sm font-semibold text-ink">Customer <span className="font-normal text-ink/40">(required for credit)</span></label>
+            <select id="customerId" value={fields.customerId} onChange={setField("customerId")} className={inputCls(!!errors.customerId)}>
+              <option value="">Walk-in customer</option>
+              {customers.map((customer) => <option key={customer.id} value={customer.id}>{customer.name} · owing {formatCurrency(customer.creditBalance)}</option>)}
+            </select>
+            {errors.customerId && <p className="mt-1 text-xs font-medium text-red-500">{errors.customerId}</p>}
+          </div>
 
           {/* Payment method */}
           <div>
@@ -465,7 +524,7 @@ export default function SaleFormPage({ embedded = false, onClose, onSaved }: Emb
                     "rounded-xl px-3.5 py-2 text-sm font-bold transition-colors",
                     fields.paymentMethod === method
                       ? "bg-ink text-white"
-                      : "border border-ink/15 text-ink/60 hover:bg-[#f4f0e8]",
+                      : "border border-ink/15 text-ink/60 hover:bg-[#eef8f4]",
                   ].join(" ")}
                 >
                   {method}
@@ -473,6 +532,31 @@ export default function SaleFormPage({ embedded = false, onClose, onSaved }: Emb
               ))}
             </div>
           </div>
+
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <div>
+              <label htmlFor="discount" className="mb-1.5 block text-sm font-semibold text-ink">Discount</label>
+              <input id="discount" type="number" min="0" step="0.01" value={fields.discount} onChange={setField("discount")} className={inputCls(!!errors.discount)} />
+              {errors.discount && <p className="mt-1 text-xs font-medium text-red-500">{errors.discount}</p>}
+            </div>
+            <div>
+              <label htmlFor="taxRate" className="mb-1.5 block text-sm font-semibold text-ink">Tax / VAT (%)</label>
+              <input id="taxRate" type="number" min="0" max="100" step="0.01" value={fields.taxRate} onChange={setField("taxRate")} className={inputCls(!!errors.taxRate)} />
+              {errors.taxRate && <p className="mt-1 text-xs font-medium text-red-500">{errors.taxRate}</p>}
+            </div>
+            <div>
+              <label htmlFor="paidAmount" className="mb-1.5 block text-sm font-semibold text-ink">Amount paid</label>
+              <input id="paidAmount" type="number" min="0" step="0.01" placeholder={String(netTotal ?? 0)} value={fields.paidAmount} onChange={setField("paidAmount")} className={inputCls(!!errors.paidAmount)} />
+              {errors.paidAmount && <p className="mt-1 text-xs font-medium text-red-500">{errors.paidAmount}</p>}
+            </div>
+          </div>
+
+          {balanceDue > 0 && (
+            <div className="mt-4">
+              <label htmlFor="paymentDueDate" className="mb-1.5 block text-sm font-semibold text-ink">Payment due date</label>
+              <input id="paymentDueDate" type="date" min={fields.saleDate} value={fields.paymentDueDate} onChange={setField("paymentDueDate")} className={inputCls()} />
+            </div>
+          )}
 
           {/* Sale date */}
           <div className="mt-4">
@@ -517,7 +601,7 @@ export default function SaleFormPage({ embedded = false, onClose, onSaved }: Emb
               placeholder="e.g. Regular customer, credit to collect Friday…"
               value={fields.notes}
               onChange={setField("notes")}
-              className="w-full resize-none rounded-xl border border-ink/15 bg-[#fbfaf6] px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+              className="w-full resize-none rounded-xl border border-ink/15 bg-[#f7faf9] px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
             />
           </div>
         </section>
@@ -528,14 +612,14 @@ export default function SaleFormPage({ embedded = false, onClose, onSaved }: Emb
             <button
               type="button"
               onClick={onClose}
-              className="flex items-center justify-center rounded-xl border border-ink/15 px-5 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-[#f4f0e8]"
+              className="flex items-center justify-center rounded-xl border border-ink/15 px-5 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-[#eef8f4]"
             >
               Cancel
             </button>
           ) : (
             <Link
               to="/sales"
-              className="flex items-center justify-center rounded-xl border border-ink/15 px-5 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-[#f4f0e8]"
+              className="flex items-center justify-center rounded-xl border border-ink/15 px-5 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-[#eef8f4]"
             >
               Cancel
             </Link>

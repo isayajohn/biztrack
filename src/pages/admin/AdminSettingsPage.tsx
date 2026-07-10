@@ -128,11 +128,11 @@ export default function AdminSettingsPage() {
           </div>
 
           <dl className="mt-5 grid gap-3 text-sm">
-            <div className="flex items-center justify-between rounded-lg bg-[#fbfaf6] px-3 py-2">
+            <div className="flex items-center justify-between rounded-lg bg-[#f7faf9] px-3 py-2">
               <dt className="font-semibold text-ink/50">Role</dt>
               <dd className="font-extrabold text-ink">{user?.role}</dd>
             </div>
-            <div className="flex items-center justify-between rounded-lg bg-[#fbfaf6] px-3 py-2">
+            <div className="flex items-center justify-between rounded-lg bg-[#f7faf9] px-3 py-2">
               <dt className="font-semibold text-ink/50">Status</dt>
               <dd className="font-extrabold text-ink">{user?.status}</dd>
             </div>
@@ -161,7 +161,7 @@ export default function AdminSettingsPage() {
             </div>
           </div>
 
-          <div className="mt-5 rounded-lg border border-ink/10 bg-[#fbfaf6] p-4">
+          <div className="mt-5 rounded-lg border border-ink/10 bg-[#f7faf9] p-4">
             {isLoadingBranding ? (
               <div className="flex items-center gap-2 text-sm font-bold text-ink/45">
                 <Loader2 size={16} className="animate-spin" aria-hidden="true" />

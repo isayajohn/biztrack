@@ -30,6 +30,9 @@ class BusinessController extends Controller
             'name' => 'required|string|max:255',
             'currency' => 'required|string|size:3',
             'country' => 'required|string',
+            'taxName' => 'nullable|string|max:50',
+            'taxNumber' => 'nullable|string|max:100',
+            'defaultTaxRate' => 'nullable|numeric|min:0|max:100',
         ]);
 
         $business = Business::where('user_id', $user->id)->first();
@@ -41,12 +44,18 @@ class BusinessController extends Controller
                 'name' => $data['name'],
                 'currency' => strtoupper($data['currency']),
                 'country' => $data['country'],
+                'tax_name' => $data['taxName'] ?? 'VAT',
+                'tax_number' => $data['taxNumber'] ?? null,
+                'default_tax_rate' => $data['defaultTaxRate'] ?? 0,
             ]);
         } else {
             $business->update([
                 'name' => $data['name'],
                 'currency' => strtoupper($data['currency']),
                 'country' => $data['country'],
+                'tax_name' => $data['taxName'] ?? $business->tax_name,
+                'tax_number' => array_key_exists('taxNumber', $data) ? $data['taxNumber'] : $business->tax_number,
+                'default_tax_rate' => $data['defaultTaxRate'] ?? $business->default_tax_rate,
             ]);
         }
 
@@ -71,6 +80,9 @@ class BusinessController extends Controller
             'name' => $business->name,
             'currency' => $business->currency,
             'country' => $business->country,
+            'taxName' => $business->tax_name,
+            'taxNumber' => $business->tax_number,
+            'defaultTaxRate' => (float) $business->default_tax_rate,
             'createdAt' => $business->created_at,
             'updatedAt' => $business->updated_at,
             'subscription' => $sub ? [

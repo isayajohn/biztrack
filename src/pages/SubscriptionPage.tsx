@@ -228,7 +228,7 @@ export default function SubscriptionPage() {
                       Select a package and continue to AzamPay checkout.
                     </p>
                   </div>
-                  <div className="grid grid-cols-2 rounded-lg border border-ink/10 bg-[#fbfaf6] p-1">
+                  <div className="grid grid-cols-2 rounded-lg border border-ink/10 bg-[#f7faf9] p-1">
                     {(["MONTHLY", "YEARLY"] as BillingCycle[]).map((cycle) => (
                       <button
                         key={cycle}
@@ -328,7 +328,7 @@ export default function SubscriptionPage() {
 
 function StatusTile({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg bg-[#fbfaf6] p-3">
+    <div className="rounded-lg bg-[#f7faf9] p-3">
       <p className="text-[11px] font-extrabold uppercase tracking-[0.06em] text-ink/35">{label}</p>
       <p className="mt-1 text-sm font-extrabold text-ink">{value}</p>
     </div>

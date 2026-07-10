@@ -83,7 +83,7 @@ export default function LandingFooter({ seoDescription, footerLinks, tagline, ba
   const footerBadgeText = badge || DEFAULT_BADGE;
 
   return (
-    <footer id="contact" className="bg-[#111815] text-white/60">
+    <footer id="contact" className="bg-[#073d33] text-white/60">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         {/* Main grid */}
         <div className="grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_0.8fr_0.8fr_1fr]">

@@ -189,7 +189,7 @@ export default function AdminEmailConfigPage() {
                   <select
                     value={form.provider}
                     onChange={(event) => updateField("provider", event.target.value as ConfigProvider)}
-                    className="mt-1 w-full rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                    className="mt-1 w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
                   >
                     <option value="SMTP">SMTP</option>
                     <option value="API">API</option>
@@ -202,7 +202,7 @@ export default function AdminEmailConfigPage() {
                     <input
                       value={form.host}
                       onChange={(event) => updateField("host", event.target.value)}
-                      className="mt-1 w-full rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                      className="mt-1 w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
                     />
                   </label>
                   <label className="text-sm font-bold text-ink/65">
@@ -213,7 +213,7 @@ export default function AdminEmailConfigPage() {
                       max={65535}
                       value={form.port}
                       onChange={(event) => updateField("port", event.target.value)}
-                      className="mt-1 w-full rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                      className="mt-1 w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
                     />
                   </label>
                 </div>
@@ -222,7 +222,7 @@ export default function AdminEmailConfigPage() {
                   <input
                     value={form.username}
                     onChange={(event) => updateField("username", event.target.value)}
-                    className="mt-1 w-full rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                    className="mt-1 w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
                   />
                 </label>
                 <label className="text-sm font-bold text-ink/65">
@@ -232,7 +232,7 @@ export default function AdminEmailConfigPage() {
                     value={form.password}
                     placeholder={settings?.config?.passwordMasked ?? ""}
                     onChange={(event) => updateField("password", event.target.value)}
-                    className="mt-1 w-full rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                    className="mt-1 w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
                   />
                 </label>
                 <label className="text-sm font-bold text-ink/65">
@@ -242,11 +242,11 @@ export default function AdminEmailConfigPage() {
                     value={form.apiKey}
                     placeholder={settings?.config?.apiKeyMasked ?? ""}
                     onChange={(event) => updateField("apiKey", event.target.value)}
-                    className="mt-1 w-full rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                    className="mt-1 w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
                   />
                 </label>
                 <div className="grid gap-2 sm:grid-cols-2">
-                  <label className="flex items-center gap-2 rounded-lg border border-ink/10 bg-[#fbfaf6] px-3 py-2 text-sm font-bold text-ink/65">
+                  <label className="flex items-center gap-2 rounded-lg border border-ink/10 bg-[#f7faf9] px-3 py-2 text-sm font-bold text-ink/65">
                     <input
                       type="checkbox"
                       checked={form.clearPassword}
@@ -255,7 +255,7 @@ export default function AdminEmailConfigPage() {
                     />
                     Clear password
                   </label>
-                  <label className="flex items-center gap-2 rounded-lg border border-ink/10 bg-[#fbfaf6] px-3 py-2 text-sm font-bold text-ink/65">
+                  <label className="flex items-center gap-2 rounded-lg border border-ink/10 bg-[#f7faf9] px-3 py-2 text-sm font-bold text-ink/65">
                     <input
                       type="checkbox"
                       checked={form.clearApiKey}
@@ -271,7 +271,7 @@ export default function AdminEmailConfigPage() {
                     value={form.fromName}
                     onChange={(event) => updateField("fromName", event.target.value)}
                     required
-                    className="mt-1 w-full rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                    className="mt-1 w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
                   />
                 </label>
                 <label className="text-sm font-bold text-ink/65">
@@ -281,7 +281,7 @@ export default function AdminEmailConfigPage() {
                     value={form.fromEmail}
                     onChange={(event) => updateField("fromEmail", event.target.value)}
                     required
-                    className="mt-1 w-full rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                    className="mt-1 w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
                   />
                 </label>
                 <label className="text-sm font-bold text-ink/65">
@@ -290,10 +290,10 @@ export default function AdminEmailConfigPage() {
                     type="email"
                     value={form.replyToEmail}
                     onChange={(event) => updateField("replyToEmail", event.target.value)}
-                    className="mt-1 w-full rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                    className="mt-1 w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
                   />
                 </label>
-                <label className="flex items-center gap-2 rounded-lg border border-ink/10 bg-[#fbfaf6] px-3 py-2 text-sm font-bold text-ink/65">
+                <label className="flex items-center gap-2 rounded-lg border border-ink/10 bg-[#f7faf9] px-3 py-2 text-sm font-bold text-ink/65">
                   <input
                     type="checkbox"
                     checked={form.isActive}
@@ -357,7 +357,7 @@ export default function AdminEmailConfigPage() {
                           }))
                         }
                         placeholder="Subject"
-                        className="rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                        className="rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
                       />
                       <textarea
                         value={draft.body}
@@ -368,13 +368,13 @@ export default function AdminEmailConfigPage() {
                           }))
                         }
                         rows={5}
-                        className="rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                        className="rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
                       />
                       <button
                         type="button"
                         disabled={savingTemplate === template.key}
                         onClick={() => saveTemplate(template)}
-                        className="inline-flex items-center justify-center gap-2 rounded-lg border border-ink/15 bg-white px-3 py-2 text-sm font-bold text-ink/60 transition-colors hover:bg-[#f4f0e8] disabled:opacity-60 sm:justify-self-end"
+                        className="inline-flex items-center justify-center gap-2 rounded-lg border border-ink/15 bg-white px-3 py-2 text-sm font-bold text-ink/60 transition-colors hover:bg-[#eef8f4] disabled:opacity-60 sm:justify-self-end"
                       >
                         {savingTemplate === template.key && <Loader2 size={15} className="animate-spin" aria-hidden="true" />}
                         Save template

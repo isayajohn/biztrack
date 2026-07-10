@@ -6,6 +6,9 @@ type ApiBusiness = {
   name: string;
   currency: string;
   country?: string;
+  taxName?: string;
+  taxNumber?: string | null;
+  defaultTaxRate?: number;
 };
 
 type ApiUser = {
@@ -122,8 +125,15 @@ export async function updateBusinessProfile(data: {
   phone?: string;
   country: string;
   currency: string;
+  taxName?: string;
+  taxNumber?: string;
+  defaultTaxRate?: number;
 }): Promise<ApiBusiness> {
   return unwrap<ApiBusiness>(await apiClient.put("/business", data));
+}
+
+export async function getBusinessProfile(): Promise<ApiBusiness> {
+  return unwrap<ApiBusiness>(await apiClient.get("/business"));
 }
 
 export function logout() {

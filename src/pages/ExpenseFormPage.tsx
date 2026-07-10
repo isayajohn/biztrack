@@ -49,7 +49,7 @@ function inputCls(hasError?: boolean) {
     "transition-all focus:ring-2",
     hasError
       ? "border-red-400 bg-red-50/40 focus:border-red-400 focus:ring-red-200/50"
-      : "border-ink/15 bg-[#fbfaf6] focus:border-leaf focus:ring-leaf/15",
+      : "border-ink/15 bg-[#f7faf9] focus:border-leaf focus:ring-leaf/15",
   ].join(" ");
 }
 
@@ -346,7 +346,7 @@ export default function ExpenseFormPage({ embedded = false, onClose, onSaved }: 
                     "rounded-xl px-3.5 py-2 text-sm font-bold transition-colors",
                     fields.paymentMethod === method
                       ? "bg-ink text-white"
-                      : "border border-ink/15 text-ink/60 hover:bg-[#f4f0e8]",
+                      : "border border-ink/15 text-ink/60 hover:bg-[#eef8f4]",
                   ].join(" ")}
                 >
                   {method}
@@ -398,7 +398,7 @@ export default function ExpenseFormPage({ embedded = false, onClose, onSaved }: 
               placeholder="e.g. Paid in advance for 3 months…"
               value={fields.notes}
               onChange={setField("notes")}
-              className="w-full resize-none rounded-xl border border-ink/15 bg-[#fbfaf6] px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+              className="w-full resize-none rounded-xl border border-ink/15 bg-[#f7faf9] px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
             />
           </div>
         </section>
@@ -409,14 +409,14 @@ export default function ExpenseFormPage({ embedded = false, onClose, onSaved }: 
             <button
               type="button"
               onClick={onClose}
-              className="flex items-center justify-center rounded-xl border border-ink/15 px-5 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-[#f4f0e8]"
+              className="flex items-center justify-center rounded-xl border border-ink/15 px-5 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-[#eef8f4]"
             >
               Cancel
             </button>
           ) : (
             <Link
               to="/expenses"
-              className="flex items-center justify-center rounded-xl border border-ink/15 px-5 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-[#f4f0e8]"
+              className="flex items-center justify-center rounded-xl border border-ink/15 px-5 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-[#eef8f4]"
             >
               Cancel
             </Link>

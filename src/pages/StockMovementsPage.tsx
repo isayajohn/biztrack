@@ -18,7 +18,7 @@ const MOVEMENT_BADGE: Record<string, BadgeConfig> = {
 };
 
 function MovementBadge({ type }: { type: string }) {
-  const cfg = MOVEMENT_BADGE[type] ?? { label: type, className: "bg-[#f4f0e8] text-ink/60" };
+  const cfg = MOVEMENT_BADGE[type] ?? { label: type, className: "bg-[#eef8f4] text-ink/60" };
   return (
     <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${cfg.className}`}>
       {cfg.label}
@@ -102,7 +102,7 @@ export default function StockMovementsPage() {
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <h1 className="font-display text-xl font-bold text-ink">Stock Movements</h1>
-          <span className="rounded-full bg-[#f4f0e8] px-2.5 py-0.5 text-xs font-bold text-ink/60">
+          <span className="rounded-full bg-[#eef8f4] px-2.5 py-0.5 text-xs font-bold text-ink/60">
             {total}
           </span>
         </div>
@@ -122,7 +122,7 @@ export default function StockMovementsPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by product name…"
-              className="w-full rounded-xl border border-ink/15 bg-[#fbfaf6] py-2.5 pl-10 pr-4 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+              className="w-full rounded-xl border border-ink/15 bg-[#f7faf9] py-2.5 pl-10 pr-4 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
             />
             {search && (
               <button
@@ -137,7 +137,7 @@ export default function StockMovementsPage() {
           <select
             value={movementType}
             onChange={(e) => setMovementType(e.target.value)}
-            className="rounded-xl border border-ink/15 bg-[#fbfaf6] px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+            className="rounded-xl border border-ink/15 bg-[#f7faf9] px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
           >
             {MOVEMENT_TYPES.map((t) => (
               <option key={t.value} value={t.value}>
@@ -161,7 +161,7 @@ export default function StockMovementsPage() {
         </div>
       ) : filtered.length === 0 ? (
         <div className="mt-10 flex flex-col items-center gap-4 text-center">
-          <span className="grid h-14 w-14 place-items-center rounded-2xl bg-[#f4f0e8] text-ink/30">
+          <span className="grid h-14 w-14 place-items-center rounded-2xl bg-[#eef8f4] text-ink/30">
             <ArrowLeftRight size={26} aria-hidden="true" />
           </span>
           <p className="text-sm font-semibold text-ink/45">No stock movements found.</p>
@@ -172,7 +172,7 @@ export default function StockMovementsPage() {
           <div className="mt-4 hidden overflow-hidden rounded-xl border border-ink/10 bg-white shadow-sm lg:block">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-ink/8 bg-[#fbfaf6]">
+                <tr className="border-b border-ink/8 bg-[#f7faf9]">
                   <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-ink/45">
                     Date
                   </th>
@@ -199,7 +199,7 @@ export default function StockMovementsPage() {
                   return (
                     <tr
                       key={m.id}
-                      className="border-b border-ink/5 last:border-b-0 transition-colors hover:bg-[#fbfaf6]"
+                      className="border-b border-ink/5 last:border-b-0 transition-colors hover:bg-[#f7faf9]"
                     >
                       <td className="px-4 py-3 text-xs text-ink/60">
                         {new Date(m.createdAt).toLocaleString()}
@@ -267,7 +267,7 @@ export default function StockMovementsPage() {
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="rounded-xl border border-ink/15 px-4 py-2 font-bold text-ink/60 transition-colors hover:bg-[#f4f0e8] disabled:cursor-not-allowed disabled:opacity-40"
+                className="rounded-xl border border-ink/15 px-4 py-2 font-bold text-ink/60 transition-colors hover:bg-[#eef8f4] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Previous
               </button>
@@ -277,7 +277,7 @@ export default function StockMovementsPage() {
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="rounded-xl border border-ink/15 px-4 py-2 font-bold text-ink/60 transition-colors hover:bg-[#f4f0e8] disabled:cursor-not-allowed disabled:opacity-40"
+                className="rounded-xl border border-ink/15 px-4 py-2 font-bold text-ink/60 transition-colors hover:bg-[#eef8f4] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Next
               </button>

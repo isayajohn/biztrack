@@ -16,7 +16,7 @@ function inputCls(hasError?: boolean) {
     "transition-all focus:ring-2",
     hasError
       ? "border-red-400 bg-red-50/40 focus:border-red-400 focus:ring-red-200/50"
-      : "border-ink/15 bg-[#fbfaf6] focus:border-leaf focus:ring-leaf/15",
+      : "border-ink/15 bg-[#f7faf9] focus:border-leaf focus:ring-leaf/15",
   ].join(" ");
 }
 
@@ -73,7 +73,7 @@ export default function ResetPasswordPage() {
 
   if (isSuccess) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-[#fbfaf6] px-4 py-10">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-[#f7faf9] px-4 py-10">
         <div className="w-full max-w-sm">
           <div className="mb-8 flex justify-center">
             <BrandLogo className="h-auto w-56 max-w-full" />
@@ -108,7 +108,7 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[#fbfaf6] px-4 py-10">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[#f7faf9] px-4 py-10">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex justify-center">
           <BrandLogo className="h-auto w-56 max-w-full" />

@@ -19,7 +19,7 @@ export default function AppLayout() {
   }, [isAdminSection, user?.role]);
 
   return (
-    <div className="flex min-h-screen bg-[#fbfaf6] text-ink">
+    <div className="flex min-h-screen bg-[#f7faf9] text-ink">
       {/* Desktop sidebar — fixed left, visible on lg+ */}
       <Sidebar navItems={navItems} />
 

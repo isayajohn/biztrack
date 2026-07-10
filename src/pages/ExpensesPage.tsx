@@ -80,7 +80,7 @@ const CATEGORY_BADGE_CLS: Record<ExpenseCategory, string> = {
   Internet: "bg-blue-50 text-blue-700",
   Food: "bg-orange-50 text-clay",
   Marketing: "bg-rose-50 text-rose-700",
-  Other: "bg-[#f4f0e8] text-ink/60",
+  Other: "bg-[#eef8f4] text-ink/60",
 };
 
 const PAYMENT_BADGE_CLS: Record<ExpensePaymentMethod, string> = {
@@ -172,7 +172,7 @@ function ExpenseCard({
               </button>
               <button
                 onClick={onCancelDelete}
-                className="rounded-lg border border-ink/15 px-3 py-1.5 text-xs font-bold text-ink/60 hover:bg-[#f4f0e8] transition-colors"
+                className="rounded-lg border border-ink/15 px-3 py-1.5 text-xs font-bold text-ink/60 hover:bg-[#eef8f4] transition-colors"
               >
                 Cancel
               </button>
@@ -182,7 +182,7 @@ function ExpenseCard({
           <div className="flex gap-2">
             <Link
               to={`/expenses/${e.id}/edit`}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-ink/15 py-2 text-xs font-bold text-ink hover:bg-[#f4f0e8] transition-colors"
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-ink/15 py-2 text-xs font-bold text-ink hover:bg-[#eef8f4] transition-colors"
             >
               <Pencil size={13} aria-hidden="true" />
               Edit
@@ -251,7 +251,7 @@ function ExpenseRow({
             </button>
             <button
               onClick={onCancelDelete}
-              className="rounded-lg border border-ink/15 px-2 py-1 text-xs font-bold text-ink/50 hover:bg-[#f4f0e8] transition-colors"
+              className="rounded-lg border border-ink/15 px-2 py-1 text-xs font-bold text-ink/50 hover:bg-[#eef8f4] transition-colors"
             >
               Cancel
             </button>
@@ -260,7 +260,7 @@ function ExpenseRow({
           <div className="flex items-center justify-end gap-1.5">
             <Link
               to={`/expenses/${e.id}/edit`}
-              className="grid h-8 w-8 place-items-center rounded-lg border border-ink/15 text-ink/50 hover:bg-[#f4f0e8] hover:text-ink transition-colors"
+              className="grid h-8 w-8 place-items-center rounded-lg border border-ink/15 text-ink/50 hover:bg-[#eef8f4] hover:text-ink transition-colors"
               aria-label={`Edit ${e.description}`}
             >
               <Pencil size={14} aria-hidden="true" />
@@ -404,7 +404,7 @@ export default function ExpensesPage() {
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <h1 className="font-display text-xl font-bold text-ink">Expenses</h1>
-          <span className="rounded-full bg-[#f4f0e8] px-2.5 py-0.5 text-xs font-bold text-ink/60">
+          <span className="rounded-full bg-[#eef8f4] px-2.5 py-0.5 text-xs font-bold text-ink/60">
             {expenses.length}
           </span>
         </div>
@@ -430,7 +430,7 @@ export default function ExpensesPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by description…"
-            className="w-full rounded-xl border border-ink/15 bg-[#fbfaf6] py-2.5 pl-10 pr-4 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+            className="w-full rounded-xl border border-ink/15 bg-[#f7faf9] py-2.5 pl-10 pr-4 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
           />
           {search && (
             <button
@@ -453,7 +453,7 @@ export default function ExpensesPage() {
                 "flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors",
                 dateFilter === key
                   ? "bg-ink text-white"
-                  : "border border-ink/10 bg-white text-ink/60 hover:bg-[#f4f0e8]",
+                  : "border border-ink/10 bg-white text-ink/60 hover:bg-[#eef8f4]",
               ].join(" ")}
             >
               {label}
@@ -471,7 +471,7 @@ export default function ExpensesPage() {
                 "flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors",
                 categoryFilter === key
                   ? "bg-ink text-white"
-                  : "border border-ink/10 bg-white text-ink/60 hover:bg-[#f4f0e8]",
+                  : "border border-ink/10 bg-white text-ink/60 hover:bg-[#eef8f4]",
               ].join(" ")}
             >
               {label}
@@ -498,7 +498,7 @@ export default function ExpensesPage() {
                 "flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors",
                 paymentFilter === key
                   ? "bg-ink text-white"
-                  : "border border-ink/10 bg-white text-ink/60 hover:bg-[#f4f0e8]",
+                  : "border border-ink/10 bg-white text-ink/60 hover:bg-[#eef8f4]",
               ].join(" ")}
             >
               {label}
@@ -547,7 +547,7 @@ export default function ExpensesPage() {
         </div>
       ) : filtered.length === 0 ? (
         <div className="mt-10 flex flex-col items-center gap-4 text-center">
-          <span className="grid h-14 w-14 place-items-center rounded-2xl bg-[#f4f0e8] text-ink/30">
+          <span className="grid h-14 w-14 place-items-center rounded-2xl bg-[#eef8f4] text-ink/30">
             <WalletCards size={26} aria-hidden="true" />
           </span>
           <p className="text-sm font-semibold text-ink/45">{emptyMessage}</p>
@@ -591,7 +591,7 @@ export default function ExpensesPage() {
             <TableContainer>
               <Table aria-label="Expenses table" sx={{ tableLayout: "fixed" }}>
                 <TableHead>
-                  <TableRow className="bg-[#fbfaf6]">
+                  <TableRow className="bg-[#f7faf9]">
                     <TableCell sx={{ py: 1.25, pl: 2 }} className="text-xs font-bold uppercase tracking-wide text-ink/45">
                     Description
                     </TableCell>

@@ -23,7 +23,7 @@ const activity = [
 
 function DemoDashboard() {
   return (
-    <main className="min-h-screen bg-[#fbfaf6] text-ink">
+    <main className="min-h-screen bg-[#f7faf9] text-ink">
       <div className="mx-auto max-w-md px-4 pb-8 pt-4">
         <header className="flex items-center justify-between">
           <Link
@@ -81,13 +81,13 @@ function DemoDashboard() {
             <button className="rounded-lg bg-leaf px-4 py-3 text-sm font-bold text-white">
               Add sale
             </button>
-            <button className="rounded-lg border border-ink/10 bg-[#fbfaf6] px-4 py-3 text-sm font-bold">
+            <button className="rounded-lg border border-ink/10 bg-[#f7faf9] px-4 py-3 text-sm font-bold">
               Add expense
             </button>
-            <button className="rounded-lg border border-ink/10 bg-[#fbfaf6] px-4 py-3 text-sm font-bold">
+            <button className="rounded-lg border border-ink/10 bg-[#f7faf9] px-4 py-3 text-sm font-bold">
               Add product
             </button>
-            <button className="rounded-lg border border-ink/10 bg-[#fbfaf6] px-4 py-3 text-sm font-bold">
+            <button className="rounded-lg border border-ink/10 bg-[#f7faf9] px-4 py-3 text-sm font-bold">
               View reports
             </button>
           </div>

@@ -192,7 +192,7 @@ export default function AdminEmailProviderConfigPage() {
                   Reply-to email
                   <input type="email" value={form.replyToEmail} onChange={(event) => updateField("replyToEmail", event.target.value)} className={fieldClass} />
                 </label>
-                <label className="mt-6 flex min-h-10 items-center gap-2 rounded-lg border border-ink/10 bg-[#fbfaf6] px-3 py-2 text-sm font-bold text-ink/65">
+                <label className="mt-6 flex min-h-10 items-center gap-2 rounded-lg border border-ink/10 bg-[#f7faf9] px-3 py-2 text-sm font-bold text-ink/65">
                   <input type="checkbox" checked={form.isActive} onChange={(event) => updateField("isActive", event.target.checked)} className="h-4 w-4 accent-leaf" />
                   Active
                 </label>

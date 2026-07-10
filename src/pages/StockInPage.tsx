@@ -164,7 +164,7 @@ export default function StockInPage() {
                   onFocus={() => setShowDropdown(true)}
                   placeholder="Search product…"
                   disabled={isLoadingProducts}
-                  className="w-full rounded-xl border border-ink/15 bg-[#fbfaf6] py-2.5 pl-10 pr-9 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15 disabled:cursor-wait disabled:opacity-60"
+                  className="w-full rounded-xl border border-ink/15 bg-[#f7faf9] py-2.5 pl-10 pr-9 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15 disabled:cursor-wait disabled:opacity-60"
                 />
                 {productSearch && (
                   <button
@@ -183,7 +183,7 @@ export default function StockInPage() {
                           <button
                             type="button"
                             onClick={() => handleSelectProduct(p)}
-                            className="flex w-full items-center justify-between px-4 py-2.5 text-left text-sm transition-colors hover:bg-[#fbfaf6]"
+                            className="flex w-full items-center justify-between px-4 py-2.5 text-left text-sm transition-colors hover:bg-[#f7faf9]"
                           >
                             <span className="font-semibold text-ink">{p.name}</span>
                             <span className="text-xs text-ink/50">
@@ -214,7 +214,7 @@ export default function StockInPage() {
                 value={quantity}
                 min={1}
                 onChange={(e) => setQuantity(Number(e.target.value))}
-                className="w-full rounded-xl border border-ink/15 bg-[#fbfaf6] px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                className="w-full rounded-xl border border-ink/15 bg-[#f7faf9] px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
               />
             </div>
 
@@ -228,7 +228,7 @@ export default function StockInPage() {
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 placeholder="e.g. Purchase from supplier"
-                className="w-full rounded-xl border border-ink/15 bg-[#fbfaf6] px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                className="w-full rounded-xl border border-ink/15 bg-[#f7faf9] px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
               />
             </div>
 
@@ -259,7 +259,7 @@ export default function StockInPage() {
             <div className="overflow-hidden rounded-xl border border-ink/10 bg-white shadow-sm">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-ink/8 bg-[#fbfaf6]">
+                  <tr className="border-b border-ink/8 bg-[#f7faf9]">
                     <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-ink/45">
                       Date
                     </th>
@@ -281,7 +281,7 @@ export default function StockInPage() {
                   {movements.map((m) => (
                     <tr
                       key={m.id}
-                      className="border-b border-ink/5 last:border-b-0 transition-colors hover:bg-[#fbfaf6]"
+                      className="border-b border-ink/5 last:border-b-0 transition-colors hover:bg-[#f7faf9]"
                     >
                       <td className="px-4 py-3 text-xs text-ink/60">
                         {new Date(m.createdAt).toLocaleString()}

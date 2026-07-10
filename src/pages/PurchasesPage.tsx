@@ -24,7 +24,7 @@ const STATUS_MAP: Record<string, StatusConfig> = {
 };
 
 function StatusBadge({ status }: { status: string }) {
-  const cfg = STATUS_MAP[status] ?? { label: status, className: "bg-[#f4f0e8] text-ink/60" };
+  const cfg = STATUS_MAP[status] ?? { label: status, className: "bg-[#eef8f4] text-ink/60" };
   return (
     <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${cfg.className}`}>
       {cfg.label}
@@ -102,7 +102,7 @@ function NewPurchaseModal({ suppliers, products, onClose, onSaved }: NewPurchase
           <h2 className="font-display text-base font-bold text-ink">New Purchase Order</h2>
           <button
             onClick={onClose}
-            className="grid h-8 w-8 place-items-center rounded-xl text-ink/40 transition-colors hover:bg-[#f4f0e8] hover:text-ink"
+            className="grid h-8 w-8 place-items-center rounded-xl text-ink/40 transition-colors hover:bg-[#eef8f4] hover:text-ink"
           >
             <X size={16} />
           </button>
@@ -122,7 +122,7 @@ function NewPurchaseModal({ suppliers, products, onClose, onSaved }: NewPurchase
               <select
                 value={supplierId}
                 onChange={(e) => setSupplierId(e.target.value)}
-                className="w-full rounded-xl border border-ink/15 bg-[#fbfaf6] px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                className="w-full rounded-xl border border-ink/15 bg-[#f7faf9] px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
               >
                 <option value="">— No supplier —</option>
                 {suppliers.map((s) => (
@@ -140,7 +140,7 @@ function NewPurchaseModal({ suppliers, products, onClose, onSaved }: NewPurchase
                 type="date"
                 value={expectedDate}
                 onChange={(e) => setExpectedDate(e.target.value)}
-                className="w-full rounded-xl border border-ink/15 bg-[#fbfaf6] px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                className="w-full rounded-xl border border-ink/15 bg-[#f7faf9] px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
               />
             </div>
           </div>
@@ -151,7 +151,7 @@ function NewPurchaseModal({ suppliers, products, onClose, onSaved }: NewPurchase
               <button
                 type="button"
                 onClick={addItem}
-                className="flex items-center gap-1 rounded-lg border border-ink/15 px-2.5 py-1 text-xs font-bold text-ink/60 transition-colors hover:bg-[#f4f0e8]"
+                className="flex items-center gap-1 rounded-lg border border-ink/15 px-2.5 py-1 text-xs font-bold text-ink/60 transition-colors hover:bg-[#eef8f4]"
               >
                 <Plus size={12} aria-hidden="true" />
                 Add Item
@@ -161,7 +161,7 @@ function NewPurchaseModal({ suppliers, products, onClose, onSaved }: NewPurchase
               {items.map((item, index) => (
                 <div
                   key={index}
-                  className="flex items-start gap-2 rounded-xl border border-ink/10 bg-[#fbfaf6] p-3"
+                  className="flex items-start gap-2 rounded-xl border border-ink/10 bg-[#f7faf9] p-3"
                 >
                   <div className="flex flex-1 flex-col gap-2 sm:flex-row">
                     <select
@@ -223,7 +223,7 @@ function NewPurchaseModal({ suppliers, products, onClose, onSaved }: NewPurchase
               onChange={(e) => setNotes(e.target.value)}
               rows={2}
               placeholder="Optional notes"
-              className="w-full resize-none rounded-xl border border-ink/15 bg-[#fbfaf6] px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+              className="w-full resize-none rounded-xl border border-ink/15 bg-[#f7faf9] px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
             />
           </div>
 
@@ -231,7 +231,7 @@ function NewPurchaseModal({ suppliers, products, onClose, onSaved }: NewPurchase
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl border border-ink/15 px-4 py-2 text-sm font-bold text-ink/60 transition-colors hover:bg-[#f4f0e8]"
+              className="rounded-xl border border-ink/15 px-4 py-2 text-sm font-bold text-ink/60 transition-colors hover:bg-[#eef8f4]"
             >
               Cancel
             </button>
@@ -298,7 +298,7 @@ function ReceiveModal({ order, onClose, onSaved }: ReceiveModalProps) {
           </div>
           <button
             onClick={onClose}
-            className="grid h-8 w-8 place-items-center rounded-xl text-ink/40 transition-colors hover:bg-[#f4f0e8] hover:text-ink"
+            className="grid h-8 w-8 place-items-center rounded-xl text-ink/40 transition-colors hover:bg-[#eef8f4] hover:text-ink"
           >
             <X size={16} />
           </button>
@@ -314,7 +314,7 @@ function ReceiveModal({ order, onClose, onSaved }: ReceiveModalProps) {
             {order.items.map((item: PurchaseOrderItem) => (
               <div
                 key={item.id}
-                className="flex items-center gap-3 rounded-xl border border-ink/10 bg-[#fbfaf6] p-3"
+                className="flex items-center gap-3 rounded-xl border border-ink/10 bg-[#f7faf9] p-3"
               >
                 <div className="flex-1">
                   <p className="text-sm font-bold text-ink">{item.productName}</p>
@@ -354,7 +354,7 @@ function ReceiveModal({ order, onClose, onSaved }: ReceiveModalProps) {
               min={0}
               step="0.01"
               onChange={(e) => setPaidAmount(Number(e.target.value))}
-              className="w-full rounded-xl border border-ink/15 bg-[#fbfaf6] px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+              className="w-full rounded-xl border border-ink/15 bg-[#f7faf9] px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
             />
           </div>
 
@@ -362,7 +362,7 @@ function ReceiveModal({ order, onClose, onSaved }: ReceiveModalProps) {
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl border border-ink/15 px-4 py-2 text-sm font-bold text-ink/60 transition-colors hover:bg-[#f4f0e8]"
+              className="rounded-xl border border-ink/15 px-4 py-2 text-sm font-bold text-ink/60 transition-colors hover:bg-[#eef8f4]"
             >
               Cancel
             </button>
@@ -424,7 +424,7 @@ export default function PurchasesPage() {
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <h1 className="font-display text-xl font-bold text-ink">Purchase Orders</h1>
-          <span className="rounded-full bg-[#f4f0e8] px-2.5 py-0.5 text-xs font-bold text-ink/60">
+          <span className="rounded-full bg-[#eef8f4] px-2.5 py-0.5 text-xs font-bold text-ink/60">
             {orders.length}
           </span>
         </div>
@@ -449,7 +449,7 @@ export default function PurchasesPage() {
         </div>
       ) : orders.length === 0 ? (
         <div className="mt-10 flex flex-col items-center gap-4 text-center">
-          <span className="grid h-14 w-14 place-items-center rounded-2xl bg-[#f4f0e8] text-ink/30">
+          <span className="grid h-14 w-14 place-items-center rounded-2xl bg-[#eef8f4] text-ink/30">
             <ShoppingCart size={26} aria-hidden="true" />
           </span>
           <p className="text-sm font-semibold text-ink/45">
@@ -476,7 +476,7 @@ export default function PurchasesPage() {
                   onClick={() =>
                     setExpandedId(expandedId === order.id ? null : order.id)
                   }
-                  className="grid h-7 w-7 shrink-0 place-items-center rounded-lg text-ink/40 transition-colors hover:bg-[#f4f0e8] hover:text-ink"
+                  className="grid h-7 w-7 shrink-0 place-items-center rounded-lg text-ink/40 transition-colors hover:bg-[#eef8f4] hover:text-ink"
                 >
                   {expandedId === order.id ? (
                     <ChevronUp size={15} aria-hidden="true" />
@@ -556,7 +556,7 @@ export default function PurchasesPage() {
                     </tbody>
                   </table>
                   {order.notes && (
-                    <p className="mt-2 rounded-lg bg-[#fbfaf6] px-3 py-2 text-xs text-ink/60">
+                    <p className="mt-2 rounded-lg bg-[#f7faf9] px-3 py-2 text-xs text-ink/60">
                       Note: {order.notes}
                     </p>
                   )}

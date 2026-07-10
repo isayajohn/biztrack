@@ -104,7 +104,7 @@ function ActionBadge({ action }: { action: string }) {
 
 function MetadataBlock({ value }: { value: unknown }) {
   return (
-    <pre className="max-h-32 max-w-md overflow-auto whitespace-pre-wrap break-words rounded-lg bg-[#fbfaf6] px-3 py-2 text-xs font-semibold leading-5 text-ink/60">
+    <pre className="max-h-32 max-w-md overflow-auto whitespace-pre-wrap break-words rounded-lg bg-[#f7faf9] px-3 py-2 text-xs font-semibold leading-5 text-ink/60">
       {safeJson(value)}
     </pre>
   );
@@ -127,11 +127,11 @@ function AuditLogMobileCard({ log }: { log: AuditLog }) {
       </div>
 
       <dl className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
-        <div className="rounded-lg bg-[#fbfaf6] p-2">
+        <div className="rounded-lg bg-[#f7faf9] p-2">
           <dt className="font-bold text-ink/35">Target Type</dt>
           <dd className="mt-0.5 font-extrabold text-ink">{log.targetType}</dd>
         </div>
-        <div className="rounded-lg bg-[#fbfaf6] p-2">
+        <div className="rounded-lg bg-[#f7faf9] p-2">
           <dt className="font-bold text-ink/35">Target ID</dt>
           <dd className="mt-0.5 break-all font-mono text-[11px] font-extrabold text-ink">{targetId}</dd>
         </div>
@@ -208,7 +208,7 @@ export default function AdminAuditLogsPage() {
         <select
           value={action}
           onChange={(event) => setAction(event.target.value)}
-          className="rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2.5 text-sm font-bold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+          className="rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2.5 text-sm font-bold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
         >
           <option value="">All actions</option>
           {ACTION_OPTIONS.map((option) => (
@@ -224,7 +224,7 @@ export default function AdminAuditLogsPage() {
             value={actor}
             onChange={(event) => setActor(event.target.value)}
             placeholder="Filter by admin name or email..."
-            className="w-full rounded-lg border border-ink/15 bg-[#fbfaf6] py-2.5 pl-10 pr-4 text-sm font-medium text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+            className="w-full rounded-lg border border-ink/15 bg-[#f7faf9] py-2.5 pl-10 pr-4 text-sm font-medium text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
           />
         </div>
 
@@ -232,7 +232,7 @@ export default function AdminAuditLogsPage() {
           type="date"
           value={date}
           onChange={(event) => setDate(event.target.value)}
-          className="rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2.5 text-sm font-bold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+          className="rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2.5 text-sm font-bold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
         />
 
         <div className="relative">
@@ -241,7 +241,7 @@ export default function AdminAuditLogsPage() {
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Search target ID or metadata..."
-            className="w-full rounded-lg border border-ink/15 bg-[#fbfaf6] py-2.5 pl-10 pr-4 text-sm font-medium text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+            className="w-full rounded-lg border border-ink/15 bg-[#f7faf9] py-2.5 pl-10 pr-4 text-sm font-medium text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
           />
         </div>
       </div>
@@ -253,7 +253,7 @@ export default function AdminAuditLogsPage() {
           <TableContainer>
             <Table aria-label="Admin audit logs table">
               <TableHead>
-                <TableRow className="bg-[#fbfaf6]">
+                <TableRow className="bg-[#f7faf9]">
                   <TableCell>Date</TableCell>
                   <TableCell>Admin</TableCell>
                   <TableCell>Action</TableCell>

@@ -29,12 +29,12 @@ export default function AuthShowcasePanel({ title, text }: AuthShowcasePanelProp
             </div>
           </div>
 
-          <div className="relative h-40 overflow-hidden rounded-lg border border-ink/10 bg-[#fbfaf6]">
+          <div className="relative h-40 overflow-hidden rounded-lg border border-ink/10 bg-[#f7faf9]">
             <div className="absolute inset-x-0 top-8 h-px bg-ink/10" />
             <div className="absolute inset-x-0 top-16 h-px bg-ink/10" />
             <div className="absolute inset-x-0 top-24 h-px bg-ink/10" />
             <svg viewBox="0 0 410 160" className="h-full w-full" aria-hidden="true">
-              <path d={chartPoints[0]} fill="none" stroke="#0f766e" strokeWidth="4" />
+              <path d={chartPoints[0]} fill="none" stroke="#12b890" strokeWidth="4" />
               <path d={chartPoints[1]} fill="none" stroke="#64748b" strokeWidth="3" opacity="0.75" />
               <path
                 d="M 24 142 L 90 102 L 148 126 L 218 84 L 302 116 L 386 72 L 386 156 L 24 156 Z"
@@ -43,8 +43,8 @@ export default function AuthShowcasePanel({ title, text }: AuthShowcasePanelProp
               />
               <defs>
                 <linearGradient id="profitGradient" x1="0" x2="0" y1="0" y2="1">
-                  <stop offset="0%" stopColor="#0f766e" />
-                  <stop offset="100%" stopColor="#0f766e" stopOpacity="0" />
+                  <stop offset="0%" stopColor="#12b890" />
+                  <stop offset="100%" stopColor="#12b890" stopOpacity="0" />
                 </linearGradient>
               </defs>
             </svg>
@@ -60,7 +60,7 @@ export default function AuthShowcasePanel({ title, text }: AuthShowcasePanelProp
 
         <div className="absolute -right-2 top-36 w-48 rounded-lg bg-white p-5 text-ink shadow-[0_24px_70px_rgba(0,0,0,0.2)]">
           <div className="relative mx-auto grid h-32 w-32 place-items-center rounded-full bg-[#e5e7eb]">
-            <div className="absolute inset-0 rounded-full bg-[conic-gradient(#0f766e_0_42%,#e5e7eb_42%_100%)]" />
+            <div className="absolute inset-0 rounded-full bg-[conic-gradient(#12b890_0_42%,#e5e7eb_42%_100%)]" />
             <div className="relative grid h-20 w-20 place-items-center rounded-full bg-white text-center shadow-inner">
               <div>
                 <p className="text-xs font-bold text-slateMuted">Total</p>

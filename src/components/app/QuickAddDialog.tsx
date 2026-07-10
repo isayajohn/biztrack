@@ -101,14 +101,14 @@ export default function QuickAddDialog({
               <button
                 type="button"
                 onClick={close}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full text-ink/45 transition-colors hover:bg-[#f4f0e8] hover:text-ink"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full text-ink/45 transition-colors hover:bg-[#eef8f4] hover:text-ink"
                 aria-label="Close form dialog"
               >
                 <X size={18} aria-hidden="true" />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto bg-[#fbfaf6] px-4 py-4 sm:px-5">{form}</div>
+            <div className="flex-1 overflow-y-auto bg-[#f7faf9] px-4 py-4 sm:px-5">{form}</div>
           </div>
         </div>
       )}

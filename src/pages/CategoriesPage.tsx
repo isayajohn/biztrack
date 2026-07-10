@@ -61,7 +61,7 @@ function CategoryModal({ initial, onClose, onSaved }: ModalProps) {
           </h2>
           <button
             onClick={onClose}
-            className="grid h-8 w-8 place-items-center rounded-xl text-ink/40 hover:bg-[#f4f0e8] hover:text-ink transition-colors"
+            className="grid h-8 w-8 place-items-center rounded-xl text-ink/40 hover:bg-[#eef8f4] hover:text-ink transition-colors"
           >
             <X size={16} />
           </button>
@@ -82,7 +82,7 @@ function CategoryModal({ initial, onClose, onSaved }: ModalProps) {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Electronics"
-                className="w-full rounded-xl border border-ink/15 bg-[#fbfaf6] px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                className="w-full rounded-xl border border-ink/15 bg-[#f7faf9] px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
                 autoFocus
               />
             </div>
@@ -95,7 +95,7 @@ function CategoryModal({ initial, onClose, onSaved }: ModalProps) {
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Optional description"
                 rows={3}
-                className="w-full resize-none rounded-xl border border-ink/15 bg-[#fbfaf6] px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                className="w-full resize-none rounded-xl border border-ink/15 bg-[#f7faf9] px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
               />
             </div>
           </div>
@@ -103,7 +103,7 @@ function CategoryModal({ initial, onClose, onSaved }: ModalProps) {
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl border border-ink/15 px-4 py-2 text-sm font-bold text-ink/60 transition-colors hover:bg-[#f4f0e8]"
+              className="rounded-xl border border-ink/15 px-4 py-2 text-sm font-bold text-ink/60 transition-colors hover:bg-[#eef8f4]"
             >
               Cancel
             </button>
@@ -190,7 +190,7 @@ export default function CategoriesPage() {
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <h1 className="font-display text-xl font-bold text-ink">Categories</h1>
-          <span className="rounded-full bg-[#f4f0e8] px-2.5 py-0.5 text-xs font-bold text-ink/60">
+          <span className="rounded-full bg-[#eef8f4] px-2.5 py-0.5 text-xs font-bold text-ink/60">
             {categories.length}
           </span>
         </div>
@@ -217,7 +217,7 @@ export default function CategoriesPage() {
         </div>
       ) : categories.length === 0 ? (
         <div className="mt-10 flex flex-col items-center gap-4 text-center">
-          <span className="grid h-14 w-14 place-items-center rounded-2xl bg-[#f4f0e8] text-ink/30">
+          <span className="grid h-14 w-14 place-items-center rounded-2xl bg-[#eef8f4] text-ink/30">
             <Tag size={26} aria-hidden="true" />
           </span>
           <p className="text-sm font-semibold text-ink/45">
@@ -235,7 +235,7 @@ export default function CategoriesPage() {
         <div className="mt-4 overflow-hidden rounded-xl border border-ink/10 bg-white shadow-sm">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-ink/8 bg-[#fbfaf6]">
+              <tr className="border-b border-ink/8 bg-[#f7faf9]">
                 <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-ink/45">
                   Name
                 </th>
@@ -257,14 +257,14 @@ export default function CategoriesPage() {
               {categories.map((cat) => (
                 <tr
                   key={cat.id}
-                  className="border-b border-ink/5 last:border-b-0 hover:bg-[#fbfaf6] transition-colors"
+                  className="border-b border-ink/5 last:border-b-0 hover:bg-[#f7faf9] transition-colors"
                 >
                   <td className="px-4 py-3 font-bold text-ink">{cat.name}</td>
                   <td className="px-4 py-3 text-ink/60">
                     {cat.description ?? <span className="text-ink/25">—</span>}
                   </td>
                   <td className="px-4 py-3 text-center">
-                    <span className="rounded-full bg-[#f4f0e8] px-2.5 py-0.5 text-xs font-bold text-ink/60">
+                    <span className="rounded-full bg-[#eef8f4] px-2.5 py-0.5 text-xs font-bold text-ink/60">
                       {cat.productCount}
                     </span>
                   </td>
@@ -274,7 +274,7 @@ export default function CategoriesPage() {
                       className={`rounded-full px-2.5 py-0.5 text-xs font-bold transition-colors ${
                         cat.isActive
                           ? "bg-mint text-leaf hover:bg-leaf/10"
-                          : "bg-[#f4f0e8] text-ink/50 hover:bg-ink/10"
+                          : "bg-[#eef8f4] text-ink/50 hover:bg-ink/10"
                       }`}
                     >
                       {cat.isActive ? "Active" : "Inactive"}
@@ -291,7 +291,7 @@ export default function CategoriesPage() {
                         </button>
                         <button
                           onClick={() => setDeletingId(null)}
-                          className="rounded-lg border border-ink/15 px-2 py-1 text-xs font-bold text-ink/50 transition-colors hover:bg-[#f4f0e8]"
+                          className="rounded-lg border border-ink/15 px-2 py-1 text-xs font-bold text-ink/50 transition-colors hover:bg-[#eef8f4]"
                         >
                           Cancel
                         </button>
@@ -300,7 +300,7 @@ export default function CategoriesPage() {
                       <div className="flex items-center justify-end gap-1.5">
                         <button
                           onClick={() => handleEdit(cat)}
-                          className="grid h-8 w-8 place-items-center rounded-xl border border-ink/15 text-ink/50 transition-colors hover:bg-[#f4f0e8] hover:text-ink"
+                          className="grid h-8 w-8 place-items-center rounded-xl border border-ink/15 text-ink/50 transition-colors hover:bg-[#eef8f4] hover:text-ink"
                           aria-label={`Edit ${cat.name}`}
                         >
                           <Pencil size={14} aria-hidden="true" />

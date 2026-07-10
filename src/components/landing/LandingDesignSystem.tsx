@@ -74,7 +74,7 @@ export function PrimaryButton(props: ButtonBaseProps) {
     <ButtonBase
       {...props}
       className={cx(
-        "bg-leaf text-white shadow-sm hover:-translate-y-0.5 hover:bg-emerald-700 hover:shadow-card",
+        "bg-leaf text-white shadow-sm hover:-translate-y-0.5 hover:bg-[#0b9279] hover:shadow-card",
         props.className,
       )}
     />
@@ -126,11 +126,11 @@ type FeatureCardProps = {
 
 export function FeatureCard({ icon: Icon, title, description, imageUrl }: FeatureCardProps) {
   return (
-    <MotionPanel className="group flex h-full flex-col rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-200 hover:border-emerald-200 hover:shadow-card">
+    <MotionPanel className="group flex h-full flex-col rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-200 hover:border-leaf/30 hover:shadow-card">
       {imageUrl ? (
         <img src={imageUrl} alt="" className="mb-4 h-32 w-full rounded-lg object-cover ring-1 ring-slate-200" />
       ) : (
-        <span className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-lg bg-mint text-leaf ring-1 ring-emerald-100">
+        <span className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-lg bg-mint text-leaf ring-1 ring-leaf/15">
           <AnimatedIcon icon={Icon} size={22} />
         </span>
       )}
@@ -214,7 +214,7 @@ type StatCardProps = {
 export function StatCard({ icon: Icon, label, value, change }: StatCardProps) {
   return (
     <MotionPanel className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <span className="mb-3 grid h-10 w-10 place-items-center rounded-lg bg-mint text-leaf ring-1 ring-emerald-100">
+      <span className="mb-3 grid h-10 w-10 place-items-center rounded-lg bg-mint text-leaf ring-1 ring-leaf/15">
         <AnimatedIcon icon={Icon} size={18} />
       </span>
       <p className="text-xs font-semibold uppercase tracking-[0.06em] text-slateMuted">{label}</p>

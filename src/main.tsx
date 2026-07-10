@@ -20,6 +20,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import Dashboard from "./pages/Dashboard";
 import SalesPage from "./pages/SalesPage";
 import SaleFormPage from "./pages/SaleFormPage";
+import SaleReceiptPage from "./pages/SaleReceiptPage";
 import ExpensesPage from "./pages/ExpensesPage";
 import ExpenseFormPage from "./pages/ExpenseFormPage";
 import ProductsPage from "./pages/ProductsPage";
@@ -30,6 +31,7 @@ import SettingsPage from "./pages/SettingsPage";
 import OnboardingPage from "./pages/OnboardingPage";
 import CategoriesPage from "./pages/CategoriesPage";
 import SuppliersPage from "./pages/SuppliersPage";
+import CustomersPage from "./pages/CustomersPage";
 import PurchasesPage from "./pages/PurchasesPage";
 import StockMovementsPage from "./pages/StockMovementsPage";
 import StockInPage from "./pages/StockInPage";
@@ -86,6 +88,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 <Route path="/sales" element={<SalesPage />} />
                 <Route path="/sales/new" element={<SaleFormPage />} />
                 <Route path="/sales/:id/edit" element={<SaleFormPage />} />
+                <Route path="/sales/:id/receipt" element={<SaleReceiptPage />} />
                 <Route path="/expenses" element={<ExpensesPage />} />
                 <Route path="/expenses/new" element={<ExpenseFormPage />} />
                 <Route path="/expenses/:id/edit" element={<ExpenseFormPage />} />
@@ -98,6 +101,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 {/* Inventory module */}
                 <Route path="/inventory/categories" element={<CategoriesPage />} />
                 <Route path="/inventory/suppliers" element={<SuppliersPage />} />
+                <Route path="/customers" element={<CustomersPage />} />
                 <Route path="/inventory/purchases" element={<PurchasesPage />} />
                 <Route path="/inventory/stock-in" element={<StockInPage />} />
                 <Route path="/inventory/stock-movements" element={<StockMovementsPage />} />

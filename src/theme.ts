@@ -3,18 +3,18 @@ import { createTheme } from "@mui/material/styles";
 export const muiTheme = createTheme({
   palette: {
     primary: {
-      main: "#1f8a5b",
+      main: "#18bd97",
       contrastText: "#ffffff",
     },
     secondary: {
-      main: "#c86b3c",
+      main: "#0b9279",
     },
     text: {
-      primary: "#17211b",
-      secondary: "rgba(23, 33, 27, 0.65)",
+      primary: "#10231e",
+      secondary: "rgba(16, 35, 30, 0.65)",
     },
     background: {
-      default: "#fbfaf6",
+      default: "#f7faf9",
       paper: "#ffffff",
     },
   },
@@ -50,8 +50,8 @@ export const muiTheme = createTheme({
       styleOverrides: {
         root: {
           ".MuiTableCell-root": {
-            backgroundColor: "#fbfaf6",
-            color: "rgba(23, 33, 27, 0.52)",
+            backgroundColor: "#f7faf9",
+            color: "rgba(16, 35, 30, 0.52)",
             fontSize: 11,
             fontWeight: 800,
             lineHeight: 1.2,
@@ -64,8 +64,8 @@ export const muiTheme = createTheme({
     MuiTableCell: {
       styleOverrides: {
         root: {
-          borderBottom: "1px solid rgba(23, 33, 27, 0.08)",
-          color: "#17211b",
+          borderBottom: "1px solid rgba(16, 35, 30, 0.08)",
+          color: "#10231e",
           fontSize: 13,
           padding: "12px 14px",
           verticalAlign: "middle",
@@ -81,7 +81,7 @@ export const muiTheme = createTheme({
         root: {
           transition: "background-color 140ms ease",
           "&.MuiTableRow-hover:hover": {
-            backgroundColor: "rgba(31, 138, 91, 0.045)",
+            backgroundColor: "rgba(18, 184, 144, 0.06)",
           },
           "&:last-child .MuiTableCell-root": {
             borderBottom: 0,
@@ -92,8 +92,8 @@ export const muiTheme = createTheme({
     MuiTablePagination: {
       styleOverrides: {
         root: {
-          borderTop: "1px solid rgba(23, 33, 27, 0.08)",
-          color: "rgba(23, 33, 27, 0.62)",
+          borderTop: "1px solid rgba(16, 35, 30, 0.08)",
+          color: "rgba(16, 35, 30, 0.62)",
           overflow: "hidden",
         },
         toolbar: {

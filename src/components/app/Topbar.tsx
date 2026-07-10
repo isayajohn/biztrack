@@ -58,7 +58,7 @@ export default function Topbar({ isAdminSection = false }: Props) {
         {/* Logout button */}
         <button
           onClick={handleLogout}
-          className="flex items-center gap-1.5 rounded-xl border border-ink/15 bg-[#fbfaf6] px-3 py-1.5 text-xs font-semibold text-ink/60 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-clay"
+          className="flex items-center gap-1.5 rounded-xl border border-ink/15 bg-[#f7faf9] px-3 py-1.5 text-xs font-semibold text-ink/60 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-clay"
           aria-label="Log out"
         >
           <LogOut size={14} aria-hidden="true" />

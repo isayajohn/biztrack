@@ -298,7 +298,7 @@ export default function AdminPackageFormPage() {
                   value={form.description}
                   onChange={(event) => updateField("description", event.target.value)}
                   rows={3}
-                  className={`mt-1 w-full rounded-lg border bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15 ${
+                  className={`mt-1 w-full rounded-lg border bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15 ${
                     errors.description ? "border-red-300" : "border-ink/15"
                   }`}
                 />
@@ -354,7 +354,7 @@ export default function AdminPackageFormPage() {
                 <select
                   value={form.status}
                   onChange={(event) => updateField("status", event.target.value as PackageStatus)}
-                  className="mt-1 w-full rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                  className="mt-1 w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
                 >
                   <option value="ACTIVE">ACTIVE</option>
                   <option value="INACTIVE">INACTIVE</option>
@@ -385,7 +385,7 @@ export default function AdminPackageFormPage() {
             <h2 className="font-display text-base font-bold text-ink">Features</h2>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {featureFields.map((field) => (
-                <label key={field.key} className="flex gap-3 rounded-lg border border-ink/10 bg-[#fbfaf6] p-3">
+                <label key={field.key} className="flex gap-3 rounded-lg border border-ink/10 bg-[#f7faf9] p-3">
                   <input
                     type="checkbox"
                     checked={form[field.key]}
@@ -404,7 +404,7 @@ export default function AdminPackageFormPage() {
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <Link
               to="/admin/packages"
-              className="inline-flex items-center justify-center rounded-lg border border-ink/10 bg-white px-4 py-2.5 text-sm font-extrabold text-ink/60 hover:bg-[#f4f0e8]"
+              className="inline-flex items-center justify-center rounded-lg border border-ink/10 bg-white px-4 py-2.5 text-sm font-extrabold text-ink/60 hover:bg-[#eef8f4]"
             >
               Cancel
             </Link>
@@ -448,7 +448,7 @@ function TextField({
         value={value}
         required={required}
         onChange={(event) => onChange(event.target.value)}
-        className={`mt-1 w-full rounded-lg border bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15 ${
+        className={`mt-1 w-full rounded-lg border bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15 ${
           error ? "border-red-300" : "border-ink/15"
         }`}
       />

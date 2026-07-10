@@ -4,21 +4,21 @@ export default {
   theme: {
     extend: {
       colors: {
-        ink: "#0f172a",
-        leaf: "#0f766e",
-        mint: "#ecfdf5",
+        ink: "#10231e",
+        leaf: "#18bd97",
+        mint: "#e7faf5",
         sun: "#f59e0b",
         clay: "#b45309",
-        cloud: "#f8fafc",
-        slateMuted: "#64748b",
+        cloud: "#f7faf9",
+        slateMuted: "#60756e",
       },
       fontFamily: {
         sans: ['"Open Sans"', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
         display: ['Sora', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
-        soft: "0 18px 45px rgba(15, 23, 42, 0.08)",
-        card: "0 10px 28px rgba(15, 23, 42, 0.07)",
+        soft: "0 18px 45px rgba(11, 146, 121, 0.11)",
+        card: "0 10px 28px rgba(11, 146, 121, 0.09)",
       },
     },
   },

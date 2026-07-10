@@ -52,7 +52,7 @@ export default function VerifyEmailPage() {
   const Icon = status === "success" ? CheckCircle2 : status === "error" ? AlertCircle : Loader2;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#fbfaf6] px-4 py-10">
+    <div className="flex min-h-screen items-center justify-center bg-[#f7faf9] px-4 py-10">
       <main className="w-full max-w-md rounded-2xl border border-ink/10 bg-white p-8 text-center shadow-soft">
         <BrandLogo className="mx-auto h-auto w-56 max-w-full" />
         <div
@@ -85,7 +85,7 @@ export default function VerifyEmailPage() {
             </Link>
             <Link
               to="/register"
-              className="rounded-xl border border-ink/15 px-4 py-3 text-sm font-bold text-ink/60 transition-colors hover:bg-[#f4f0e8]"
+              className="rounded-xl border border-ink/15 px-4 py-3 text-sm font-bold text-ink/60 transition-colors hover:bg-[#eef8f4]"
             >
               Create a new account
             </Link>

@@ -105,7 +105,7 @@ export default function AdminSecurityConfigPage() {
                 ["passwordRequireNumber", "Password requires number"],
                 ["passwordRequireSpecialChar", "Password requires special character"],
               ].map(([key, label]) => (
-                <label key={key} className="flex items-center gap-2 rounded-lg border border-ink/10 bg-[#fbfaf6] px-3 py-2 text-sm font-bold text-ink/65">
+                <label key={key} className="flex items-center gap-2 rounded-lg border border-ink/10 bg-[#f7faf9] px-3 py-2 text-sm font-bold text-ink/65">
                   <input
                     type="checkbox"
                     checked={Boolean(form[key as keyof SecurityForm])}
@@ -133,7 +133,7 @@ export default function AdminSecurityConfigPage() {
                     max={max as number}
                     value={form[key as keyof SecurityForm] as number}
                     onChange={(event) => updateField(key as keyof SecurityForm, Number(event.target.value) as never)}
-                    className="mt-1 w-full rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                    className="mt-1 w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
                   />
                 </label>
               ))}

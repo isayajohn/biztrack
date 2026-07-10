@@ -108,7 +108,7 @@ export default function HeroSection({
     >
       <div className="relative mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:min-h-[620px] lg:grid-cols-[minmax(0,0.92fr)_minmax(520px,1.08fr)] lg:items-center lg:gap-12">
         <div className="max-w-2xl">
-          <div className="hero-kicker mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-white px-3.5 py-1.5 text-sm font-bold text-leaf shadow-sm">
+          <div className="hero-kicker mb-5 inline-flex items-center gap-2 rounded-full border border-leaf/30 bg-white px-3.5 py-1.5 text-sm font-bold text-leaf shadow-sm">
             <ShieldCheck size={15} aria-hidden="true" />
             {kicker}
           </div>

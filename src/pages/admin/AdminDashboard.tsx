@@ -75,7 +75,7 @@ function getStatusBadgeClass(status: AdminStatus) {
 function getRoleBadgeClass(role: AdminRole) {
   return role === "SUPER_ADMIN"
     ? "border-leaf/20 bg-mint text-leaf"
-    : "border-ink/10 bg-[#f4f0e8] text-ink/60";
+    : "border-ink/10 bg-[#eef8f4] text-ink/60";
 }
 
 function isStatsEmpty(stats: PlatformStats) {
@@ -114,7 +114,7 @@ function SectionHeader({
 
 function EmptyState({ message, icon: Icon }: { message: string; icon: LucideIcon }) {
   return (
-    <div className="flex min-h-36 flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-ink/15 bg-[#fbfaf6] px-4 py-8 text-center">
+    <div className="flex min-h-36 flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-ink/15 bg-[#f7faf9] px-4 py-8 text-center">
       <AnimatedIcon icon={Icon} size={24} className="text-ink/25" />
       <p className="max-w-xs text-sm font-semibold leading-6 text-ink/45">{message}</p>
     </div>
@@ -141,7 +141,7 @@ function SummarySkeleton() {
   return (
     <div className="mt-4 grid animate-pulse gap-3 sm:grid-cols-2">
       {Array.from({ length: 4 }).map((_, index) => (
-        <div key={index} className="rounded-lg border border-ink/10 bg-[#fbfaf6] p-3">
+        <div key={index} className="rounded-lg border border-ink/10 bg-[#f7faf9] p-3">
           <div className="h-2.5 w-24 rounded-full bg-ink/8" />
           <div className="mt-3 h-6 w-20 rounded-full bg-ink/8" />
           <div className="mt-2 h-2.5 w-36 rounded-full bg-ink/8" />
@@ -225,7 +225,7 @@ function RecentUserRow({ user }: { user: AdminUser }) {
 
 function SummaryMetricCard({ metric }: { metric: SummaryMetric }) {
   return (
-    <MotionPanel className="rounded-lg border border-ink/10 bg-[#fbfaf6] p-3">
+    <MotionPanel className="rounded-lg border border-ink/10 bg-[#f7faf9] p-3">
       <p className="text-xs font-semibold text-ink/45">{metric.label}</p>
       <p className="mt-1 text-xl font-extrabold tracking-tight text-ink">{metric.value}</p>
       <p className="mt-1 text-xs font-semibold leading-5 text-ink/45">{metric.helper}</p>
@@ -419,7 +419,7 @@ export default function AdminDashboard() {
           label="Total products"
           value={String(stats?.totalProducts ?? 0)}
           icon={Boxes}
-          iconClass="bg-[#f4f0e8] text-ink/65"
+          iconClass="bg-[#eef8f4] text-ink/65"
           loading={isLoading}
         />
       </section>
@@ -470,7 +470,7 @@ export default function AdminDashboard() {
                       {business.user.name} · {business.country} · {business.currency}
                     </p>
                   </div>
-                  <div className="grid shrink-0 grid-cols-3 overflow-hidden rounded-lg border border-ink/10 bg-[#fbfaf6] text-center">
+                  <div className="grid shrink-0 grid-cols-3 overflow-hidden rounded-lg border border-ink/10 bg-[#f7faf9] text-center">
                     <div className="min-w-12 px-2 py-1.5">
                       <p className="text-[10px] font-bold text-ink/35">P</p>
                       <p className="text-xs font-extrabold text-ink">{business._count.products}</p>
@@ -559,7 +559,7 @@ export default function AdminDashboard() {
                       fontFamily: "Open Sans",
                     }}
                   />
-                  <Bar dataKey="sales" name="Sales" fill="#1f8a5b" radius={[5, 5, 0, 0]} />
+                  <Bar dataKey="sales" name="Sales" fill="#12b890" radius={[5, 5, 0, 0]} />
                   <Bar dataKey="expenses" name="Expenses" fill="#c86b3c" radius={[5, 5, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>

@@ -141,7 +141,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 
 function CategoryBadge({ category }: { category: string }) {
-  const cls = CATEGORY_COLORS[category] ?? "bg-[#f4f0e8] text-ink/60";
+  const cls = CATEGORY_COLORS[category] ?? "bg-[#eef8f4] text-ink/60";
   return (
     <span className={`inline-block rounded-full px-1.5 py-0.5 text-[10px] font-bold ${cls}`}>
       {category}
@@ -283,13 +283,13 @@ export default function Dashboard() {
             formType="expense"
             triggerLabel="Add Expense"
             triggerIconSize={13}
-            triggerClassName="flex items-center gap-1.5 rounded-xl border border-ink/15 bg-white px-3.5 py-2 text-xs font-bold text-ink transition-colors hover:bg-[#f4f0e8]"
+            triggerClassName="flex items-center gap-1.5 rounded-xl border border-ink/15 bg-white px-3.5 py-2 text-xs font-bold text-ink transition-colors hover:bg-[#eef8f4]"
           />
           <QuickAddDialog
             formType="product"
             triggerLabel="Add Product"
             triggerIconSize={13}
-            triggerClassName="flex items-center gap-1.5 rounded-xl border border-ink/15 bg-white px-3.5 py-2 text-xs font-bold text-ink transition-colors hover:bg-[#f4f0e8]"
+            triggerClassName="flex items-center gap-1.5 rounded-xl border border-ink/15 bg-white px-3.5 py-2 text-xs font-bold text-ink transition-colors hover:bg-[#eef8f4]"
           />
         </div>
       </div>
@@ -461,7 +461,7 @@ export default function Dashboard() {
                     iconSize={8}
                     wrapperStyle={{ fontSize: 12, paddingTop: 14, fontFamily: "Open Sans" }}
                   />
-                  <Bar dataKey="sales" name="Sales" fill="#1f8a5b" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="sales" name="Sales" fill="#12b890" radius={[4, 4, 0, 0]} />
                   <Bar dataKey="expenses" name="Expenses" fill="#c86b3c" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>

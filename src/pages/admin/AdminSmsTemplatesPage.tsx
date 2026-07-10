@@ -170,7 +170,7 @@ export default function AdminSmsTemplatesPage() {
                     <VariableList variables={selectedTemplate.requiredVariables} />
                   </div>
                 </div>
-                <label className="flex items-center gap-2 rounded-lg border border-ink/10 bg-[#fbfaf6] px-3 py-2 text-sm font-bold text-ink/65">
+                <label className="flex items-center gap-2 rounded-lg border border-ink/10 bg-[#f7faf9] px-3 py-2 text-sm font-bold text-ink/65">
                   <input type="checkbox" checked={selectedDraft.isActive} onChange={(event) => updateDraft(selectedTemplate.key, { isActive: event.target.checked })} className="h-4 w-4 accent-leaf" />
                   Active
                 </label>
@@ -198,7 +198,7 @@ export default function AdminSmsTemplatesPage() {
               </div>
 
               {preview && (
-                <div className="mt-5 rounded-lg border border-ink/10 bg-[#fbfaf6] p-4">
+                <div className="mt-5 rounded-lg border border-ink/10 bg-[#f7faf9] p-4">
                   <div className="flex items-center justify-between gap-3">
                     <p className="text-xs font-bold uppercase text-ink/40">Preview</p>
                     <span className="text-xs font-bold text-ink/40">{preview.characterCount} chars</span>

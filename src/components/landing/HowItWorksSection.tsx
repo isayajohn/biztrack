@@ -95,7 +95,7 @@ export default function HowItWorksSection({ content }: Props) {
             {steps.map(({ number, icon: Icon, title: stepTitle, description: stepDescription }) => (
               <article
                 key={number}
-                className="group relative overflow-hidden rounded-xl border border-slate-200 bg-cloud p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-emerald-200 hover:bg-white hover:shadow-card"
+                className="group relative overflow-hidden rounded-xl border border-slate-200 bg-cloud p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-leaf/30 hover:bg-white hover:shadow-card"
               >
                 <div
                   className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-[radial-gradient(circle_at_top,rgba(16,185,129,0.18),transparent_65%)]"
@@ -105,7 +105,7 @@ export default function HowItWorksSection({ content }: Props) {
                 <div className="relative flex min-h-32 items-center justify-center">
                   <div className="absolute h-28 w-28 rounded-full border border-leaf/10" aria-hidden="true" />
                   <div className="absolute h-20 w-20 rounded-full border border-leaf/15" aria-hidden="true" />
-                  <span className="grid h-16 w-16 place-items-center rounded-full bg-leaf text-white shadow-card ring-8 ring-emerald-100/80 transition-transform duration-200 group-hover:scale-105">
+                  <span className="grid h-16 w-16 place-items-center rounded-full bg-leaf text-white shadow-card ring-8 ring-leaf/15 transition-transform duration-200 group-hover:scale-105">
                     <Icon size={27} aria-hidden="true" />
                   </span>
                 </div>
@@ -129,7 +129,7 @@ export default function HowItWorksSection({ content }: Props) {
           </div>
 
           <div className="mt-8 flex justify-center">
-            <div className="inline-flex flex-wrap items-center justify-center gap-2 rounded-full border border-emerald-100 bg-mint px-4 py-2 text-sm font-bold text-leaf">
+            <div className="inline-flex flex-wrap items-center justify-center gap-2 rounded-full border border-leaf/15 bg-mint px-4 py-2 text-sm font-bold text-leaf">
               <span className="h-2 w-2 rounded-full bg-leaf" aria-hidden="true" />
               Setup takes minutes, then your daily numbers stay organized automatically.
             </div>

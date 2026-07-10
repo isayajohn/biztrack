@@ -33,7 +33,7 @@ export default function AdminTopbar() {
         <div className="flex shrink-0 items-center gap-2">
           <button
             onClick={handleLogout}
-            className="flex items-center gap-1.5 rounded-lg border border-ink/10 bg-[#fbfaf6] px-3 py-2 text-xs font-bold text-ink/65 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-clay"
+            className="flex items-center gap-1.5 rounded-lg border border-ink/10 bg-[#f7faf9] px-3 py-2 text-xs font-bold text-ink/65 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-clay"
             aria-label="Log out"
           >
             <LogOut size={14} aria-hidden="true" />

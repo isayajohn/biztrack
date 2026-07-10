@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\SmsConfigController;
 use App\Http\Controllers\Api\SmsTemplateController;
 use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\SupplierController;
 use App\Http\Controllers\Api\StockController;
 use App\Http\Controllers\Api\PurchaseController;
@@ -124,6 +125,17 @@ Route::middleware('jwt.auth')->group(function () {
         Route::get('/{id}', [SupplierController::class, 'getSupplier']);
         Route::put('/{id}', [SupplierController::class, 'updateSupplier']);
         Route::delete('/{id}', [SupplierController::class, 'deleteSupplier']);
+    });
+
+    // Customers and customer credit
+    Route::prefix('customers')->group(function () {
+        Route::get('/', [CustomerController::class, 'index']);
+        Route::post('/', [CustomerController::class, 'store']);
+        Route::get('/{id}', [CustomerController::class, 'show']);
+        Route::put('/{id}', [CustomerController::class, 'update']);
+        Route::delete('/{id}', [CustomerController::class, 'destroy']);
+        Route::get('/{id}/statement', [CustomerController::class, 'statement']);
+        Route::post('/{id}/payments', [CustomerController::class, 'recordPayment']);
     });
 
     // Stock

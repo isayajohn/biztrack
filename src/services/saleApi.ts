@@ -38,9 +38,18 @@ function normalizeSale(sale: ApiSale): Sale {
     id: sale.id,
     productId: sale.productId,
     productName: sale.productName ?? sale.product?.name ?? "Unassigned product",
+    receiptNumber: sale.receiptNumber,
+    customerId: sale.customerId,
+    customerName: sale.customerName,
     quantity: Number(sale.quantity ?? 0),
     unitPrice: Number(sale.unitPrice ?? 0),
     totalAmount: Number(sale.totalAmount ?? 0),
+    discount: Number(sale.discount ?? 0),
+    taxRate: Number(sale.taxRate ?? 0),
+    taxAmount: Number(sale.taxAmount ?? 0),
+    paidAmount: Number(sale.paidAmount ?? 0),
+    balanceDue: Number(sale.balanceDue ?? 0),
+    paymentDueDate: sale.paymentDueDate,
     paymentMethod: fromApiPaymentMethod(sale.paymentMethod),
     saleDate: sale.saleDate,
     notes: sale.notes,
@@ -72,7 +81,11 @@ export async function getSaleById(id: string): Promise<Sale | undefined> {
 }
 
 export async function createSale(
-  data: Omit<Sale, "id" | "createdAt" | "updatedAt">,
+  data: Omit<Sale, "id" | "createdAt" | "updatedAt" | "balanceDue" | "discount" | "taxRate" | "taxAmount" | "paidAmount"> & {
+    discount?: number;
+    taxRate?: number;
+    paidAmount?: number;
+  },
 ): Promise<Sale> {
   const sale = unwrap<ApiSale>(await apiClient.post("/sales", serializeSale(data)));
   return normalizeSale(sale);

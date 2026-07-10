@@ -37,7 +37,7 @@ function VisualCard({
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-card">
       <div className="flex items-center justify-between">
-        <span className={`grid h-10 w-10 place-items-center rounded-lg ${tone} ring-1 ring-emerald-100`}>
+        <span className={`grid h-10 w-10 place-items-center rounded-lg ${tone} ring-1 ring-leaf/15`}>
           <Icon size={20} aria-hidden="true" />
         </span>
         <span className={`rounded-lg px-2.5 py-1 text-xs font-bold ${tone}`}>{badge}</span>
@@ -72,7 +72,7 @@ const DEFAULT_ROWS = [
       "See top-selling products instantly",
     ],
     icon: ReceiptText,
-    visual: { label: "Today's sales", value: "$248", badge: "+12% vs yesterday", tone: "bg-mint text-leaf", barTone: "#0f766e", lightBarTone: "#ccfbf1" },
+    visual: { label: "Today's sales", value: "$248", badge: "+12% vs yesterday", tone: "bg-mint text-leaf", barTone: "#18bd97", lightBarTone: "#d8f8ef" },
     reverse: false,
   },
   {
@@ -86,7 +86,7 @@ const DEFAULT_ROWS = [
       "See what's eating your profit",
     ],
     icon: WalletCards,
-    visual: { label: "This month's expenses", value: "$1,840", badge: "3 categories", tone: "bg-mint text-leaf", barTone: "#0f766e", lightBarTone: "#ccfbf1" },
+    visual: { label: "This month's expenses", value: "$1,840", badge: "3 categories", tone: "bg-mint text-leaf", barTone: "#18bd97", lightBarTone: "#d8f8ef" },
     reverse: true,
   },
   {
@@ -100,7 +100,7 @@ const DEFAULT_ROWS = [
       "Monthly profit and product reports",
     ],
     icon: Boxes,
-    visual: { label: "Net profit this month", value: "$9,270", badge: "+22% vs last month", tone: "bg-mint text-leaf", barTone: "#0f766e", lightBarTone: "#ccfbf1" },
+    visual: { label: "Net profit this month", value: "$9,270", badge: "+22% vs last month", tone: "bg-mint text-leaf", barTone: "#18bd97", lightBarTone: "#d8f8ef" },
     reverse: false,
   },
 ];

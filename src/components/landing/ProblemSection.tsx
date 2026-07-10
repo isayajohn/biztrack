@@ -59,7 +59,7 @@ export default function ProblemSection({ content }: Props) {
     <section className="bg-ink py-16 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto mb-10 max-w-2xl text-center">
-          <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-emerald-300">
+          <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-[#8af0d5]">
             {eyebrow}
           </p>
           <h2 className="mt-3 font-display text-3xl font-bold text-white sm:text-4xl">
@@ -78,7 +78,7 @@ export default function ProblemSection({ content }: Props) {
               key={quote}
               className="rounded-xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-sm transition-all hover:border-white/20 hover:bg-white/[0.07]"
             >
-              <span className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 text-emerald-300">
+              <span className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 text-[#8af0d5]">
                 <XCircle size={20} aria-hidden="true" />
               </span>
               <p className="text-base font-bold italic text-white/90">

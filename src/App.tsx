@@ -46,7 +46,7 @@ const businessTypes = [
 
 function App() {
   return (
-    <main className="min-h-screen bg-[#fbfaf6] text-ink">
+    <main className="min-h-screen bg-[#f7faf9] text-ink">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
         <Link to="/" className="flex items-center gap-2 font-bold tracking-tight">
           <span className="grid h-9 w-9 place-items-center rounded-lg bg-leaf text-white">
@@ -114,7 +114,7 @@ function App() {
             <Metric icon={Boxes} label="Items left" value="126" tone="bg-sky-50 text-sky-700" />
             <Metric icon={BarChart3} label="Profit" value="$177" tone="bg-amber-50 text-amber-700" />
           </div>
-          <div className="mt-4 rounded-lg bg-[#f4f0e8] p-4">
+          <div className="mt-4 rounded-lg bg-[#eef8f4] p-4">
             <div className="mb-3 flex items-center justify-between">
               <p className="font-bold">Top products</p>
               <ClipboardList size={18} className="text-ink/55" aria-hidden="true" />
@@ -135,7 +135,7 @@ function App() {
       <section className="border-y border-ink/10 bg-white py-8">
         <div className="mx-auto grid max-w-6xl gap-3 px-4 sm:grid-cols-3 sm:px-6">
           {businessTypes.map((type) => (
-            <div key={type} className="flex items-center gap-2 rounded-lg bg-[#fbfaf6] p-3">
+            <div key={type} className="flex items-center gap-2 rounded-lg bg-[#f7faf9] p-3">
               <CheckCircle2 size={18} className="text-leaf" aria-hidden="true" />
               <span className="font-semibold">{type}</span>
             </div>

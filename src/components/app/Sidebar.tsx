@@ -51,7 +51,7 @@ export default function Sidebar({ navItems }: Props) {
                         "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors",
                         isActive
                           ? "bg-mint text-leaf"
-                          : "text-ink/65 hover:bg-[#f4f0e8] hover:text-ink",
+                          : "text-ink/65 hover:bg-[#eef8f4] hover:text-ink",
                       ].join(" ")
                     }
                   >

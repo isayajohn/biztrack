@@ -180,7 +180,7 @@ export default function OnboardingPage() {
                 <div className="h-full rounded-full bg-leaf" style={{ width: `${progress}%` }} />
               </div>
 
-              <div className="mt-5 rounded-lg border border-ink/10 bg-[#fbfaf6] p-4">
+              <div className="mt-5 rounded-lg border border-ink/10 bg-[#f7faf9] p-4">
                 <div className="flex items-start gap-3">
                   <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-mint text-leaf">
                     <Store size={20} aria-hidden="true" />
@@ -211,7 +211,7 @@ export default function OnboardingPage() {
                 const Icon = step.icon;
                 return (
                   <div key={step.title} className="flex gap-3">
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-[#fbfaf6] text-leaf">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-[#f7faf9] text-leaf">
                       <Icon size={18} aria-hidden="true" />
                     </span>
                     <div>

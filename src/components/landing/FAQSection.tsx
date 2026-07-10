@@ -143,7 +143,7 @@ export default function FAQSection({ eyebrow, title, description, faqs: dynamicF
           </div>
         </div>
 
-        <div className="relative min-h-[380px] overflow-hidden rounded-xl border border-emerald-100 bg-cloud p-8 shadow-card sm:min-h-[440px]">
+        <div className="relative min-h-[380px] overflow-hidden rounded-xl border border-leaf/15 bg-cloud p-8 shadow-card sm:min-h-[440px]">
           <div
             className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.2),transparent_48%)]"
             aria-hidden="true"
@@ -162,10 +162,10 @@ export default function FAQSection({ eyebrow, title, description, faqs: dynamicF
               Q
             </span>
 
-            <div className="relative grid h-56 w-56 place-items-center rounded-full bg-white shadow-card ring-1 ring-emerald-100 sm:h-64 sm:w-64">
+            <div className="relative grid h-56 w-56 place-items-center rounded-full bg-white shadow-card ring-1 ring-leaf/15 sm:h-64 sm:w-64">
               <div className="absolute h-72 w-72 rounded-full border border-leaf/10" aria-hidden="true" />
               <div className="absolute h-44 w-44 rounded-full border border-leaf/15" aria-hidden="true" />
-              <div className="grid h-24 w-24 place-items-center rounded-full bg-leaf text-white shadow-card ring-8 ring-emerald-100">
+              <div className="grid h-24 w-24 place-items-center rounded-full bg-leaf text-white shadow-card ring-8 ring-leaf/15">
                 <HelpCircle size={46} aria-hidden="true" />
               </div>
             </div>

@@ -39,7 +39,7 @@ function StatusBadge({ status }: { status: PaymentStatus }) {
         ? "border-amber-200 bg-amber-50 text-amber-700"
         : status === "FAILED"
           ? "border-red-200 bg-red-50 text-red-600"
-          : "border-ink/10 bg-[#f4f0e8] text-ink/55";
+          : "border-ink/10 bg-[#eef8f4] text-ink/55";
 
   return (
     <span className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-extrabold ${classes}`}>
@@ -212,13 +212,13 @@ export default function AdminCollectionsPage() {
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Search business, email, package, or reference"
-              className="w-full rounded-lg border border-ink/10 bg-[#fbfaf6] py-2.5 pl-9 pr-3 text-sm font-semibold outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+              className="w-full rounded-lg border border-ink/10 bg-[#f7faf9] py-2.5 pl-9 pr-3 text-sm font-semibold outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
             />
           </div>
           <select
             value={status}
             onChange={(event) => setStatus(event.target.value)}
-            className="rounded-lg border border-ink/10 bg-[#fbfaf6] px-3 py-2.5 text-sm font-bold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+            className="rounded-lg border border-ink/10 bg-[#f7faf9] px-3 py-2.5 text-sm font-bold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
           >
             <option value="">All statuses</option>
             {statuses.map((item) => (
@@ -241,7 +241,7 @@ export default function AdminCollectionsPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-ink/10 text-left text-sm">
-              <thead className="bg-[#fbfaf6] text-xs font-extrabold uppercase tracking-[0.05em] text-ink/45">
+              <thead className="bg-[#f7faf9] text-xs font-extrabold uppercase tracking-[0.05em] text-ink/45">
                 <tr>
                   <th className="px-4 py-3">Business</th>
                   <th className="px-4 py-3">Package</th>

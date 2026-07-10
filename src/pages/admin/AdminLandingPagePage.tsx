@@ -754,7 +754,7 @@ export default function AdminLandingPagePage() {
             to="/"
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-ink/10 bg-white px-4 py-2.5 text-sm font-extrabold text-ink/60 hover:bg-[#f4f0e8]"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-ink/10 bg-white px-4 py-2.5 text-sm font-extrabold text-ink/60 hover:bg-[#eef8f4]"
           >
             <Eye size={16} aria-hidden="true" />
             Preview Landing Page
@@ -804,7 +804,7 @@ export default function AdminLandingPagePage() {
                       className={`inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border px-3 py-2 text-sm font-extrabold transition-colors ${
                         isActive
                           ? "border-leaf bg-leaf text-white shadow-sm"
-                          : "border-ink/10 bg-white text-ink/55 hover:bg-[#f4f0e8]"
+                          : "border-ink/10 bg-white text-ink/55 hover:bg-[#eef8f4]"
                       }`}
                     >
                       {tab.icon}
@@ -836,13 +836,13 @@ export default function AdminLandingPagePage() {
                 <TextField label="Secondary button URL" value={state.secondaryButtonUrl} onChange={(value) => update("secondaryButtonUrl", value)} required />
                 <TextArea label="Trust text" value={state.heroTrustText} onChange={(value) => update("heroTrustText", value)} rows={2} className="lg:col-span-2" />
               </div>
-              <div className="mt-4 rounded-lg border border-ink/8 bg-[#fbfaf6] p-3">
+              <div className="mt-4 rounded-lg border border-ink/8 bg-[#f7faf9] p-3">
                 <div className="mb-2 flex items-center justify-between gap-2">
                   <p className="text-xs font-extrabold uppercase tracking-[0.06em] text-ink/35">Trust indicator chips</p>
                   <button
                     type="button"
                     onClick={() => update("heroTrustIndicators", [...state.heroTrustIndicators, { ...emptyTrustIndicator }])}
-                    className="inline-flex items-center gap-1 rounded-lg border border-ink/10 bg-white px-2 py-1.5 text-xs font-extrabold text-ink/55 hover:bg-[#f4f0e8]"
+                    className="inline-flex items-center gap-1 rounded-lg border border-ink/10 bg-white px-2 py-1.5 text-xs font-extrabold text-ink/55 hover:bg-[#eef8f4]"
                   >
                     <Plus size={13} aria-hidden="true" />
                     Add chip
@@ -966,13 +966,13 @@ export default function AdminLandingPagePage() {
                       <TextField label="Title" value={row.title} onChange={(v) => updateSolutionRow(rowIndex, "title", v)} required />
                       <TextArea label="Description" value={row.description} onChange={(v) => updateSolutionRow(rowIndex, "description", v)} rows={2} className="lg:col-span-2" />
                     </div>
-                    <div className="mt-3 rounded-lg bg-[#fbfaf6] p-3">
+                    <div className="mt-3 rounded-lg bg-[#f7faf9] p-3">
                       <div className="mb-2 flex items-center justify-between gap-2">
                         <p className="text-xs font-extrabold uppercase tracking-[0.06em] text-ink/35">Bullet points</p>
                         <button
                           type="button"
                           onClick={() => updateSolutionRowBullets(rowIndex, [...row.bullets, ""])}
-                          className="inline-flex items-center gap-1 rounded-lg border border-ink/10 bg-white px-2 py-1.5 text-xs font-extrabold text-ink/55 hover:bg-[#f4f0e8]"
+                          className="inline-flex items-center gap-1 rounded-lg border border-ink/10 bg-white px-2 py-1.5 text-xs font-extrabold text-ink/55 hover:bg-[#eef8f4]"
                         >
                           <Plus size={13} aria-hidden="true" />
                           Add bullet
@@ -1147,13 +1147,13 @@ export default function AdminLandingPagePage() {
                     <TextField label="Button text" value={plan.buttonText} onChange={(value) => updatePricing(index, "buttonText", value)} />
                     <TextField label="Button URL" value={plan.buttonUrl} onChange={(value) => updatePricing(index, "buttonUrl", value)} />
                   </div>
-                  <div className="mt-3 rounded-lg bg-[#fbfaf6] p-3">
+                  <div className="mt-3 rounded-lg bg-[#f7faf9] p-3">
                     <div className="mb-2 flex items-center justify-between gap-2">
                       <p className="text-xs font-extrabold uppercase tracking-[0.06em] text-ink/35">Features list</p>
                       <button
                         type="button"
                         onClick={() => updatePricingFeatures(index, [...plan.features, ""])}
-                        className="inline-flex items-center gap-1 rounded-lg border border-ink/10 bg-white px-2 py-1.5 text-xs font-extrabold text-ink/55 hover:bg-[#f4f0e8]"
+                        className="inline-flex items-center gap-1 rounded-lg border border-ink/10 bg-white px-2 py-1.5 text-xs font-extrabold text-ink/55 hover:bg-[#eef8f4]"
                       >
                         <Plus size={13} aria-hidden="true" />
                         Add item
@@ -1371,7 +1371,7 @@ export default function AdminLandingPagePage() {
                 <TextField label="Google Play app link" value={state.androidAppUrl} onChange={(value) => update("androidAppUrl", value)} placeholder="https://play.google.com/store/apps/details?id=..." />
                 <TextField label="Apple App Store link" value={state.iosAppUrl} onChange={(value) => update("iosAppUrl", value)} placeholder="https://apps.apple.com/app/..." />
               </div>
-              <div className="mt-4 rounded-lg border border-ink/10 bg-[#fbfaf6] p-4">
+              <div className="mt-4 rounded-lg border border-ink/10 bg-[#f7faf9] p-4">
                 <p className="text-sm font-extrabold text-ink">Direct Android APK</p>
                 <p className="mt-1 text-xs font-semibold text-ink/50">Upload up to 200 MB. Users can download it securely from the landing page.</p>
                 <label className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-lg bg-leaf px-4 py-2.5 text-sm font-bold text-white hover:bg-leaf/90">
@@ -1532,7 +1532,7 @@ function DynamicSection({
 
 function RepeaterCard({ title, onDelete, children }: { title: string; onDelete: () => void; children: ReactNode }) {
   return (
-    <article className="rounded-lg border border-ink/10 bg-[#fbfaf6] p-3">
+    <article className="rounded-lg border border-ink/10 bg-[#f7faf9] p-3">
       <div className="mb-3 flex items-center justify-between gap-2">
         <h3 className="text-sm font-extrabold text-ink">{title}</h3>
         <button
@@ -1570,7 +1570,7 @@ function TextField({
         required={required}
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
-        className="mt-1 w-full rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+        className="mt-1 w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
       />
     </label>
   );
@@ -1599,7 +1599,7 @@ function TextArea({
         rows={rows}
         required={required}
         onChange={(event) => onChange(event.target.value)}
-        className="mt-1 w-full rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+        className="mt-1 w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
       />
     </label>
   );
@@ -1627,7 +1627,7 @@ function ImageField({
             <img src={value} alt="" className="h-32 w-full object-cover" />
           </div>
         ) : (
-          <div className="grid h-32 place-items-center rounded-lg border border-dashed border-ink/15 bg-[#fbfaf6] text-xs font-extrabold text-ink/35">
+          <div className="grid h-32 place-items-center rounded-lg border border-dashed border-ink/15 bg-[#f7faf9] text-xs font-extrabold text-ink/35">
             No image selected
           </div>
         )}
@@ -1635,7 +1635,7 @@ function ImageField({
           value={value.startsWith("data:") ? "" : value}
           onChange={(event) => onChange(event.target.value)}
           placeholder="Paste image URL or upload a file"
-          className="w-full rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+          className="w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
         />
         <div className="flex flex-col gap-2 sm:flex-row">
           <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-leaf/20 bg-mint px-3 py-2 text-xs font-extrabold text-leaf hover:bg-leaf/10">
@@ -1656,7 +1656,7 @@ function ImageField({
             type="button"
             onClick={onClear}
             disabled={!value}
-            className="inline-flex items-center justify-center rounded-lg border border-ink/10 bg-white px-3 py-2 text-xs font-extrabold text-ink/55 hover:bg-[#f4f0e8] disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex items-center justify-center rounded-lg border border-ink/10 bg-white px-3 py-2 text-xs font-extrabold text-ink/55 hover:bg-[#eef8f4] disabled:cursor-not-allowed disabled:opacity-50"
           >
             Clear
           </button>
@@ -1668,7 +1668,7 @@ function ImageField({
 
 function EmptyList({ label }: { label: string }) {
   return (
-    <div className="rounded-lg border border-dashed border-ink/15 bg-[#fbfaf6] px-4 py-6 text-center text-sm font-semibold text-ink/45">
+    <div className="rounded-lg border border-dashed border-ink/15 bg-[#f7faf9] px-4 py-6 text-center text-sm font-semibold text-ink/45">
       {label}
     </div>
   );

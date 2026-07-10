@@ -92,7 +92,7 @@ function DetailSkeleton() {
 
 function EmptyState({ message, icon: Icon }: { message: string; icon: LucideIcon }) {
   return (
-    <div className="flex min-h-36 flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-ink/15 bg-[#fbfaf6] px-4 py-8 text-center">
+    <div className="flex min-h-36 flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-ink/15 bg-[#f7faf9] px-4 py-8 text-center">
       <Icon size={24} className="text-ink/25" aria-hidden="true" />
       <p className="max-w-xs text-sm font-semibold leading-6 text-ink/45">{message}</p>
     </div>
@@ -101,7 +101,7 @@ function EmptyState({ message, icon: Icon }: { message: string; icon: LucideIcon
 
 function ProfileItem({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-ink/10 bg-[#fbfaf6] p-3">
+    <div className="rounded-lg border border-ink/10 bg-[#f7faf9] p-3">
       <p className="text-xs font-bold uppercase text-ink/40">{label}</p>
       <p className="mt-1 text-sm font-extrabold text-ink">{value}</p>
     </div>
@@ -150,7 +150,7 @@ export default function AdminBusinessDetailPage() {
       <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6">
         <Link
           to="/admin/businesses"
-          className="inline-flex items-center gap-1.5 rounded-lg border border-ink/15 bg-white px-3 py-2 text-xs font-bold text-ink/60 transition-colors hover:bg-[#f4f0e8]"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-ink/15 bg-white px-3 py-2 text-xs font-bold text-ink/60 transition-colors hover:bg-[#eef8f4]"
         >
           <ArrowLeft size={14} aria-hidden="true" />
           Businesses
@@ -179,7 +179,7 @@ export default function AdminBusinessDetailPage() {
         <div>
           <Link
             to="/admin/businesses"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-ink/15 bg-white px-3 py-2 text-xs font-bold text-ink/60 transition-colors hover:bg-[#f4f0e8]"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-ink/15 bg-white px-3 py-2 text-xs font-bold text-ink/60 transition-colors hover:bg-[#eef8f4]"
           >
             <ArrowLeft size={14} aria-hidden="true" />
             Businesses

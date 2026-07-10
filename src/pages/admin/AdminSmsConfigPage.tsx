@@ -192,7 +192,7 @@ export default function AdminSmsConfigPage() {
                     <select
                       value={form.provider}
                       onChange={(event) => updateField("provider", event.target.value as ConfigProvider)}
-                      className="mt-1 w-full rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                      className="mt-1 w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
                     >
                       <option value="API">API</option>
                       <option value="CUSTOM">CUSTOM</option>
@@ -204,7 +204,7 @@ export default function AdminSmsConfigPage() {
                     <input
                       value={form.baseUrl}
                       onChange={(event) => updateField("baseUrl", event.target.value)}
-                      className="mt-1 w-full rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                      className="mt-1 w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
                     />
                   </label>
                   <label className="text-sm font-bold text-ink/65">
@@ -212,7 +212,7 @@ export default function AdminSmsConfigPage() {
                     <input
                       value={form.senderId}
                       onChange={(event) => updateField("senderId", event.target.value)}
-                      className="mt-1 w-full rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                      className="mt-1 w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
                     />
                   </label>
                   <label className="text-sm font-bold text-ink/65">
@@ -222,7 +222,7 @@ export default function AdminSmsConfigPage() {
                       value={form.apiKey}
                       placeholder={settings?.config?.apiKeyMasked ?? ""}
                       onChange={(event) => updateField("apiKey", event.target.value)}
-                      className="mt-1 w-full rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                      className="mt-1 w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
                     />
                   </label>
                   <label className="text-sm font-bold text-ink/65">
@@ -232,11 +232,11 @@ export default function AdminSmsConfigPage() {
                       value={form.apiSecret}
                       placeholder={settings?.config?.apiSecretMasked ?? ""}
                       onChange={(event) => updateField("apiSecret", event.target.value)}
-                      className="mt-1 w-full rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                      className="mt-1 w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
                     />
                   </label>
                   <div className="grid gap-2 sm:grid-cols-2">
-                    <label className="flex items-center gap-2 rounded-lg border border-ink/10 bg-[#fbfaf6] px-3 py-2 text-sm font-bold text-ink/65">
+                    <label className="flex items-center gap-2 rounded-lg border border-ink/10 bg-[#f7faf9] px-3 py-2 text-sm font-bold text-ink/65">
                       <input
                         type="checkbox"
                         checked={form.clearApiKey}
@@ -245,7 +245,7 @@ export default function AdminSmsConfigPage() {
                       />
                       Clear API key
                     </label>
-                    <label className="flex items-center gap-2 rounded-lg border border-ink/10 bg-[#fbfaf6] px-3 py-2 text-sm font-bold text-ink/65">
+                    <label className="flex items-center gap-2 rounded-lg border border-ink/10 bg-[#f7faf9] px-3 py-2 text-sm font-bold text-ink/65">
                       <input
                         type="checkbox"
                         checked={form.clearApiSecret}
@@ -255,7 +255,7 @@ export default function AdminSmsConfigPage() {
                       Clear secret
                     </label>
                   </div>
-                  <label className="flex items-center gap-2 rounded-lg border border-ink/10 bg-[#fbfaf6] px-3 py-2 text-sm font-bold text-ink/65">
+                  <label className="flex items-center gap-2 rounded-lg border border-ink/10 bg-[#f7faf9] px-3 py-2 text-sm font-bold text-ink/65">
                     <input
                       type="checkbox"
                       checked={form.isActive}
@@ -289,20 +289,20 @@ export default function AdminSmsConfigPage() {
                 onChange={(event) => setTestTo(event.target.value)}
                 placeholder="+255..."
                 required
-                className="rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                className="rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
               />
               <textarea
                 value={testMessage}
                 onChange={(event) => setTestMessage(event.target.value)}
                 rows={3}
                 required
-                className="rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                className="rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
               />
             </div>
             <button
               type="submit"
               disabled={isTesting}
-              className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-ink/15 bg-white px-4 py-2.5 text-sm font-bold text-ink/60 transition-colors hover:bg-[#f4f0e8] disabled:opacity-60"
+              className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-ink/15 bg-white px-4 py-2.5 text-sm font-bold text-ink/60 transition-colors hover:bg-[#eef8f4] disabled:opacity-60"
             >
               {isTesting ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : <Send size={16} aria-hidden="true" />}
               Send test
@@ -350,13 +350,13 @@ export default function AdminSmsConfigPage() {
                         }))
                       }
                       rows={5}
-                      className="mt-3 w-full rounded-lg border border-ink/15 bg-[#fbfaf6] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                      className="mt-3 w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
                     />
                     <button
                       type="button"
                       disabled={savingTemplate === template.key}
                       onClick={() => saveTemplate(template)}
-                      className="mt-3 inline-flex items-center justify-center gap-2 rounded-lg border border-ink/15 bg-white px-3 py-2 text-sm font-bold text-ink/60 transition-colors hover:bg-[#f4f0e8] disabled:opacity-60 sm:float-right"
+                      className="mt-3 inline-flex items-center justify-center gap-2 rounded-lg border border-ink/15 bg-white px-3 py-2 text-sm font-bold text-ink/60 transition-colors hover:bg-[#eef8f4] disabled:opacity-60 sm:float-right"
                     >
                       {savingTemplate === template.key && <Loader2 size={15} className="animate-spin" aria-hidden="true" />}
                       Save template

@@ -68,7 +68,7 @@ function SupplierModal({ initial, onClose, onSaved }: ModalProps) {
           </h2>
           <button
             onClick={onClose}
-            className="grid h-8 w-8 place-items-center rounded-xl text-ink/40 transition-colors hover:bg-[#f4f0e8] hover:text-ink"
+            className="grid h-8 w-8 place-items-center rounded-xl text-ink/40 transition-colors hover:bg-[#eef8f4] hover:text-ink"
           >
             <X size={16} />
           </button>
@@ -89,7 +89,7 @@ function SupplierModal({ initial, onClose, onSaved }: ModalProps) {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Supplier name"
-                className="w-full rounded-xl border border-ink/15 bg-[#fbfaf6] px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                className="w-full rounded-xl border border-ink/15 bg-[#f7faf9] px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
                 autoFocus
               />
             </div>
@@ -102,7 +102,7 @@ function SupplierModal({ initial, onClose, onSaved }: ModalProps) {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="+255 700 000 000"
-                className="w-full rounded-xl border border-ink/15 bg-[#fbfaf6] px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                className="w-full rounded-xl border border-ink/15 bg-[#f7faf9] px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
               />
             </div>
             <div>
@@ -114,7 +114,7 @@ function SupplierModal({ initial, onClose, onSaved }: ModalProps) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="supplier@example.com"
-                className="w-full rounded-xl border border-ink/15 bg-[#fbfaf6] px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                className="w-full rounded-xl border border-ink/15 bg-[#f7faf9] px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
               />
             </div>
             <div>
@@ -126,7 +126,7 @@ function SupplierModal({ initial, onClose, onSaved }: ModalProps) {
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="Physical address"
                 rows={2}
-                className="w-full resize-none rounded-xl border border-ink/15 bg-[#fbfaf6] px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
+                className="w-full resize-none rounded-xl border border-ink/15 bg-[#f7faf9] px-4 py-2.5 text-sm font-medium text-ink outline-none transition-all focus:border-leaf focus:ring-2 focus:ring-leaf/15"
               />
             </div>
           </div>
@@ -134,7 +134,7 @@ function SupplierModal({ initial, onClose, onSaved }: ModalProps) {
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl border border-ink/15 px-4 py-2 text-sm font-bold text-ink/60 transition-colors hover:bg-[#f4f0e8]"
+              className="rounded-xl border border-ink/15 px-4 py-2 text-sm font-bold text-ink/60 transition-colors hover:bg-[#eef8f4]"
             >
               Cancel
             </button>
@@ -211,7 +211,7 @@ export default function SuppliersPage() {
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <h1 className="font-display text-xl font-bold text-ink">Suppliers</h1>
-          <span className="rounded-full bg-[#f4f0e8] px-2.5 py-0.5 text-xs font-bold text-ink/60">
+          <span className="rounded-full bg-[#eef8f4] px-2.5 py-0.5 text-xs font-bold text-ink/60">
             {suppliers.length}
           </span>
         </div>
@@ -238,7 +238,7 @@ export default function SuppliersPage() {
         </div>
       ) : suppliers.length === 0 ? (
         <div className="mt-10 flex flex-col items-center gap-4 text-center">
-          <span className="grid h-14 w-14 place-items-center rounded-2xl bg-[#f4f0e8] text-ink/30">
+          <span className="grid h-14 w-14 place-items-center rounded-2xl bg-[#eef8f4] text-ink/30">
             <Truck size={26} aria-hidden="true" />
           </span>
           <p className="text-sm font-semibold text-ink/45">
@@ -258,7 +258,7 @@ export default function SuppliersPage() {
           <div className="hidden lg:block">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-ink/8 bg-[#fbfaf6]">
+                <tr className="border-b border-ink/8 bg-[#f7faf9]">
                   <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-ink/45">
                     Name
                   </th>
@@ -286,7 +286,7 @@ export default function SuppliersPage() {
                 {suppliers.map((s) => (
                   <tr
                     key={s.id}
-                    className="border-b border-ink/5 last:border-b-0 transition-colors hover:bg-[#fbfaf6]"
+                    className="border-b border-ink/5 last:border-b-0 transition-colors hover:bg-[#f7faf9]"
                   >
                     <td className="px-4 py-3">
                       <p className="font-bold text-ink">{s.name}</p>
@@ -308,14 +308,14 @@ export default function SuppliersPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-center">
-                      <span className="rounded-full bg-[#f4f0e8] px-2.5 py-0.5 text-xs font-bold text-ink/60">
+                      <span className="rounded-full bg-[#eef8f4] px-2.5 py-0.5 text-xs font-bold text-ink/60">
                         {s.productCount}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-center">
                       <span
                         className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
-                          s.isActive ? "bg-mint text-leaf" : "bg-[#f4f0e8] text-ink/50"
+                          s.isActive ? "bg-mint text-leaf" : "bg-[#eef8f4] text-ink/50"
                         }`}
                       >
                         {s.isActive ? "Active" : "Inactive"}
@@ -332,7 +332,7 @@ export default function SuppliersPage() {
                           </button>
                           <button
                             onClick={() => setDeletingId(null)}
-                            className="rounded-lg border border-ink/15 px-2 py-1 text-xs font-bold text-ink/50 transition-colors hover:bg-[#f4f0e8]"
+                            className="rounded-lg border border-ink/15 px-2 py-1 text-xs font-bold text-ink/50 transition-colors hover:bg-[#eef8f4]"
                           >
                             Cancel
                           </button>
@@ -341,7 +341,7 @@ export default function SuppliersPage() {
                         <div className="flex items-center justify-end gap-1.5">
                           <button
                             onClick={() => handleEdit(s)}
-                            className="grid h-8 w-8 place-items-center rounded-xl border border-ink/15 text-ink/50 transition-colors hover:bg-[#f4f0e8] hover:text-ink"
+                            className="grid h-8 w-8 place-items-center rounded-xl border border-ink/15 text-ink/50 transition-colors hover:bg-[#eef8f4] hover:text-ink"
                             aria-label={`Edit ${s.name}`}
                           >
                             <Pencil size={14} aria-hidden="true" />
@@ -374,7 +374,7 @@ export default function SuppliersPage() {
                   </div>
                   <span
                     className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                      s.isActive ? "bg-mint text-leaf" : "bg-[#f4f0e8] text-ink/50"
+                      s.isActive ? "bg-mint text-leaf" : "bg-[#eef8f4] text-ink/50"
                     }`}
                   >
                     {s.isActive ? "Active" : "Inactive"}
@@ -392,7 +392,7 @@ export default function SuppliersPage() {
                 <div className="mt-3 flex gap-2 border-t border-ink/5 pt-3">
                   <button
                     onClick={() => handleEdit(s)}
-                    className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-ink/15 py-2 text-xs font-bold text-ink transition-colors hover:bg-[#f4f0e8]"
+                    className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-ink/15 py-2 text-xs font-bold text-ink transition-colors hover:bg-[#eef8f4]"
                   >
                     <Pencil size={12} aria-hidden="true" />
                     Edit
@@ -407,7 +407,7 @@ export default function SuppliersPage() {
                       </button>
                       <button
                         onClick={() => setDeletingId(null)}
-                        className="flex-1 rounded-xl border border-ink/15 py-2 text-xs font-bold text-ink/50 transition-colors hover:bg-[#f4f0e8]"
+                        className="flex-1 rounded-xl border border-ink/15 py-2 text-xs font-bold text-ink/50 transition-colors hover:bg-[#eef8f4]"
                       >
                         Cancel
                       </button>

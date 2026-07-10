@@ -47,7 +47,7 @@ function StatusBadge({ status }: { status: PackageStatus }) {
   const classes =
     status === "ACTIVE"
       ? "border-leaf/20 bg-mint text-leaf"
-      : "border-ink/10 bg-[#f4f0e8] text-ink/55";
+      : "border-ink/10 bg-[#eef8f4] text-ink/55";
 
   return (
     <span className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-extrabold ${classes}`}>
@@ -70,7 +70,7 @@ function PageMessage({ type, text }: { type: "success" | "error"; text: string }
 
 function Detail({ label, value }: { label: string; value: string | number | null | undefined }) {
   return (
-    <div className="rounded-lg bg-[#fbfaf6] p-3">
+    <div className="rounded-lg bg-[#f7faf9] p-3">
       <dt className="text-[11px] font-extrabold uppercase tracking-[0.06em] text-ink/35">{label}</dt>
       <dd className="mt-1 text-sm font-extrabold text-ink">{value ?? "None"}</dd>
     </div>
@@ -194,7 +194,7 @@ export default function AdminPackagesPage() {
             <>
               <div className="hidden overflow-x-auto lg:block">
                 <table className="min-w-full divide-y divide-ink/10 text-left text-sm">
-                  <thead className="bg-[#fbfaf6] text-xs font-extrabold uppercase tracking-[0.05em] text-ink/45">
+                  <thead className="bg-[#f7faf9] text-xs font-extrabold uppercase tracking-[0.05em] text-ink/45">
                     <tr>
                       <th className="px-4 py-3">Package name</th>
                       <th className="px-4 py-3">Monthly price</th>
@@ -367,11 +367,11 @@ function PackageActions({
 
   return (
     <div className={`flex flex-wrap gap-2 ${compact ? "" : "justify-end"}`}>
-      <button type="button" onClick={onView} className={`${base} border-ink/10 text-ink/60 hover:bg-[#f4f0e8]`}>
+      <button type="button" onClick={onView} className={`${base} border-ink/10 text-ink/60 hover:bg-[#eef8f4]`}>
         <Eye size={14} aria-hidden="true" />
         View
       </button>
-      <Link to={`/admin/packages/${plan.id}/edit`} className={`${base} border-ink/10 text-ink/60 hover:bg-[#f4f0e8]`}>
+      <Link to={`/admin/packages/${plan.id}/edit`} className={`${base} border-ink/10 text-ink/60 hover:bg-[#eef8f4]`}>
         <Pencil size={14} aria-hidden="true" />
         Edit
       </Link>
@@ -424,7 +424,7 @@ function ViewPackageModal({ plan, onClose }: { plan: AdminPackage; onClose: () =
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-ink/10 px-3 py-2 text-xs font-extrabold text-ink/60 hover:bg-[#f4f0e8]"
+            className="rounded-lg border border-ink/10 px-3 py-2 text-xs font-extrabold text-ink/60 hover:bg-[#eef8f4]"
           >
             Close
           </button>
@@ -476,7 +476,7 @@ function ConfirmModal({
             type="button"
             onClick={onCancel}
             disabled={isWorking}
-            className="rounded-lg border border-ink/10 px-4 py-2.5 text-sm font-extrabold text-ink/60 hover:bg-[#f4f0e8] disabled:opacity-60"
+            className="rounded-lg border border-ink/10 px-4 py-2.5 text-sm font-extrabold text-ink/60 hover:bg-[#eef8f4] disabled:opacity-60"
           >
             Cancel
           </button>

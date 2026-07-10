@@ -161,7 +161,7 @@ export default function AdminSmsProviderConfigPage() {
                   <input type="password" value={form.apiSecret} placeholder={config?.apiSecretMasked ?? "Leave blank to keep saved API secret"} onChange={(event) => updateField("apiSecret", event.target.value)} className={fieldClass} />
                   {config?.apiSecretMasked && <span className="mt-1 block text-xs font-bold text-ink/40">Saved: {config.apiSecretMasked}</span>}
                 </label>
-                <label className="flex min-h-10 items-center gap-2 rounded-lg border border-ink/10 bg-[#fbfaf6] px-3 py-2 text-sm font-bold text-ink/65">
+                <label className="flex min-h-10 items-center gap-2 rounded-lg border border-ink/10 bg-[#f7faf9] px-3 py-2 text-sm font-bold text-ink/65">
                   <input type="checkbox" checked={form.isActive} onChange={(event) => updateField("isActive", event.target.checked)} className="h-4 w-4 accent-leaf" />
                   Active
                 </label>
