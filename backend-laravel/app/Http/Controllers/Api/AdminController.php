@@ -18,6 +18,7 @@ use App\Services\EncryptionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
 {
@@ -129,6 +130,10 @@ class AdminController extends Controller
             'problemSection' => 'nullable|array',
             'solutionSection' => 'nullable|array',
             'howItWorks' => 'nullable|array',
+            'mobileAppTitle' => 'nullable|string|max:160',
+            'mobileAppDescription' => 'nullable|string|max:1000',
+            'androidAppUrl' => 'nullable|url|max:2048',
+            'iosAppUrl' => 'nullable|url|max:2048',
             'seoTitle' => 'nullable|string',
             'seoDescription' => 'nullable|string',
             'isPublished' => 'nullable|boolean',
@@ -177,6 +182,10 @@ class AdminController extends Controller
             'problem_section' => $value('problemSection', 'problem_section'),
             'solution_section' => $value('solutionSection', 'solution_section'),
             'how_it_works' => $value('howItWorks', 'how_it_works'),
+            'mobile_app_title' => $value('mobileAppTitle', 'mobile_app_title'),
+            'mobile_app_description' => $value('mobileAppDescription', 'mobile_app_description'),
+            'android_app_url' => $value('androidAppUrl', 'android_app_url'),
+            'ios_app_url' => $value('iosAppUrl', 'ios_app_url'),
             'seo_title' => $value('seoTitle', 'seo_title'),
             'seo_description' => $value('seoDescription', 'seo_description'),
             'is_published' => $value('isPublished', 'is_published', false),
@@ -189,6 +198,27 @@ class AdminController extends Controller
         }
 
         return response()->json(['success' => true, 'data' => $content]);
+    }
+
+    public function uploadLandingPageApk(Request $request): JsonResponse
+    {
+        $request->validate([
+            'apk' => ['required', 'file', 'mimes:apk,zip', 'max:204800'],
+        ]);
+
+        $content = LandingPageContent::firstOrFail();
+        if ($content->apk_path) {
+            Storage::disk('local')->delete($content->apk_path);
+        }
+
+        $file = $request->file('apk');
+        $path = $file->storeAs('mobile-app', Str::uuid().'.apk', 'local');
+        $content->update([
+            'apk_path' => $path,
+            'apk_file_name' => $file->getClientOriginalName(),
+        ]);
+
+        return response()->json(['success' => true, 'data' => $content->fresh()]);
     }
 
     public function publishLandingPageContent(Request $request): JsonResponse

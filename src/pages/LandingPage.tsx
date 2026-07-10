@@ -12,6 +12,7 @@ import PricingSection from "../components/landing/PricingSection";
 import TestimonialsSection from "../components/landing/TestimonialsSection";
 import FAQSection from "../components/landing/FAQSection";
 import FinalCTA from "../components/landing/FinalCTA";
+import MobileAppSection from "../components/landing/MobileAppSection";
 import LandingFooter from "../components/landing/LandingFooter";
 import { getLandingPageContent } from "../services/landingApi";
 import type { PublicLandingPageContent } from "../services/landingApi";
@@ -123,6 +124,13 @@ export default function LandingPage() {
           title={content?.testimonialsTitle}
           description={content?.testimonialsDescription}
           testimonials={content?.testimonials}
+        />
+        <MobileAppSection
+          title={content?.mobileAppTitle}
+          description={content?.mobileAppDescription}
+          androidUrl={content?.androidAppUrl}
+          iosUrl={content?.iosAppUrl}
+          apkAvailable={content?.apkAvailable}
         />
         <FAQSection
           eyebrow={content?.faqEyebrow}

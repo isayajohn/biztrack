@@ -268,6 +268,11 @@ export type LandingPageContent = {
   problemSection?: Record<string, unknown> | null;
   solutionSection?: Record<string, unknown> | null;
   howItWorks?: Record<string, unknown> | null;
+  mobileAppTitle?: string | null;
+  mobileAppDescription?: string | null;
+  androidAppUrl?: string | null;
+  iosAppUrl?: string | null;
+  apkFileName?: string | null;
   seoTitle?: string | null;
   seoDescription?: string | null;
   isPublished: boolean;
@@ -501,6 +506,11 @@ type ApiLandingPageContent = Partial<LandingPageContent> & {
   problem_section?: Record<string, unknown> | null;
   solution_section?: Record<string, unknown> | null;
   how_it_works?: Record<string, unknown> | null;
+  mobile_app_title?: string | null;
+  mobile_app_description?: string | null;
+  android_app_url?: string | null;
+  ios_app_url?: string | null;
+  apk_file_name?: string | null;
   seo_title?: string | null;
   seo_description?: string | null;
   is_published?: boolean | number;
@@ -739,6 +749,11 @@ function normalizeLandingContent(content: ApiLandingPageContent | null): Landing
     problemSection: content.problemSection ?? content.problem_section ?? null,
     solutionSection: content.solutionSection ?? content.solution_section ?? null,
     howItWorks: content.howItWorks ?? content.how_it_works ?? null,
+    mobileAppTitle: content.mobileAppTitle ?? content.mobile_app_title ?? "",
+    mobileAppDescription: content.mobileAppDescription ?? content.mobile_app_description ?? "",
+    androidAppUrl: content.androidAppUrl ?? content.android_app_url ?? "",
+    iosAppUrl: content.iosAppUrl ?? content.ios_app_url ?? "",
+    apkFileName: content.apkFileName ?? content.apk_file_name ?? null,
     seoTitle: content.seoTitle ?? content.seo_title ?? "",
     seoDescription: content.seoDescription ?? content.seo_description ?? "",
     isPublished: Boolean(content.isPublished ?? content.is_published),
@@ -1199,6 +1214,12 @@ export async function getAdminLandingContent() {
 
 export async function updateAdminLandingContent(payload: LandingPageContent) {
   return normalizeLandingContent(unwrap<ApiLandingPageContent>(await apiClient.put("/admin/landing-page", payload)));
+}
+
+export async function uploadAdminLandingApk(file: File) {
+  const form = new FormData();
+  form.append("apk", file);
+  return normalizeLandingContent(unwrap<ApiLandingPageContent>(await apiClient.post("/admin/landing-page/apk", form)));
 }
 
 export async function publishAdminLandingContent() {

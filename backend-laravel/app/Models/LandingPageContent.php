@@ -25,6 +25,8 @@ class LandingPageContent extends Model
         'hero_trust_indicators',
         'footer_tagline', 'footer_badge', 'footer_product_links', 'footer_company_links',
         'problem_section', 'solution_section', 'how_it_works',
+        'mobile_app_title', 'mobile_app_description', 'android_app_url', 'ios_app_url',
+        'apk_path', 'apk_file_name',
         'seo_title', 'seo_description', 'is_published',
     ];
 

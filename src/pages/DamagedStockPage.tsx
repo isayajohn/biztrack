@@ -109,7 +109,7 @@ export default function DamagedStockPage() {
     try {
       const [dmg, prods] = await Promise.all([getDamagedStock(), getProducts()]);
       setRecords(dmg);
-      setProducts(prods.products ?? prods);
+      setProducts(prods);
     } catch (err) {
       setError(getApiErrorMessage(err));
     } finally {

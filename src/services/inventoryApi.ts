@@ -330,5 +330,5 @@ export async function markAllNotificationsRead(): Promise<void> {
 
 export async function getInventoryDashboard(): Promise<InventoryDashboard> {
   const response = await apiClient.get("/reports/inventory-dashboard");
-  return inner(response) as InventoryDashboard;
+  return inner(response) as unknown as InventoryDashboard;
 }

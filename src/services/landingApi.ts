@@ -38,6 +38,11 @@ export type PublicLandingPageContent = {
   problemSection?: Record<string, unknown> | null;
   solutionSection?: Record<string, unknown> | null;
   howItWorks?: Record<string, unknown> | null;
+  mobileAppTitle?: string | null;
+  mobileAppDescription?: string | null;
+  androidAppUrl?: string | null;
+  iosAppUrl?: string | null;
+  apkAvailable?: boolean;
   seoTitle?: string | null;
   seoDescription?: string | null;
 };
@@ -129,6 +134,11 @@ type PublicLandingPageApiContent = Partial<PublicLandingPageContent> & {
   problem_section?: Record<string, unknown> | null;
   solution_section?: Record<string, unknown> | null;
   how_it_works?: Record<string, unknown> | null;
+  mobile_app_title?: string | null;
+  mobile_app_description?: string | null;
+  android_app_url?: string | null;
+  ios_app_url?: string | null;
+  apk_available?: boolean;
   seo_title?: string | null;
   seo_description?: string | null;
 };
@@ -205,6 +215,11 @@ function sanitizeLandingContent(content: PublicLandingPageApiContent | null): Pu
     problemSection: content?.problemSection ?? content?.problem_section ?? null,
     solutionSection: content?.solutionSection ?? content?.solution_section ?? null,
     howItWorks: content?.howItWorks ?? content?.how_it_works ?? null,
+    mobileAppTitle: content?.mobileAppTitle ?? content?.mobile_app_title ?? null,
+    mobileAppDescription: content?.mobileAppDescription ?? content?.mobile_app_description ?? null,
+    androidAppUrl: content?.androidAppUrl ?? content?.android_app_url ?? null,
+    iosAppUrl: content?.iosAppUrl ?? content?.ios_app_url ?? null,
+    apkAvailable: Boolean(content?.apkAvailable ?? content?.apk_available),
     seoTitle: content?.seoTitle ?? content?.seo_title ?? null,
     seoDescription: content?.seoDescription ?? content?.seo_description ?? null,
   };

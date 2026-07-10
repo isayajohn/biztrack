@@ -36,6 +36,7 @@ Route::prefix('public')->group(function () {
     Route::get('/landing-page', [LandingController::class, 'getPublicLandingPage']);
     Route::get('/landing-page/branding', [LandingController::class, 'getBranding']);
     Route::get('/landing-page/branding/logo', [LandingController::class, 'getBrandingLogo']);
+    Route::get('/landing-page/mobile-app.apk', [LandingController::class, 'downloadApk']);
     Route::get('/packages', [PublicPackageController::class, 'listPackages']);
 });
 
@@ -247,6 +248,7 @@ Route::middleware('jwt.auth')->group(function () {
         Route::get('/landing-page', [AdminController::class, 'getLandingPageContent']);
         Route::put('/landing-page', [AdminController::class, 'updateLandingPageContent']);
         Route::post('/landing-page/publish', [AdminController::class, 'publishLandingPageContent']);
+        Route::post('/landing-page/apk', [AdminController::class, 'uploadLandingPageApk']);
 
         // Email settings (legacy)
         Route::get('/email', [AdminController::class, 'getEmailSettings']);

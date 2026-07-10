@@ -8,6 +8,7 @@ import {
   FileText,
   HelpCircle,
   ImagePlus,
+  Smartphone,
   Lightbulb,
   Loader2,
   MapPin,
@@ -26,6 +27,7 @@ import {
   getAdminLandingContent,
   publishAdminLandingContent,
   updateAdminLandingContent,
+  uploadAdminLandingApk,
 } from "../../services/adminApi";
 import type { LandingPageContent } from "../../services/adminApi";
 import { getApiErrorMessage } from "../../services/apiClient";
@@ -115,6 +117,7 @@ type LandingEditorTab =
   | "faq"
   | "testimonials"
   | "footer"
+  | "mobile"
   | "seo";
 
 type LandingEditorState = {
@@ -156,6 +159,11 @@ type LandingEditorState = {
   problemSection: ProblemSectionState;
   solutionSection: SolutionSectionState;
   howItWorks: HowItWorksSectionState;
+  mobileAppTitle: string;
+  mobileAppDescription: string;
+  androidAppUrl: string;
+  iosAppUrl: string;
+  apkFileName: string;
   seoTitle: string;
   seoDescription: string;
   isPublished: boolean;
@@ -199,6 +207,11 @@ const fallbackState: LandingEditorState = {
   problemSection: { eyebrow: "", title: "", description: "", items: [] },
   solutionSection: { eyebrow: "", title: "", description: "", rows: [] },
   howItWorks: { eyebrow: "", title: "", description: "", steps: [] },
+  mobileAppTitle: "Get BizTrack on your phone",
+  mobileAppDescription: "Run your business anywhere with the BizTrack mobile app.",
+  androidAppUrl: "",
+  iosAppUrl: "",
+  apkFileName: "",
   seoTitle: "",
   seoDescription: "",
   isPublished: false,
@@ -375,6 +388,11 @@ function editorFromContent(content: LandingPageContent): LandingEditorState {
         })),
       };
     })(),
+    mobileAppTitle: content.mobileAppTitle ?? "",
+    mobileAppDescription: content.mobileAppDescription ?? "",
+    androidAppUrl: content.androidAppUrl ?? "",
+    iosAppUrl: content.iosAppUrl ?? "",
+    apkFileName: content.apkFileName ?? "",
     seoTitle: content.seoTitle ?? "",
     seoDescription: content.seoDescription ?? "",
     isPublished: Boolean(content.isPublished),
@@ -489,6 +507,11 @@ function payloadFromState(state: LandingEditorState, isPublished: boolean): Land
           description: step.description.trim(),
         })),
     },
+    mobileAppTitle: state.mobileAppTitle.trim() || null,
+    mobileAppDescription: state.mobileAppDescription.trim() || null,
+    androidAppUrl: state.androidAppUrl.trim() || null,
+    iosAppUrl: state.iosAppUrl.trim() || null,
+    apkFileName: state.apkFileName || null,
     seoTitle: state.seoTitle.trim() || null,
     seoDescription: state.seoDescription.trim() || null,
     isPublished,
@@ -496,7 +519,7 @@ function payloadFromState(state: LandingEditorState, isPublished: boolean): Land
 }
 
 function validateState(state: LandingEditorState) {
-  for (const tab of ["hero", "story", "features", "pricing", "faq", "testimonials", "footer", "seo"] satisfies LandingEditorTab[]) {
+  for (const tab of ["hero", "story", "features", "pricing", "faq", "testimonials", "mobile", "footer", "seo"] satisfies LandingEditorTab[]) {
     const tabError = validateTab(state, tab);
     if (tabError) return tabError;
   }
@@ -574,6 +597,7 @@ export default function AdminLandingPagePage() {
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [activeTab, setActiveTab] = useState<LandingEditorTab>("hero");
   const [savingTab, setSavingTab] = useState<LandingEditorTab | null>(null);
+  const [uploadingApk, setUploadingApk] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -598,6 +622,7 @@ export default function AdminLandingPagePage() {
   const editorTabs = useMemo(
     () => [
       { id: "hero" as const, label: "Hero", icon: <Megaphone size={16} aria-hidden="true" /> },
+      { id: "mobile" as const, label: "Mobile app", icon: <Smartphone size={16} aria-hidden="true" /> },
       { id: "story" as const, label: "Story", icon: <Lightbulb size={16} aria-hidden="true" /> },
       { id: "features" as const, label: "Features", icon: <Sparkles size={16} aria-hidden="true" /> },
       { id: "pricing" as const, label: "Pricing", icon: <FileText size={16} aria-hidden="true" /> },
@@ -688,6 +713,24 @@ export default function AdminLandingPagePage() {
       setMessage({ type: "error", text: getApiErrorMessage(error) });
     } finally {
       setIsPublishing(false);
+    }
+  }
+
+  async function uploadApk(file: File) {
+    if (!file.name.toLowerCase().endsWith(".apk")) {
+      setMessage({ type: "error", text: "Choose an Android .apk file." });
+      return;
+    }
+    setUploadingApk(true);
+    setMessage(null);
+    try {
+      const saved = await uploadAdminLandingApk(file);
+      setState(editorFromContent(saved));
+      setMessage({ type: "success", text: "APK uploaded. Publish the landing page when you are ready." });
+    } catch (error) {
+      setMessage({ type: "error", text: getApiErrorMessage(error) });
+    } finally {
+      setUploadingApk(false);
     }
   }
 
@@ -1318,6 +1361,27 @@ export default function AdminLandingPagePage() {
               {!state.footerCompanyLinks.length && <EmptyList label="No company links yet. Defaults will be shown." />}
             </DynamicSection>
             </>
+            )}
+
+            {activeTab === "mobile" && (
+            <EditorSection title="Mobile app downloads" icon={<Smartphone size={18} aria-hidden="true" />}>
+              <div className="grid gap-4 lg:grid-cols-2">
+                <TextField label="Section title" value={state.mobileAppTitle} onChange={(value) => update("mobileAppTitle", value)} />
+                <TextArea label="Description" value={state.mobileAppDescription} onChange={(value) => update("mobileAppDescription", value)} rows={3} className="lg:col-span-2" />
+                <TextField label="Google Play app link" value={state.androidAppUrl} onChange={(value) => update("androidAppUrl", value)} placeholder="https://play.google.com/store/apps/details?id=..." />
+                <TextField label="Apple App Store link" value={state.iosAppUrl} onChange={(value) => update("iosAppUrl", value)} placeholder="https://apps.apple.com/app/..." />
+              </div>
+              <div className="mt-4 rounded-lg border border-ink/10 bg-[#fbfaf6] p-4">
+                <p className="text-sm font-extrabold text-ink">Direct Android APK</p>
+                <p className="mt-1 text-xs font-semibold text-ink/50">Upload up to 200 MB. Users can download it securely from the landing page.</p>
+                <label className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-lg bg-leaf px-4 py-2.5 text-sm font-bold text-white hover:bg-leaf/90">
+                  {uploadingApk ? <Loader2 size={16} className="animate-spin" /> : <ImagePlus size={16} />}
+                  {uploadingApk ? "Uploading..." : state.apkFileName ? "Replace APK" : "Upload APK"}
+                  <input type="file" accept=".apk,application/vnd.android.package-archive" className="hidden" disabled={uploadingApk} onChange={(event) => { const file = event.target.files?.[0]; if (file) void uploadApk(file); event.target.value = ""; }} />
+                </label>
+                {state.apkFileName && <p className="mt-2 text-xs font-bold text-leaf">Current file: {state.apkFileName}</p>}
+              </div>
+            </EditorSection>
             )}
 
             {activeTab === "seo" && (

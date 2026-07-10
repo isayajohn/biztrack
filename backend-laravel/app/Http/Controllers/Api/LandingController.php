@@ -5,14 +5,30 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\AppBranding;
 use App\Models\LandingPageContent;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class LandingController extends Controller
 {
+    public function downloadApk()
+    {
+        $content = LandingPageContent::where('is_published', true)->firstOrFail();
+        abort_unless($content->apk_path && Storage::disk('local')->exists($content->apk_path), 404);
+
+        return Storage::disk('local')->download(
+            $content->apk_path,
+            $content->apk_file_name ?: 'biztrack.apk',
+            ['Content-Type' => 'application/vnd.android.package-archive']
+        );
+    }
     public function getPublicLandingPage(Request $request): JsonResponse
     {
         $content = LandingPageContent::where('is_published', true)->first();
+        if ($content) {
+            $content->makeHidden(['apk_path']);
+            $content->setAttribute('apk_available', (bool) ($content->apk_path && Storage::disk('local')->exists($content->apk_path)));
+        }
         return response()->json(['success' => true, 'data' => $content]);
     }
 
