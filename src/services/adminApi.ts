@@ -296,6 +296,8 @@ export type MessageTemplate = {
   subject?: string | null;
   body: string;
   isActive: boolean;
+  requiredVariables?: string[];
+  supportedVariables?: string[];
   createdAt: string;
   updatedAt: string;
 };
@@ -470,6 +472,10 @@ type ApiEmailConfig = Partial<EmailConfig> & {
 
 type ApiMessageTemplate = Partial<MessageTemplate> & {
   is_active?: boolean | number;
+  requiredVariables?: string[];
+  required_variables?: string[];
+  supportedVariables?: string[];
+  supported_variables?: string[];
   created_at?: string;
   updated_at?: string;
 };
@@ -799,6 +805,8 @@ function normalizeMessageTemplate(template: ApiMessageTemplate): MessageTemplate
     subject: template.subject ?? null,
     body: template.body ?? "",
     isActive: Boolean(template.isActive ?? template.is_active),
+    requiredVariables: template.requiredVariables ?? template.required_variables ?? [],
+    supportedVariables: template.supportedVariables ?? template.supported_variables ?? [],
     createdAt: template.createdAt ?? template.created_at ?? "",
     updatedAt: template.updatedAt ?? template.updated_at ?? "",
   };
