@@ -11,6 +11,8 @@ import {
   CheckCircle2,
   Eye,
   Loader2,
+  Pencil,
+  Plus,
   Search,
   ShieldAlert,
   ShieldCheck,
@@ -22,7 +24,9 @@ import { useAuth } from "../../auth/AuthContext";
 import {
   getAdminUser,
   getAdminUsersPage,
+  createAdminUser,
   deleteAdminUser,
+  updateAdminUser,
   updateAdminUserRole,
   updateAdminUserStatus,
 } from "../../services/adminApi";
@@ -38,6 +42,24 @@ type PendingAction = {
   body: string;
   confirmLabel: string;
   tone: "leaf" | "clay";
+};
+
+type UserFormState = {
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+  role: AdminRole;
+  status: AdminStatus;
+};
+
+const emptyUserForm: UserFormState = {
+  name: "",
+  email: "",
+  phone: "",
+  password: "",
+  role: "USER",
+  status: "ACTIVE",
 };
 
 function formatDate(value?: string | null) {
@@ -347,15 +369,108 @@ function UserDetailsModal({
   );
 }
 
+function UserFormModal({
+  mode,
+  form,
+  isSubmitting,
+  error,
+  onChange,
+  onClose,
+  onSubmit,
+}: {
+  mode: "create" | "edit";
+  form: UserFormState;
+  isSubmitting: boolean;
+  error: string;
+  onChange: (next: UserFormState) => void;
+  onClose: () => void;
+  onSubmit: (event: React.FormEvent) => void;
+}) {
+  const isCreate = mode === "create";
+
+  return (
+    <div className="fixed inset-0 z-40 grid place-items-center bg-ink/45 px-4 py-6">
+      <form onSubmit={onSubmit} className="max-h-[88vh] w-full max-w-2xl overflow-y-auto rounded-xl border border-ink/10 bg-white p-5 shadow-soft">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.08em] text-leaf">{isCreate ? "Add user" : "Edit user"}</p>
+            <h2 className="mt-1 font-display text-lg font-bold text-ink">{isCreate ? "Create platform user" : "Update platform user"}</h2>
+            <p className="mt-1 text-sm font-semibold text-ink/45">Assign role, status, and login details.</p>
+          </div>
+          <button type="button" onClick={onClose} disabled={isSubmitting} className="rounded-lg p-2 text-ink/45 transition-colors hover:bg-[#eef8f4] hover:text-ink" aria-label="Close user form">
+            <X size={17} />
+          </button>
+        </div>
+
+        {error && <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-600">{error}</p>}
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          <FormField label="Name" value={form.name} onChange={(value) => onChange({ ...form, name: value })} />
+          <FormField label="Email" type="email" value={form.email} onChange={(value) => onChange({ ...form, email: value })} />
+          <FormField label="Phone" required={false} value={form.phone} onChange={(value) => onChange({ ...form, phone: value })} />
+          <FormField label={isCreate ? "Temporary password" : "New password"} type="password" required={isCreate} minLength={8} value={form.password} onChange={(value) => onChange({ ...form, password: value })} />
+          <label className="text-xs font-bold text-ink/55">
+            Role
+            <select value={form.role} onChange={(event) => onChange({ ...form, role: event.target.value as AdminRole })} className="mt-1 w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2.5 text-sm font-bold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15">
+              <option value="USER">USER</option>
+              <option value="SUPER_ADMIN">SUPER_ADMIN</option>
+            </select>
+          </label>
+          <label className="text-xs font-bold text-ink/55">
+            Status
+            <select value={form.status} onChange={(event) => onChange({ ...form, status: event.target.value as AdminStatus })} className="mt-1 w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2.5 text-sm font-bold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15">
+              <option value="ACTIVE">ACTIVE</option>
+              <option value="SUSPENDED">SUSPENDED</option>
+            </select>
+          </label>
+        </div>
+
+        <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <button type="button" onClick={onClose} disabled={isSubmitting} className="rounded-lg border border-ink/15 bg-white px-4 py-2 text-sm font-bold text-ink/60 transition-colors hover:bg-[#eef8f4] disabled:opacity-60">Cancel</button>
+          <button disabled={isSubmitting} className="inline-flex items-center justify-center gap-2 rounded-lg bg-leaf px-4 py-2 text-sm font-bold text-white shadow-sm transition-colors hover:bg-leaf/90 disabled:opacity-60">
+            {isSubmitting && <Loader2 size={15} className="animate-spin" />}
+            {isCreate ? "Create user" : "Save changes"}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+function FormField({
+  label,
+  value,
+  onChange,
+  type = "text",
+  required = true,
+  minLength,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  type?: string;
+  required?: boolean;
+  minLength?: number;
+}) {
+  return (
+    <label className="text-xs font-bold text-ink/55">
+      {label}
+      <input required={required} minLength={minLength} type={type} value={value} onChange={(event) => onChange(event.target.value)} className="mt-1 w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2.5 text-sm font-semibold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15" />
+    </label>
+  );
+}
+
 function UserActions({
   user,
   currentUserId,
   onView,
+  onEdit,
   onRequestAction,
 }: {
   user: AdminUser;
   currentUserId?: string;
   onView: (user: AdminUser) => void;
+  onEdit: (user: AdminUser) => void;
   onRequestAction: (action: PendingAction) => void;
 }) {
   const isSelf = currentUserId === user.id;
@@ -365,6 +480,7 @@ function UserActions({
   return (
     <div className="flex flex-wrap gap-1.5">
       <ActionButton label="View" icon={Eye} onClick={() => onView(user)} />
+      <ActionButton label="Edit" icon={Pencil} onClick={() => onEdit(user)} />
       {user.role === "USER" ? (
         <ActionButton
           label="Make SUPER_ADMIN"
@@ -474,6 +590,12 @@ export default function AdminUsersPage() {
   const [detailsError, setDetailsError] = useState("");
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [isDetailsLoading, setIsDetailsLoading] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
+  const [formMode, setFormMode] = useState<"create" | "edit">("create");
+  const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
+  const [form, setForm] = useState<UserFormState>(emptyUserForm);
+  const [formError, setFormError] = useState("");
+  const [isFormSubmitting, setIsFormSubmitting] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -521,6 +643,68 @@ export default function AdminUsersPage() {
       setDetailsError(getApiErrorMessage(err));
     } finally {
       setIsDetailsLoading(false);
+    }
+  };
+
+  const openCreateForm = () => {
+    setFormMode("create");
+    setEditingUser(null);
+    setForm(emptyUserForm);
+    setFormError("");
+    setFormOpen(true);
+  };
+
+  const openEditForm = (user: AdminUser) => {
+    setFormMode("edit");
+    setEditingUser(user);
+    setForm({
+      name: user.name,
+      email: user.email,
+      phone: "",
+      password: "",
+      role: user.role,
+      status: user.status,
+    });
+    setFormError("");
+    setFormOpen(true);
+  };
+
+  const submitForm = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setIsFormSubmitting(true);
+    setFormError("");
+    setError("");
+    setSuccess("");
+
+    try {
+      const payload = {
+        name: form.name,
+        email: form.email,
+        phone: form.phone || null,
+        role: form.role,
+        status: form.status,
+        ...(form.password ? { password: form.password } : {}),
+      };
+      const saved =
+        formMode === "create"
+          ? await createAdminUser({ ...payload, password: form.password })
+          : editingUser
+            ? await updateAdminUser(editingUser.id, payload)
+            : null;
+      if (!saved) return;
+
+      setUsers((current) => {
+        const exists = current.some((user) => user.id === saved.id);
+        return exists ? current.map((user) => (user.id === saved.id ? { ...user, ...saved } : user)) : [saved, ...current];
+      });
+      if (formMode === "create") setTotal((current) => current + 1);
+      setDetailsUser((current) => (current?.id === saved.id ? { ...current, ...saved } : current));
+      setSuccess(`${saved.name} was ${formMode === "create" ? "created" : "updated"} successfully.`);
+      setFormOpen(false);
+    } catch (err) {
+      setFormError(getApiErrorMessage(err));
+    } finally {
+      setIsFormSubmitting(false);
     }
   };
 
@@ -608,12 +792,18 @@ export default function AdminUsersPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6">
-      <div>
-        <p className="text-xs font-bold uppercase tracking-[0.08em] text-leaf">SUPER_ADMIN</p>
-        <h1 className="mt-1 font-display text-xl font-bold text-ink">Users management</h1>
-        <p className="mt-1 text-sm font-semibold text-ink/45">
-          Search, filter, review, and manage BizTrack user access.
-        </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.08em] text-leaf">SUPER_ADMIN</p>
+          <h1 className="mt-1 font-display text-xl font-bold text-ink">Users management</h1>
+          <p className="mt-1 text-sm font-semibold text-ink/45">
+            Add, edit, assign roles, view, and remove BizTrack user access.
+          </p>
+        </div>
+        <button onClick={openCreateForm} className="inline-flex items-center justify-center gap-2 rounded-lg bg-leaf px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-leaf/90">
+          <Plus size={16} />
+          Add user
+        </button>
       </div>
 
       <div className="mt-4 grid gap-2 rounded-lg border border-ink/10 bg-white p-3 shadow-sm sm:grid-cols-[minmax(0,1fr)_160px_160px]">
@@ -683,6 +873,7 @@ export default function AdminUsersPage() {
                           user={adminUser}
                           currentUserId={currentUser?.id}
                           onView={openDetails}
+                          onEdit={openEditForm}
                           onRequestAction={requestAction}
                         />
                       </TableCell>
@@ -736,6 +927,7 @@ export default function AdminUsersPage() {
                       user={adminUser}
                       currentUserId={currentUser?.id}
                       onView={openDetails}
+                      onEdit={openEditForm}
                       onRequestAction={requestAction}
                     />
                   </div>
@@ -776,6 +968,18 @@ export default function AdminUsersPage() {
           isLoading={isDetailsLoading}
           error={detailsError}
           onClose={() => setDetailsOpen(false)}
+        />
+      )}
+
+      {formOpen && (
+        <UserFormModal
+          mode={formMode}
+          form={form}
+          isSubmitting={isFormSubmitting}
+          error={formError}
+          onChange={setForm}
+          onClose={() => setFormOpen(false)}
+          onSubmit={submitForm}
         />
       )}
     </div>

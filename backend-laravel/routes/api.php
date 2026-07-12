@@ -324,7 +324,9 @@ Route::middleware('jwt.auth')->group(function () {
 
         // Users
         Route::get('/users', [AdminController::class, 'listUsers']);
+        Route::post('/users', [AdminController::class, 'createUser']);
         Route::get('/users/{id}', [AdminController::class, 'getUserDetails']);
+        Route::put('/users/{id}', [AdminController::class, 'updateUser']);
         Route::patch('/users/{id}/status', [AdminController::class, 'updateUserStatus']);
         Route::patch('/users/{id}/role', [AdminController::class, 'updateUserRole']);
         Route::delete('/users/{id}', [AdminController::class, 'deleteUser']);

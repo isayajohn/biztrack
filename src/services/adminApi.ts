@@ -37,6 +37,15 @@ export type AdminUser = {
   updatedAt: string;
 };
 
+export type AdminUserPayload = {
+  name: string;
+  email: string;
+  phone?: string | null;
+  password?: string;
+  role: AdminRole;
+  status: AdminStatus;
+};
+
 export type AdminBusiness = {
   id: string;
   name: string;
@@ -1040,6 +1049,14 @@ export async function getAdminUsers(search = "") {
 
 export async function getAdminUser(id: string) {
   return normalizeAdminUser(unwrap<ApiAdminUser>(await apiClient.get(`/admin/users/${id}`)));
+}
+
+export async function createAdminUser(payload: AdminUserPayload) {
+  return normalizeAdminUser(unwrap<ApiAdminUser>(await apiClient.post("/admin/users", payload)));
+}
+
+export async function updateAdminUser(id: string, payload: Partial<AdminUserPayload>) {
+  return normalizeAdminUser(unwrap<ApiAdminUser>(await apiClient.put(`/admin/users/${id}`, payload)));
 }
 
 export async function updateAdminUserStatus(id: string, status: AdminStatus) {

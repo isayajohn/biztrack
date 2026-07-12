@@ -1,47 +1,31 @@
 import { useEffect, useMemo, useState } from "react";
 import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Legend,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-import {
   AlertCircle,
-  BarChart3,
-  Boxes,
   Building2,
   CheckCircle2,
-  CircleDollarSign,
-  Clock3,
+  Package,
   RefreshCcw,
+  Settings,
   ShieldAlert,
   Store,
+  TrendingUp,
+  UserPlus,
   Users,
-  WalletCards,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { LucideIcon } from "lucide-react";
-import StatCard from "../../components/dashboard/StatCard";
-import { AnimatedIcon, MotionItem, MotionList, MotionPanel } from "../../components/animate-ui/MotionPrimitives";
+import { AnimatedIcon } from "../../components/animate-ui/MotionPrimitives";
 import { getAdminStats } from "../../services/adminApi";
-import type { AdminRole, AdminStatus, AdminUser, PlatformStats } from "../../services/adminApi";
+import type { AdminRole, AdminStatus, PlatformStats } from "../../services/adminApi";
 import { getApiErrorMessage } from "../../services/apiClient";
-import { formatCurrency } from "../../utils/format";
 
 type SummaryMetric = {
   label: string;
   value: string;
   helper: string;
-};
-
-type TooltipEntry = {
-  name?: string;
-  value?: number | string;
-  color?: string;
+  icon: LucideIcon;
+  tone: "emerald" | "orange" | "violet";
+  progress?: number;
 };
 
 function formatDate(value?: string | null) {
@@ -57,179 +41,175 @@ function formatPercent(value: number) {
   return `${Math.round(value)}%`;
 }
 
-function formatCompactCurrency(value: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    notation: "compact",
-    maximumFractionDigits: 1,
-  }).format(value);
-}
-
 function getStatusBadgeClass(status: AdminStatus) {
   return status === "ACTIVE"
-    ? "border-leaf/20 bg-mint text-leaf"
-    : "border-clay/20 bg-orange-50 text-clay";
+    ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+    : "border-orange-200 bg-orange-50 text-orange-700";
 }
 
 function getRoleBadgeClass(role: AdminRole) {
   return role === "SUPER_ADMIN"
-    ? "border-leaf/20 bg-mint text-leaf"
-    : "border-ink/10 bg-[#eef8f4] text-ink/60";
+    ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+    : "border-ink/10 bg-[#f7faf9] text-ink/60";
 }
 
 function isStatsEmpty(stats: PlatformStats) {
   return (
     stats.totalUsers === 0 &&
     stats.totalBusinesses === 0 &&
-    stats.totalProducts === 0 &&
-    stats.totalSalesAmount === 0 &&
-    stats.totalExpensesAmount === 0 &&
     stats.recentUsers.length === 0 &&
     stats.recentBusinesses.length === 0
   );
 }
 
-function SectionHeader({
+function Sparkline({ tone }: { tone: "blue" | "emerald" | "orange" | "violet" }) {
+  const color = {
+    blue: "#2563eb",
+    emerald: "#059669",
+    orange: "#ea580c",
+    violet: "#7c3aed",
+  }[tone];
+
+  return (
+    <svg className="h-8 w-28" viewBox="0 0 112 32" aria-hidden="true">
+      <polyline
+        points={tone === "orange" ? "0,24 18,24 36,24 54,24 72,24 90,24 112,24" : "0,26 16,19 32,21 48,13 64,17 80,8 96,14 112,4"}
+        fill="none"
+        stroke={color}
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function AdminKpiCard({
+  label,
+  value,
+  icon: Icon,
+  iconClass,
+  trend,
+  sparkTone,
+  loading,
+}: {
+  label: string;
+  value: string;
+  icon: LucideIcon;
+  iconClass: string;
+  trend: string;
+  sparkTone: "blue" | "emerald" | "orange" | "violet";
+  loading?: boolean;
+}) {
+  return (
+    <section className="min-h-[9rem] rounded-xl border border-ink/10 bg-white p-5 shadow-sm">
+      {loading ? (
+        <div className="animate-pulse space-y-4">
+          <div className="h-11 w-11 rounded-lg bg-ink/8" />
+          <div className="h-4 w-28 rounded-full bg-ink/8" />
+          <div className="h-7 w-10 rounded-full bg-ink/8" />
+        </div>
+      ) : (
+        <>
+          <div className="flex items-start gap-4">
+            <span className={`grid h-11 w-11 place-items-center rounded-lg ${iconClass}`}>
+              <AnimatedIcon icon={Icon} size={19} />
+            </span>
+            <div>
+              <p className="text-sm font-semibold text-ink/70">{label}</p>
+              <p className="mt-2 font-display text-2xl font-bold text-ink">{value}</p>
+            </div>
+          </div>
+          <div className="mt-7 flex items-end justify-between gap-3">
+            <p className="text-xs font-semibold text-ink/50">
+              <span className="font-bold text-emerald-700">↑ {trend}</span> vs last month
+            </p>
+            <Sparkline tone={sparkTone} />
+          </div>
+        </>
+      )}
+    </section>
+  );
+}
+
+function EmptyTableState({ icon: Icon, title, subtitle }: { icon: LucideIcon; title: string; subtitle: string }) {
+  return (
+    <div className="grid min-h-44 place-items-center px-5 py-8 text-center">
+      <div>
+        <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-ink/5 text-ink/45">
+          <Icon size={22} />
+        </span>
+        <p className="mt-4 text-sm font-bold text-ink">{title}</p>
+        <p className="mt-2 text-sm font-semibold text-ink/45">{subtitle}</p>
+      </div>
+    </div>
+  );
+}
+
+function PanelHeader({ title, icon: Icon, to }: { title: string; icon: LucideIcon; to: string }) {
+  return (
+    <div className="flex items-center justify-between border-b border-ink/10 px-5 py-4">
+      <div className="flex items-center gap-2">
+        <Icon size={16} className="text-ink/55" />
+        <h2 className="font-display text-sm font-bold text-ink">{title}</h2>
+      </div>
+      <Link to={to} className="text-xs font-bold text-ink/55 hover:text-emerald-700">View all</Link>
+    </div>
+  );
+}
+
+function SummaryCard({ metric }: { metric: SummaryMetric }) {
+  const toneClass = {
+    emerald: "bg-emerald-50 text-emerald-700",
+    orange: "bg-orange-50 text-orange-700",
+    violet: "bg-violet-50 text-violet-700",
+  }[metric.tone];
+  const barClass = {
+    emerald: "bg-emerald-500",
+    orange: "bg-orange-500",
+    violet: "bg-violet-500",
+  }[metric.tone];
+
+  return (
+    <div className="rounded-xl border border-ink/10 bg-gradient-to-br from-white to-[#f7faf9] p-5">
+      <span className={`grid h-11 w-11 place-items-center rounded-lg ${toneClass}`}>
+        <metric.icon size={18} />
+      </span>
+      <p className="mt-4 text-sm font-semibold text-ink/65">{metric.label}</p>
+      <p className="mt-2 font-display text-2xl font-bold text-ink">{metric.value}</p>
+      {metric.progress !== undefined && (
+        <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-ink/8">
+          <div className={`h-full rounded-full ${barClass}`} style={{ width: `${metric.progress}%` }} />
+        </div>
+      )}
+      <p className="mt-4 text-sm font-semibold text-ink/50">{metric.helper}</p>
+    </div>
+  );
+}
+
+function QuickAction({
+  to,
+  icon: Icon,
   title,
   subtitle,
-  icon: Icon,
+  tone,
 }: {
-  title: string;
-  subtitle?: string;
+  to: string;
   icon: LucideIcon;
+  title: string;
+  subtitle: string;
+  tone: string;
 }) {
   return (
-    <div className="flex items-start justify-between gap-3">
-      <div className="flex min-w-0 items-center gap-2">
-        <span className="shrink-0 text-ink/40">
-          <AnimatedIcon icon={Icon} size={16} />
-        </span>
-        <h2 className="truncate text-sm font-bold text-ink">{title}</h2>
-      </div>
-      {subtitle && <span className="shrink-0 text-xs font-semibold text-ink/40">{subtitle}</span>}
-    </div>
-  );
-}
-
-function EmptyState({ message, icon: Icon }: { message: string; icon: LucideIcon }) {
-  return (
-    <div className="flex min-h-36 flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-ink/15 bg-[#f7faf9] px-4 py-8 text-center">
-      <AnimatedIcon icon={Icon} size={24} className="text-ink/25" />
-      <p className="max-w-xs text-sm font-semibold leading-6 text-ink/45">{message}</p>
-    </div>
-  );
-}
-
-function ListSkeleton() {
-  return (
-    <div className="mt-3 animate-pulse divide-y divide-ink/8">
-      {Array.from({ length: 5 }).map((_, index) => (
-        <div key={index} className="flex items-center justify-between gap-3 py-3">
-          <div className="min-w-0 flex-1 space-y-2">
-            <div className="h-3 w-32 rounded-full bg-ink/8" />
-            <div className="h-2.5 w-44 max-w-full rounded-full bg-ink/8" />
-          </div>
-          <div className="h-6 w-20 rounded-full bg-ink/8" />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function SummarySkeleton() {
-  return (
-    <div className="mt-4 grid animate-pulse gap-3 sm:grid-cols-2">
-      {Array.from({ length: 4 }).map((_, index) => (
-        <div key={index} className="rounded-lg border border-ink/10 bg-[#f7faf9] p-3">
-          <div className="h-2.5 w-24 rounded-full bg-ink/8" />
-          <div className="mt-3 h-6 w-20 rounded-full bg-ink/8" />
-          <div className="mt-2 h-2.5 w-36 rounded-full bg-ink/8" />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function ChartSkeleton() {
-  return (
-    <div className="mt-5 flex h-[260px] animate-pulse items-end gap-5 px-6">
-      {[72, 48].map((height, index) => (
-        <div key={index} className="flex flex-1 items-end justify-center">
-          <div className="w-full max-w-32 rounded-t-lg bg-ink/8" style={{ height: `${height}%` }} />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function SalesExpensesTooltip({
-  active,
-  payload,
-}: {
-  active?: boolean;
-  payload?: TooltipEntry[];
-}) {
-  if (!active || !payload?.length) return null;
-
-  return (
-    <div className="rounded-xl border border-ink/10 bg-white px-3.5 py-3 shadow-soft">
-      <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-ink/45">
-        Platform totals
-      </p>
-      {payload.map((entry) => (
-        <p key={entry.name} className="text-sm font-bold" style={{ color: entry.color }}>
-          {entry.name}:{" "}
-          <span className="font-extrabold">
-            {formatCurrency(Number(entry.value ?? 0))}
-          </span>
-        </p>
-      ))}
-    </div>
-  );
-}
-
-function RecentUserRow({ user }: { user: AdminUser }) {
-  return (
-    <MotionItem className="flex items-center justify-between gap-3 py-3">
-      <div className="min-w-0">
-        <Link
-          to={`/admin/users/${user.id}`}
-          className="block truncate text-sm font-extrabold text-ink transition-colors hover:text-leaf"
-        >
-          {user.name}
-        </Link>
-        <p className="truncate text-xs font-semibold text-ink/45">
-          {user.email} · Joined {formatDate(user.createdAt)}
-        </p>
-      </div>
-      <div className="flex shrink-0 flex-col items-end gap-1">
-        <span
-          className={`inline-flex rounded-full border px-2 py-1 text-[10px] font-extrabold ${getStatusBadgeClass(
-            user.status,
-          )}`}
-        >
-          {user.status}
-        </span>
-        <span
-          className={`inline-flex rounded-full border px-2 py-1 text-[10px] font-extrabold ${getRoleBadgeClass(
-            user.role,
-          )}`}
-        >
-          {user.role}
-        </span>
-      </div>
-    </MotionItem>
-  );
-}
-
-function SummaryMetricCard({ metric }: { metric: SummaryMetric }) {
-  return (
-    <MotionPanel className="rounded-lg border border-ink/10 bg-[#f7faf9] p-3">
-      <p className="text-xs font-semibold text-ink/45">{metric.label}</p>
-      <p className="mt-1 text-xl font-extrabold tracking-tight text-ink">{metric.value}</p>
-      <p className="mt-1 text-xs font-semibold leading-5 text-ink/45">{metric.helper}</p>
-    </MotionPanel>
+    <Link to={to} className="flex items-center gap-4 rounded-xl border border-ink/10 bg-white p-4 transition-colors hover:bg-emerald-50/60">
+      <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-lg ${tone}`}>
+        <Icon size={18} />
+      </span>
+      <span className="min-w-0">
+        <span className="block font-display text-sm font-bold text-ink">{title}</span>
+        <span className="mt-1 block truncate text-xs font-semibold text-ink/50">{subtitle}</span>
+      </span>
+    </Link>
   );
 }
 
@@ -250,7 +230,6 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     let alive = true;
-
     setIsLoading(true);
     setError("");
     getAdminStats()
@@ -269,13 +248,9 @@ export default function AdminDashboard() {
     };
   }, []);
 
-  const activeRate =
-    stats && stats.totalUsers > 0 ? (stats.activeUsers / stats.totalUsers) * 100 : 0;
-  const suspendedRate =
-    stats && stats.totalUsers > 0 ? (stats.suspendedUsers / stats.totalUsers) * 100 : 0;
-  const netAmount = (stats?.totalSalesAmount ?? 0) - (stats?.totalExpensesAmount ?? 0);
-  const productsPerBusiness =
-    stats && stats.totalBusinesses > 0 ? stats.totalProducts / stats.totalBusinesses : 0;
+  const activeRate = stats && stats.totalUsers > 0 ? (stats.activeUsers / stats.totalUsers) * 100 : 0;
+  const suspendedRate = stats && stats.totalUsers > 0 ? (stats.suspendedUsers / stats.totalUsers) * 100 : 0;
+  const showEmptyPlatform = stats ? isStatsEmpty(stats) : false;
 
   const summaryMetrics = useMemo<SummaryMetric[]>(() => {
     if (!stats) return [];
@@ -285,80 +260,56 @@ export default function AdminDashboard() {
         label: "Active user rate",
         value: formatPercent(activeRate),
         helper: `${stats.activeUsers} of ${stats.totalUsers} users active`,
+        icon: Users,
+        tone: "emerald",
+        progress: activeRate,
       },
       {
         label: "Suspension rate",
         value: formatPercent(suspendedRate),
         helper: `${stats.suspendedUsers} suspended accounts`,
+        icon: ShieldAlert,
+        tone: "orange",
+        progress: suspendedRate,
       },
       {
-        label: "Net sales after expenses",
-        value: formatCurrency(netAmount),
-        helper: netAmount >= 0 ? "Sales are above expenses" : "Expenses are above sales",
-      },
-      {
-        label: "Products per business",
-        value: productsPerBusiness.toFixed(1),
-        helper: `${stats.totalProducts} products across ${stats.totalBusinesses} businesses`,
+        label: "Businesses on platform",
+        value: String(stats.totalBusinesses),
+        helper: "Registered businesses managed by super admin",
+        icon: Building2,
+        tone: "violet",
       },
     ];
-  }, [activeRate, netAmount, productsPerBusiness, stats, suspendedRate]);
-
-  const chartData = useMemo(
-    () => [
-      {
-        label: "Platform",
-        sales: stats?.totalSalesAmount ?? 0,
-        expenses: stats?.totalExpensesAmount ?? 0,
-      },
-    ],
-    [stats],
-  );
-
-  const hasChartData = chartData.some((row) => row.sales > 0 || row.expenses > 0);
-  const hasStats = Boolean(stats);
-  const showEmptyPlatform = stats ? isStatsEmpty(stats) : false;
+  }, [activeRate, stats, suspendedRate]);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div className="mx-auto max-w-[94rem] px-5 py-7 sm:px-7">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.08em] text-leaf">
-            SUPER_ADMIN
-          </p>
-          <h1 className="mt-1 font-display text-xl font-bold text-ink">
-            BizTrack Dashboard
-          </h1>
-          <p className="mt-1 text-sm font-semibold text-ink/45">
-            Platform-wide users, businesses, sales, expenses, and products.
-          </p>
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-700">SUPER ADMIN</p>
+          <h1 className="mt-2 font-display text-3xl font-bold text-ink">BizTrack Dashboard</h1>
+          <p className="mt-2 text-sm font-semibold text-ink/55">Manage users, businesses, packages, website content, and system settings.</p>
         </div>
         <button
           type="button"
           onClick={loadStats}
           disabled={isLoading}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-ink/10 bg-white px-3 py-2 text-xs font-bold text-ink/65 shadow-sm transition-colors hover:bg-mint hover:text-leaf disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+          className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-ink/10 bg-white px-5 text-sm font-bold text-ink/65 shadow-sm transition-colors hover:bg-emerald-50 hover:text-emerald-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
         >
           <span className={isLoading ? "animate-spin" : ""}>
-            <AnimatedIcon icon={RefreshCcw} size={14} />
+            <AnimatedIcon icon={RefreshCcw} size={15} />
           </span>
           Refresh
         </button>
       </div>
 
       {error && (
-        <div className="mt-4 flex flex-col gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-5 flex flex-col gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-2">
-            <span className="mt-0.5 shrink-0">
-              <AnimatedIcon icon={AlertCircle} size={17} />
-            </span>
+            <AnimatedIcon icon={AlertCircle} size={17} />
             <span>{error}</span>
           </div>
-          <button
-            type="button"
-            onClick={loadStats}
-            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-2 text-xs font-extrabold text-red-600"
-          >
+          <button type="button" onClick={loadStats} className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-2 text-xs font-extrabold text-red-600">
             <AnimatedIcon icon={RefreshCcw} size={13} />
             Retry
           </button>
@@ -366,211 +317,102 @@ export default function AdminDashboard() {
       )}
 
       {!isLoading && !error && showEmptyPlatform && (
-        <div className="mt-4 rounded-xl border border-ink/10 bg-white px-4 py-3 text-sm font-semibold text-ink/50 shadow-sm">
+        <div className="mt-5 rounded-xl border border-ink/10 bg-white px-4 py-3 text-sm font-semibold text-ink/50 shadow-sm">
           No platform activity has been recorded yet.
         </div>
       )}
 
-      <section className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3 xl:grid-cols-4">
-        <StatCard
-          label="Total users"
-          value={String(stats?.totalUsers ?? 0)}
-          icon={Users}
-          iconClass="bg-sky-50 text-sky-700"
-          loading={isLoading}
-        />
-        <StatCard
-          label="Active users"
-          value={String(stats?.activeUsers ?? 0)}
-          icon={CheckCircle2}
-          iconClass="bg-mint text-leaf"
-          loading={isLoading}
-        />
-        <StatCard
-          label="Suspended users"
-          value={String(stats?.suspendedUsers ?? 0)}
-          icon={ShieldAlert}
-          iconClass="bg-orange-50 text-clay"
-          loading={isLoading}
-        />
-        <StatCard
-          label="Total businesses"
-          value={String(stats?.totalBusinesses ?? 0)}
-          icon={Building2}
-          iconClass="bg-amber-50 text-amber-700"
-          loading={isLoading}
-        />
-        <StatCard
-          label="Total sales amount"
-          value={formatCurrency(stats?.totalSalesAmount ?? 0)}
-          icon={CircleDollarSign}
-          iconClass="bg-mint text-leaf"
-          loading={isLoading}
-          profitColor="positive"
-        />
-        <StatCard
-          label="Total expenses amount"
-          value={formatCurrency(stats?.totalExpensesAmount ?? 0)}
-          icon={WalletCards}
-          iconClass="bg-orange-50 text-clay"
-          loading={isLoading}
-        />
-        <StatCard
-          label="Total products"
-          value={String(stats?.totalProducts ?? 0)}
-          icon={Boxes}
-          iconClass="bg-[#eef8f4] text-ink/65"
-          loading={isLoading}
-        />
+      <section className="mt-7 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <AdminKpiCard label="Total users" value={String(stats?.totalUsers ?? 0)} icon={Users} iconClass="bg-blue-50 text-blue-700" trend="100%" sparkTone="blue" loading={isLoading} />
+        <AdminKpiCard label="Active users" value={String(stats?.activeUsers ?? 0)} icon={CheckCircle2} iconClass="bg-emerald-50 text-emerald-700" trend="100%" sparkTone="emerald" loading={isLoading} />
+        <AdminKpiCard label="Suspended users" value={String(stats?.suspendedUsers ?? 0)} icon={ShieldAlert} iconClass="bg-orange-50 text-orange-700" trend="0%" sparkTone="orange" loading={isLoading} />
+        <AdminKpiCard label="Total businesses" value={String(stats?.totalBusinesses ?? 0)} icon={Building2} iconClass="bg-violet-50 text-violet-700" trend="100%" sparkTone="violet" loading={isLoading} />
       </section>
 
-      {!isLoading && !error && !hasStats && (
-        <div className="mt-5">
-          <EmptyState message="No admin stats are available." icon={AlertCircle} />
-        </div>
-      )}
-
       <div className="mt-5 grid gap-5 xl:grid-cols-2">
-        <section className="rounded-xl border border-ink/10 bg-white p-4 shadow-sm">
-          <SectionHeader
-            title="Recent users"
-            subtitle={stats ? `${stats.recentUsers.length} latest` : undefined}
-            icon={Users}
-          />
+        <section className="overflow-hidden rounded-xl border border-ink/10 bg-white shadow-sm">
+          <PanelHeader title="Recent users" icon={Users} to="/admin/users" />
+          <div className="grid grid-cols-[1.1fr_1.2fr_0.8fr_0.8fr] border-b border-ink/10 bg-white px-5 py-3 text-xs font-semibold text-ink/55">
+            <span>User</span>
+            <span>Email</span>
+            <span>Status</span>
+            <span>Joined</span>
+          </div>
           {isLoading ? (
-            <ListSkeleton />
+            <div className="animate-pulse px-5 py-8">
+              <div className="h-4 w-2/3 rounded-full bg-ink/8" />
+            </div>
           ) : stats?.recentUsers.length ? (
-            <MotionList className="mt-3 divide-y divide-ink/8" role="list">
+            <div className="divide-y divide-ink/8">
               {stats.recentUsers.map((user) => (
-                <RecentUserRow key={user.id} user={user} />
+                <div key={user.id} className="grid grid-cols-[1.1fr_1.2fr_0.8fr_0.8fr] items-center gap-3 px-5 py-3 text-sm">
+                  <Link to={`/admin/users/${user.id}`} className="truncate font-bold text-ink hover:text-emerald-700">{user.name}</Link>
+                  <span className="truncate text-ink/55">{user.email}</span>
+                  <span className="flex flex-wrap gap-1">
+                    <span className={`inline-flex rounded-full border px-2 py-1 text-[10px] font-extrabold ${getStatusBadgeClass(user.status)}`}>{user.status}</span>
+                    <span className={`inline-flex rounded-full border px-2 py-1 text-[10px] font-extrabold ${getRoleBadgeClass(user.role)}`}>{user.role}</span>
+                  </span>
+                  <span className="text-xs font-semibold text-ink/50">{formatDate(user.createdAt)}</span>
+                </div>
               ))}
-            </MotionList>
-          ) : (
-            <div className="mt-4">
-              <EmptyState message="No recent users found." icon={Users} />
             </div>
+          ) : (
+            <EmptyTableState icon={Users} title="No recent users found." subtitle="Newly registered users will appear here." />
           )}
         </section>
 
-        <section className="rounded-xl border border-ink/10 bg-white p-4 shadow-sm">
-          <SectionHeader
-            title="Recent businesses"
-            subtitle={stats ? `${stats.recentBusinesses.length} latest` : undefined}
-            icon={Store}
-          />
+        <section className="overflow-hidden rounded-xl border border-ink/10 bg-white shadow-sm">
+          <PanelHeader title="Recent businesses" icon={Store} to="/admin/businesses" />
+          <div className="grid grid-cols-[1.1fr_1fr_0.8fr_0.8fr] border-b border-ink/10 bg-white px-5 py-3 text-xs font-semibold text-ink/55">
+            <span>Business</span>
+            <span>Owner</span>
+            <span>Status</span>
+            <span>Registered</span>
+          </div>
           {isLoading ? (
-            <ListSkeleton />
+            <div className="animate-pulse px-5 py-8">
+              <div className="h-4 w-2/3 rounded-full bg-ink/8" />
+            </div>
           ) : stats?.recentBusinesses.length ? (
-            <MotionList className="mt-3 divide-y divide-ink/8" role="list">
+            <div className="divide-y divide-ink/8">
               {stats.recentBusinesses.map((business) => (
-                <MotionItem key={business.id} className="flex items-center justify-between gap-3 py-3">
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-extrabold text-ink">{business.name}</p>
-                    <p className="truncate text-xs font-semibold text-ink/45">
-                      {business.user.name} · {business.country} · {business.currency}
-                    </p>
-                  </div>
-                  <div className="grid shrink-0 grid-cols-3 overflow-hidden rounded-lg border border-ink/10 bg-[#f7faf9] text-center">
-                    <div className="min-w-12 px-2 py-1.5">
-                      <p className="text-[10px] font-bold text-ink/35">P</p>
-                      <p className="text-xs font-extrabold text-ink">{business._count.products}</p>
-                    </div>
-                    <div className="min-w-12 border-x border-ink/10 px-2 py-1.5">
-                      <p className="text-[10px] font-bold text-ink/35">S</p>
-                      <p className="text-xs font-extrabold text-leaf">{business._count.sales}</p>
-                    </div>
-                    <div className="min-w-12 px-2 py-1.5">
-                      <p className="text-[10px] font-bold text-ink/35">E</p>
-                      <p className="text-xs font-extrabold text-clay">{business._count.expenses}</p>
-                    </div>
-                  </div>
-                </MotionItem>
+                <div key={business.id} className="grid grid-cols-[1.1fr_1fr_0.8fr_0.8fr] items-center gap-3 px-5 py-3 text-sm">
+                  <Link to={`/admin/businesses/${business.id}`} className="truncate font-bold text-ink hover:text-emerald-700">{business.name}</Link>
+                  <span className="truncate text-ink/55">{business.user.name}</span>
+                  <span className="inline-flex w-fit rounded-full border border-emerald-200 bg-emerald-50 px-2 py-1 text-[10px] font-extrabold text-emerald-700">ACTIVE</span>
+                  <span className="text-xs font-semibold text-ink/50">{formatDate(business.createdAt)}</span>
+                </div>
               ))}
-            </MotionList>
-          ) : (
-            <div className="mt-4">
-              <EmptyState message="No recent businesses found." icon={Store} />
             </div>
+          ) : (
+            <EmptyTableState icon={Store} title="No recent businesses found." subtitle="Newly registered businesses will appear here." />
           )}
         </section>
       </div>
 
-      <div className="mt-5 grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
-        <section className="rounded-xl border border-ink/10 bg-white p-4 shadow-sm">
-          <SectionHeader title="Platform activity summary" icon={Clock3} />
+      <section className="mt-5 rounded-xl border border-ink/10 bg-white p-5 shadow-sm">
+        <div className="flex items-center gap-2">
+          <TrendingUp size={16} className="text-ink/55" />
+          <h2 className="font-display text-sm font-bold text-ink">Admin activity summary</h2>
+        </div>
+        <div className="mt-5 grid gap-4 lg:grid-cols-3">
           {isLoading ? (
-            <SummarySkeleton />
-          ) : stats ? (
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              {summaryMetrics.map((metric) => (
-                <SummaryMetricCard key={metric.label} metric={metric} />
-              ))}
-            </div>
+            Array.from({ length: 3 }).map((_, index) => <div key={index} className="h-36 animate-pulse rounded-xl bg-ink/8" />)
           ) : (
-            <div className="mt-4">
-              <EmptyState message="No activity summary available." icon={Clock3} />
-            </div>
+            summaryMetrics.map((metric) => <SummaryCard key={metric.label} metric={metric} />)
           )}
-        </section>
+        </div>
+      </section>
 
-        <section className="rounded-xl border border-ink/10 bg-white p-4 shadow-sm">
-          <SectionHeader title="Sales vs expenses overview chart" icon={BarChart3} />
-          {isLoading ? (
-            <ChartSkeleton />
-          ) : hasChartData ? (
-            <div className="mt-4 h-[280px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={chartData}
-                  margin={{ top: 8, right: 4, left: 0, bottom: 0 }}
-                  barCategoryGap="40%"
-                  barGap={8}
-                >
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke="rgba(23,33,27,0.08)"
-                    vertical={false}
-                  />
-                  <XAxis
-                    dataKey="label"
-                    tick={{ fontSize: 11, fill: "rgba(23,33,27,0.45)", fontFamily: "Open Sans" }}
-                    axisLine={false}
-                    tickLine={false}
-                    tickMargin={8}
-                  />
-                  <YAxis
-                    tick={{ fontSize: 11, fill: "rgba(23,33,27,0.45)", fontFamily: "Open Sans" }}
-                    axisLine={false}
-                    tickLine={false}
-                    width={58}
-                    tickFormatter={(value) => formatCompactCurrency(Number(value))}
-                  />
-                  <Tooltip
-                    content={<SalesExpensesTooltip />}
-                    cursor={{ fill: "rgba(23,33,27,0.04)", radius: 4 } as object}
-                  />
-                  <Legend
-                    iconType="circle"
-                    iconSize={8}
-                    wrapperStyle={{
-                      fontSize: 12,
-                      fontWeight: 700,
-                      paddingTop: 14,
-                      fontFamily: "Open Sans",
-                    }}
-                  />
-                  <Bar dataKey="sales" name="Sales" fill="#12b890" radius={[5, 5, 0, 0]} />
-                  <Bar dataKey="expenses" name="Expenses" fill="#c86b3c" radius={[5, 5, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          ) : (
-            <div className="mt-4">
-              <EmptyState message="No sales or expenses recorded yet." icon={BarChart3} />
-            </div>
-          )}
-        </section>
-      </div>
+      <section className="mt-5 rounded-xl border border-ink/10 bg-white p-5 shadow-sm">
+        <h2 className="font-display text-sm font-bold text-ink">Quick actions</h2>
+        <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <QuickAction to="/admin/users" icon={UserPlus} title="Add New User" subtitle="Create a new platform user" tone="bg-emerald-50 text-emerald-700" />
+          <QuickAction to="/admin/businesses" icon={Building2} title="Add New Business" subtitle="Register a new business" tone="bg-blue-50 text-blue-700" />
+          <QuickAction to="/admin/packages/new" icon={Package} title="Create Package" subtitle="Add a new subscription package" tone="bg-orange-50 text-orange-700" />
+          <QuickAction to="/admin/settings" icon={Settings} title="System Settings" subtitle="Manage platform settings" tone="bg-violet-50 text-violet-700" />
+        </div>
+      </section>
     </div>
   );
 }

@@ -1,10 +1,16 @@
-  import { LogOut, ShieldCheck } from "lucide-react";
+import { ChevronDown, LogOut, ShieldCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
+
+function initials(name?: string) {
+  const parts = (name ?? "Admin").trim().split(/\s+/).filter(Boolean);
+  return parts.slice(0, 2).map((part) => part[0]?.toUpperCase()).join("") || "A";
+}
 
 export default function AdminTopbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const roleLabel = user?.role === "SUPER_ADMIN" ? "Super Admin" : (user?.role ?? "Admin");
 
   const handleLogout = () => {
     logout();
@@ -12,32 +18,38 @@ export default function AdminTopbar() {
   };
 
   return (
-    <header className="sticky top-0 z-20 border-b border-ink/10 bg-white/95 px-4 shadow-sm backdrop-blur lg:px-6">
-      <div className="flex h-16 items-center justify-between gap-3">
+    <header className="sticky top-0 z-20 border-b border-ink/10 bg-white px-4 shadow-sm lg:px-6">
+      <div className="flex h-14 items-center justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-[#111814] text-white lg:hidden">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-emerald-50 text-emerald-700 lg:hidden">
               <ShieldCheck size={16} aria-hidden="true" />
             </span>
             <div className="min-w-0">
-              <p className="truncate font-display text-base font-extrabold text-ink sm:text-lg">
+              <p className="truncate font-display text-base font-bold text-ink">
                 BizTrack Admin
               </p>
               <p className="truncate text-xs font-semibold text-ink/45">
-                {user?.name ?? "Admin"} · {user?.role ?? "SUPER_ADMIN"}
+                Platform management
               </p>
             </div>
           </div>
         </div>
 
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 items-center gap-3">
+          <div className="flex items-center gap-2 rounded-full px-1.5 pr-2">
+            <span className="grid h-9 w-9 place-items-center rounded-full bg-ink/5 text-xs font-bold text-ink/65">
+              {initials(user?.name)}
+            </span>
+            <span className="hidden text-sm font-bold text-ink sm:inline">{roleLabel}</span>
+            <ChevronDown size={16} className="hidden text-ink/45 sm:block" aria-hidden="true" />
+          </div>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-1.5 rounded-lg border border-ink/10 bg-[#f7faf9] px-3 py-2 text-xs font-bold text-ink/65 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-clay"
+            className="grid h-10 w-10 place-items-center rounded-full text-ink/45 transition-colors hover:bg-red-50 hover:text-clay"
             aria-label="Log out"
           >
-            <LogOut size={14} aria-hidden="true" />
-            <span className="hidden sm:inline">Logout</span>
+            <LogOut size={16} aria-hidden="true" />
           </button>
         </div>
       </div>

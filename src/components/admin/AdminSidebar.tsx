@@ -2,20 +2,22 @@ import { ShieldCheck } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { ADMIN_NAV_GROUPS } from "../../constants/adminNav";
 import { AnimatedIcon } from "../animate-ui/MotionPrimitives";
-import BrandLogo from "../BrandLogo";
 
 export default function AdminSidebar() {
   return (
-    <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-ink/10 bg-[#111814] text-white lg:flex lg:flex-col">
-      <div className="flex h-16 shrink-0 items-center gap-3 border-b border-white/10 px-5">
-        <BrandLogo className="h-auto w-36 max-w-full" variant="dark" />
-        <div className="min-w-0">
-          <p className="text-xs font-semibold text-white/45">SUPER_ADMIN console</p>
+    <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-ink/10 bg-white lg:flex lg:flex-col">
+      <div className="flex h-16 shrink-0 items-center gap-3 border-b border-ink/10 px-5">
+        <img src="/biztrack-logo.png" alt="BizTrack" className="h-9 w-9 rounded-lg object-contain" />
+        <div className="flex min-w-0 items-center gap-2">
+          <p className="font-display text-lg font-bold text-ink">
+            Biz<span className="text-orange-500">Track</span>
+          </p>
+          <span className="rounded-md bg-emerald-50 px-2 py-1 text-[11px] font-extrabold text-emerald-700">Admin</span>
         </div>
       </div>
 
       <div className="overflow-y-auto px-3 py-4">
-        <div className="mb-3 flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.06] px-3 py-2 text-xs font-bold text-white/70">
+        <div className="mb-3 flex items-center gap-2 rounded-lg border border-emerald-100 bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700">
           <AnimatedIcon icon={ShieldCheck} size={15} className="text-leaf" />
           Platform Management
         </div>
@@ -25,7 +27,7 @@ export default function AdminSidebar() {
               <section key={group.label} aria-labelledby={`admin-nav-${group.label.replace(/\W+/g, "-").toLowerCase()}`}>
                 <h2
                   id={`admin-nav-${group.label.replace(/\W+/g, "-").toLowerCase()}`}
-                  className="px-3 pb-2 text-[11px] font-black uppercase tracking-[0.12em] text-white/35"
+                  className="px-3 pb-2 text-[11px] font-black uppercase tracking-[0.12em] text-ink/35"
                 >
                   {group.label}
                 </h2>
@@ -39,8 +41,8 @@ export default function AdminSidebar() {
                           [
                             "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-bold transition-colors",
                             isActive
-                              ? "bg-white text-[#111814]"
-                              : "text-white/62 hover:bg-white/[0.08] hover:text-white",
+                              ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100"
+                              : "text-ink/65 hover:bg-emerald-50/70 hover:text-ink",
                           ].join(" ")
                         }
                       >
@@ -56,9 +58,6 @@ export default function AdminSidebar() {
         </nav>
       </div>
 
-      <div className="mt-auto border-t border-white/10 px-5 py-4">
-        <p className="text-xs font-semibold text-white/35">Admin controls are enforced by the API.</p>
-      </div>
     </aside>
   );
 }

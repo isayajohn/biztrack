@@ -18,6 +18,7 @@ use App\Services\EncryptionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
@@ -478,6 +479,80 @@ class AdminController extends Controller
         if (!$user) return response()->json(['success' => false, 'error' => 'Not found'], 404);
 
         return response()->json(['success' => true, 'data' => $user]);
+    }
+
+    public function createUser(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email',
+            'phone' => 'nullable|string|max:50',
+            'password' => 'required|string|min:8',
+            'role' => 'required|in:USER,SUPER_ADMIN',
+            'status' => 'required|in:ACTIVE,SUSPENDED',
+        ]);
+
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'phone' => $data['phone'] ?? null,
+            'password_hash' => Hash::make($data['password']),
+            'role' => $data['role'],
+            'status' => $data['status'],
+            'email_verified_at' => now(),
+        ]);
+
+        AuditService::log([
+            'actor_id' => auth()->id(),
+            'action' => 'USER_CREATED',
+            'target_type' => 'User',
+            'target_id' => $user->id,
+            'details' => ['role' => $user->role, 'status' => $user->status],
+        ]);
+
+        return response()->json(['success' => true, 'data' => $this->formatAdminUser($user->fresh()->loadCount('businesses'))], 201);
+    }
+
+    public function updateUser(Request $request, string $id): JsonResponse
+    {
+        $user = User::find($id);
+        if (!$user) return response()->json(['success' => false, 'error' => 'Not found'], 404);
+
+        $data = $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'email' => 'sometimes|required|email|max:255|unique:users,email,' . $id,
+            'phone' => 'nullable|string|max:50',
+            'password' => 'nullable|string|min:8',
+            'role' => 'sometimes|required|in:USER,SUPER_ADMIN',
+            'status' => 'sometimes|required|in:ACTIVE,SUSPENDED',
+        ]);
+
+        if ($user->id === auth()->id()) {
+            if (($data['role'] ?? $user->role) !== 'SUPER_ADMIN') {
+                return response()->json(['success' => false, 'error' => 'You cannot remove your own SUPER_ADMIN role'], 400);
+            }
+            if (($data['status'] ?? $user->status) === 'SUSPENDED') {
+                return response()->json(['success' => false, 'error' => 'You cannot suspend your own account'], 400);
+            }
+        }
+
+        $payload = [];
+        foreach (['name', 'email', 'phone', 'role', 'status'] as $field) {
+            if (array_key_exists($field, $data)) $payload[$field] = $data[$field];
+        }
+        if (!empty($data['password'])) $payload['password_hash'] = Hash::make($data['password']);
+
+        $user->update($payload);
+
+        AuditService::log([
+            'actor_id' => auth()->id(),
+            'action' => 'USER_UPDATED',
+            'target_type' => 'User',
+            'target_id' => $id,
+            'details' => array_intersect_key($payload, array_flip(['name', 'email', 'phone', 'role', 'status'])),
+        ]);
+
+        return response()->json(['success' => true, 'data' => $this->formatAdminUser($user->fresh()->loadCount('businesses'))]);
     }
 
     public function updateUserStatus(Request $request, string $id): JsonResponse
