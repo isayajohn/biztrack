@@ -21,19 +21,34 @@ class AdminRestrictedScreen extends StatelessWidget {
               children: [
                 Container(
                   padding: const EdgeInsets.all(28),
-                  decoration: const BoxDecoration(color: kLightGreen, shape: BoxShape.circle),
-                  child: const Icon(Icons.admin_panel_settings_rounded, size: 52, color: kPrimaryGreen),
+                  decoration: const BoxDecoration(
+                    color: kLightGreen,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.admin_panel_settings_rounded,
+                    size: 52,
+                    color: kPrimaryGreen,
+                  ),
                 ),
                 const SizedBox(height: 28),
                 const Text(
                   'Super Admin Account',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: kDark),
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: kDark,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
                 Text(
                   'Hi ${user?.name ?? 'Admin'}, this mobile app is for business owners.\n\nAs a Super Admin, please use the web dashboard to manage businesses, users, subscriptions, and platform settings.',
-                  style: const TextStyle(fontSize: 14, color: kMuted, height: 1.6),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: kMuted,
+                    height: 1.6,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),
@@ -46,14 +61,31 @@ class AdminRestrictedScreen extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.language_rounded, color: kPrimaryGreen, size: 20),
+                      const Icon(
+                        Icons.language_rounded,
+                        color: kPrimaryGreen,
+                        size: 20,
+                      ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('Web Admin Panel', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: kDark)),
-                            Text(kApiBaseUrl.replaceAll('/api', ''), style: const TextStyle(fontSize: 12, color: kMuted)),
+                            const Text(
+                              'Web Admin Panel',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 13,
+                                color: kDark,
+                              ),
+                            ),
+                            Text(
+                              kApiBaseUrl.replaceAll('/api', ''),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: kMuted,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -72,7 +104,9 @@ class AdminRestrictedScreen extends StatelessWidget {
                     foregroundColor: Colors.red,
                     side: const BorderSide(color: Colors.red),
                     minimumSize: const Size.fromHeight(48),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
               ],

@@ -35,7 +35,13 @@ import 'screens/products/products_screen.dart';
 import 'screens/reports/reports_screen.dart';
 import 'screens/sales/sale_form_screen.dart';
 import 'screens/sales/sales_screen.dart';
+import 'screens/sales/pos_screen.dart';
 import 'screens/settings/settings_screen.dart';
+import 'screens/customers/customers_screen.dart';
+import 'screens/management/promotions_screen.dart';
+import 'screens/management/organization_screen.dart';
+import 'screens/reports/advanced_reports_screen.dart';
+import 'screens/inventory/inventory_management_screen.dart';
 import 'screens/admin_restricted_screen.dart';
 import 'screens/splash_screen.dart';
 
@@ -73,9 +79,8 @@ class _BizTrackAppState extends State<BizTrackApp> {
           return loc == '/splash' ? null : '/splash';
         }
 
-        final isAuthRoute = loc == '/login' ||
-            loc == '/register' ||
-            loc == '/forgot-password';
+        final isAuthRoute =
+            loc == '/login' || loc == '/register' || loc == '/forgot-password';
 
         if (!isAuth && !isAuthRoute && loc != '/splash') return '/login';
         if (isAuth && (isAuthRoute || loc == '/splash')) {
@@ -88,72 +93,157 @@ class _BizTrackAppState extends State<BizTrackApp> {
       },
       routes: [
         GoRoute(path: '/splash', builder: (_, __) => const SplashScreen()),
-        GoRoute(path: '/admin-restricted', builder: (_, __) => const AdminRestrictedScreen()),
+        GoRoute(
+          path: '/admin-restricted',
+          builder: (_, __) => const AdminRestrictedScreen(),
+        ),
         GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
         GoRoute(path: '/register', builder: (_, __) => const RegisterScreen()),
-        GoRoute(path: '/forgot-password', builder: (_, __) => const ForgotPasswordScreen()),
+        GoRoute(
+          path: '/forgot-password',
+          builder: (_, __) => const ForgotPasswordScreen(),
+        ),
 
         // Main shell — 5 bottom-nav branches
         StatefulShellRoute.indexedStack(
           builder: (_, __, shell) => HomeShell(navigationShell: shell),
           branches: [
             // 0: Dashboard
-            StatefulShellBranch(routes: [
-              GoRoute(path: '/', builder: (_, __) => const DashboardScreen()),
-            ]),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(path: '/', builder: (_, __) => const DashboardScreen()),
+              ],
+            ),
             // 1: Sales
-            StatefulShellBranch(routes: [
-              GoRoute(path: '/sales', builder: (_, __) => const SalesScreen()),
-            ]),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/sales',
+                  builder: (_, __) => const SalesScreen(),
+                ),
+              ],
+            ),
             // 2: Expenses
-            StatefulShellBranch(routes: [
-              GoRoute(path: '/expenses', builder: (_, __) => const ExpensesScreen()),
-            ]),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/expenses',
+                  builder: (_, __) => const ExpensesScreen(),
+                ),
+              ],
+            ),
             // 3: Inventory hub
-            StatefulShellBranch(routes: [
-              GoRoute(path: '/inventory', builder: (_, __) => const InventoryHubScreen()),
-            ]),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/inventory',
+                  builder: (_, __) => const InventoryHubScreen(),
+                ),
+              ],
+            ),
             // 4: More (Reports, Notifications, Settings)
-            StatefulShellBranch(routes: [
-              GoRoute(path: '/more', builder: (_, __) => const MoreScreen()),
-            ]),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(path: '/more', builder: (_, __) => const MoreScreen()),
+              ],
+            ),
           ],
         ),
 
         // --- Sales ---
         GoRoute(path: '/sales/add', builder: (_, __) => const SaleFormScreen()),
-        GoRoute(path: '/sales/edit/:id', builder: (ctx, state) {
-          final sale = state.extra as Sale?;
-          return SaleFormScreen(sale: sale);
-        }),
+        GoRoute(path: '/sales/pos', builder: (_, __) => const PosScreen()),
+        GoRoute(
+          path: '/sales/edit/:id',
+          builder: (ctx, state) {
+            final sale = state.extra as Sale?;
+            return SaleFormScreen(sale: sale);
+          },
+        ),
 
         // --- Expenses ---
-        GoRoute(path: '/expenses/add', builder: (_, __) => const ExpenseFormScreen()),
-        GoRoute(path: '/expenses/edit/:id', builder: (ctx, state) {
-          final expense = state.extra as Expense?;
-          return ExpenseFormScreen(expense: expense);
-        }),
+        GoRoute(
+          path: '/expenses/add',
+          builder: (_, __) => const ExpenseFormScreen(),
+        ),
+        GoRoute(
+          path: '/expenses/edit/:id',
+          builder: (ctx, state) {
+            final expense = state.extra as Expense?;
+            return ExpenseFormScreen(expense: expense);
+          },
+        ),
 
         // --- Products ---
         GoRoute(path: '/products', builder: (_, __) => const ProductsScreen()),
-        GoRoute(path: '/products/add', builder: (_, __) => const ProductFormScreen()),
-        GoRoute(path: '/products/edit/:id', builder: (ctx, state) {
-          final product = state.extra as Product?;
-          return ProductFormScreen(product: product);
-        }),
+        GoRoute(
+          path: '/products/add',
+          builder: (_, __) => const ProductFormScreen(),
+        ),
+        GoRoute(
+          path: '/products/edit/:id',
+          builder: (ctx, state) {
+            final product = state.extra as Product?;
+            return ProductFormScreen(product: product);
+          },
+        ),
 
         // --- Inventory sub-pages ---
-        GoRoute(path: '/inventory/categories', builder: (_, __) => const CategoriesScreen()),
-        GoRoute(path: '/inventory/suppliers', builder: (_, __) => const SuppliersScreen()),
-        GoRoute(path: '/inventory/purchases', builder: (_, __) => const PurchasesScreen()),
-        GoRoute(path: '/inventory/stock-in', builder: (_, __) => const StockInScreen()),
-        GoRoute(path: '/inventory/movements', builder: (_, __) => const StockMovementsScreen()),
-        GoRoute(path: '/inventory/low-stock', builder: (_, __) => const LowStockScreen()),
-        GoRoute(path: '/inventory/damaged-stock', builder: (_, __) => const DamagedStockScreen()),
+        GoRoute(
+          path: '/inventory/categories',
+          builder: (_, __) => const CategoriesScreen(),
+        ),
+        GoRoute(
+          path: '/inventory/suppliers',
+          builder: (_, __) => const SuppliersScreen(),
+        ),
+        GoRoute(
+          path: '/inventory/purchases',
+          builder: (_, __) => const PurchasesScreen(),
+        ),
+        GoRoute(
+          path: '/inventory/stock-in',
+          builder: (_, __) => const StockInScreen(),
+        ),
+        GoRoute(
+          path: '/inventory/movements',
+          builder: (_, __) => const StockMovementsScreen(),
+        ),
+        GoRoute(
+          path: '/inventory/low-stock',
+          builder: (_, __) => const LowStockScreen(),
+        ),
+        GoRoute(
+          path: '/inventory/damaged-stock',
+          builder: (_, __) => const DamagedStockScreen(),
+        ),
 
         // --- Other ---
         GoRoute(path: '/reports', builder: (_, __) => const ReportsScreen()),
-        GoRoute(path: '/notifications', builder: (_, __) => const NotificationsScreen()),
+        GoRoute(
+          path: '/reports/advanced',
+          builder: (_, __) => const AdvancedReportsScreen(),
+        ),
+        GoRoute(
+          path: '/customers',
+          builder: (_, __) => const CustomersScreen(),
+        ),
+        GoRoute(
+          path: '/promotions',
+          builder: (_, __) => const PromotionsScreen(),
+        ),
+        GoRoute(
+          path: '/organization',
+          builder: (_, __) => const OrganizationScreen(),
+        ),
+        GoRoute(
+          path: '/inventory/management',
+          builder: (_, __) => const InventoryManagementScreen(),
+        ),
+        GoRoute(
+          path: '/notifications',
+          builder: (_, __) => const NotificationsScreen(),
+        ),
         GoRoute(path: '/settings', builder: (_, __) => const SettingsScreen()),
       ],
     );
@@ -168,7 +258,9 @@ class _BizTrackAppState extends State<BizTrackApp> {
         ChangeNotifierProvider(create: (_) => SaleProvider(_apiClient)),
         ChangeNotifierProvider(create: (_) => ExpenseProvider(_apiClient)),
         ChangeNotifierProvider(create: (_) => ProductProvider(_apiClient)),
-        ChangeNotifierProvider(create: (_) => InventoryProvider(InventoryApi(_apiClient))),
+        ChangeNotifierProvider(
+          create: (_) => InventoryProvider(InventoryApi(_apiClient)),
+        ),
       ],
       child: MaterialApp.router(
         title: 'BizTrack',

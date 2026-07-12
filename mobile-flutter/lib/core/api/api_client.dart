@@ -17,6 +17,7 @@ class ApiException implements Exception {
 
 class ApiClient {
   static const _tokenKey = 'biztrack_token';
+  static const _branchKey = 'biztrack_active_branch';
   static const _requestTimeout = Duration(seconds: 15);
 
   Future<String?> getToken() async {
@@ -34,6 +35,28 @@ class ApiClient {
     await prefs.remove(_tokenKey);
   }
 
+  Future<String> getBaseUrl() async => kApiBaseUrl;
+
+  Future<void> saveActiveBranch(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_branchKey, id);
+  }
+
+  Future<bool> healthCheck() async {
+    try {
+      final baseUrl = await getBaseUrl();
+      final response = await http
+          .get(
+            Uri.parse('$baseUrl/health'),
+            headers: await _headers(auth: false),
+          )
+          .timeout(const Duration(seconds: 5));
+      return response.statusCode >= 200 && response.statusCode < 300;
+    } catch (_) {
+      return false;
+    }
+  }
+
   Future<Map<String, String>> _headers({bool auth = true}) async {
     final headers = <String, String>{
       HttpHeaders.contentTypeHeader: 'application/json',
@@ -45,11 +68,17 @@ class ApiClient {
         headers[HttpHeaders.authorizationHeader] = 'Bearer $token';
       }
     }
+    final prefs = await SharedPreferences.getInstance();
+    final branchId = prefs.getString(_branchKey);
+    if (branchId != null && branchId.isNotEmpty) {
+      headers['X-Branch-Id'] = branchId;
+    }
     return headers;
   }
 
-  Uri _uri(String path, [Map<String, String>? params]) {
-    final uri = Uri.parse('$kApiBaseUrl$path');
+  Future<Uri> _uri(String path, [Map<String, String>? params]) async {
+    final baseUrl = await getBaseUrl();
+    final uri = Uri.parse('$baseUrl$path');
     if (params != null && params.isNotEmpty) {
       return uri.replace(queryParameters: params);
     }
@@ -58,8 +87,8 @@ class ApiClient {
 
   ApiException _connectionException(String detail) {
     return ApiException(
-      'Cannot connect to the server ($kApiBaseUrl). '
-      'Make sure the Laravel backend is running on port 8000. '
+      'Cannot connect to the BizTrack server. '
+      'Confirm that the device has network access and try again. '
       'Detail: $detail',
     );
   }
@@ -112,7 +141,7 @@ class ApiClient {
   Future<dynamic> get(String path, {Map<String, String>? params}) async {
     try {
       final response = await http
-          .get(_uri(path, params), headers: await _headers())
+          .get(await _uri(path, params), headers: await _headers())
           .timeout(_requestTimeout);
       return _parseResponse(response);
     } on TimeoutException {
@@ -132,7 +161,7 @@ class ApiClient {
     try {
       final response = await http
           .post(
-            _uri(path),
+            await _uri(path),
             headers: await _headers(auth: auth),
             body: jsonEncode(body),
           )
@@ -150,7 +179,11 @@ class ApiClient {
   Future<dynamic> put(String path, Map<String, dynamic> body) async {
     try {
       final response = await http
-          .put(_uri(path), headers: await _headers(), body: jsonEncode(body))
+          .put(
+            await _uri(path),
+            headers: await _headers(),
+            body: jsonEncode(body),
+          )
           .timeout(_requestTimeout);
       return _parseResponse(response);
     } on TimeoutException {
@@ -165,7 +198,7 @@ class ApiClient {
   Future<dynamic> delete(String path) async {
     try {
       final response = await http
-          .delete(_uri(path), headers: await _headers())
+          .delete(await _uri(path), headers: await _headers())
           .timeout(_requestTimeout);
       return _parseResponse(response);
     } on TimeoutException {

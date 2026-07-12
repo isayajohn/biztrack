@@ -1,6 +1,7 @@
 import axios from "axios";
 
 export const AUTH_TOKEN_KEY = "biztrack_token";
+export const ACTIVE_BRANCH_KEY = "biztrack_active_branch";
 
 export const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL ?? "http://localhost:5000/api",
@@ -21,6 +22,8 @@ apiClient.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  const branchId = localStorage.getItem(ACTIVE_BRANCH_KEY);
+  if (branchId) config.headers["X-Branch-Id"] = branchId;
   return config;
 });
 

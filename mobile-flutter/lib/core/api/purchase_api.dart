@@ -8,12 +8,16 @@ class PurchaseApi {
   Future<List<Purchase>> getPurchases() async {
     final data = await _client.get('/purchases');
     if (data is List) {
-      return data.map((e) => Purchase.fromJson(e as Map<String, dynamic>)).toList();
+      return data
+          .map((e) => Purchase.fromJson(e as Map<String, dynamic>))
+          .toList();
     }
     if (data is Map) {
       final inner = data['purchases'] ?? data['data'];
       if (inner is List) {
-        return inner.map((e) => Purchase.fromJson(e as Map<String, dynamic>)).toList();
+        return inner
+            .map((e) => Purchase.fromJson(e as Map<String, dynamic>))
+            .toList();
       }
     }
     return [];
@@ -23,7 +27,8 @@ class PurchaseApi {
     final data = await _client.get('/damaged-stock');
     if (data is List) return data;
     if (data is Map) {
-      final inner = data['damaged_stock'] ?? data['damagedStock'] ?? data['data'];
+      final inner =
+          data['damaged_stock'] ?? data['damagedStock'] ?? data['data'];
       if (inner is List) return inner;
     }
     return [];

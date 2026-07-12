@@ -8,6 +8,8 @@ import '../../core/theme/app_theme.dart';
 import '../../providers/product_provider.dart';
 import '../../providers/sale_provider.dart';
 import '../../widgets/form_field_wrapper.dart';
+import '../../core/api/business_api.dart';
+import '../../core/api/api_client.dart';
 
 class SaleFormScreen extends StatefulWidget {
   final Sale? sale;
@@ -24,9 +26,16 @@ class _SaleFormScreenState extends State<SaleFormScreen> {
   final _quantityCtrl = TextEditingController();
   final _unitPriceCtrl = TextEditingController();
   final _notesCtrl = TextEditingController();
+  final _discountCtrl = TextEditingController(text: '0');
+  final _taxCtrl = TextEditingController(text: '0');
+  final _paidCtrl = TextEditingController();
 
   String? _selectedProductId;
   String _paymentMethod = 'CASH';
+  String? _customerId;
+  String? _promotionId;
+  List<Map<String, dynamic>> _customers = [];
+  List<Map<String, dynamic>> _promotions = [];
   DateTime _saleDate = DateTime.now();
   bool _loading = false;
   double _total = 0;
@@ -38,6 +47,7 @@ class _SaleFormScreenState extends State<SaleFormScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ProductProvider>().fetchProducts();
+      _loadBusinessOptions();
     });
 
     if (_isEditing) {
@@ -49,17 +59,58 @@ class _SaleFormScreenState extends State<SaleFormScreen> {
       _paymentMethod = s.paymentMethod;
       _saleDate = DateTime.tryParse(s.saleDate) ?? DateTime.now();
       _notesCtrl.text = s.notes ?? '';
+      _customerId = s.customerId;
+      _discountCtrl.text = s.discount.toString();
+      _paidCtrl.text = s.paidAmount.toString();
       _total = s.totalAmount;
     }
 
     _quantityCtrl.addListener(_calcTotal);
     _unitPriceCtrl.addListener(_calcTotal);
+    _discountCtrl.addListener(_calcTotal);
+    _taxCtrl.addListener(_calcTotal);
+  }
+
+  Future<void> _loadBusinessOptions() async {
+    try {
+      final api = BusinessApi(context.read<ApiClient>());
+      final values = await Future.wait([api.customers(), api.promotions()]);
+      if (mounted) {
+        setState(() {
+          _customers = values[0].where((c) => c['isActive'] == true).toList();
+          _promotions = values[1]
+              .where((p) => p['isAvailable'] == true)
+              .toList();
+        });
+      }
+    } catch (_) {}
   }
 
   void _calcTotal() {
     final q = int.tryParse(_quantityCtrl.text) ?? 0;
     final p = double.tryParse(_unitPriceCtrl.text) ?? 0;
-    setState(() => _total = q * p);
+    final subtotal = q * p;
+    final discount = double.tryParse(_discountCtrl.text) ?? 0;
+    final beforePromotion = (subtotal - discount).clamp(0, double.infinity);
+    Map<String, dynamic>? promotion;
+    for (final item in _promotions) {
+      if (item['id']?.toString() == _promotionId) promotion = item;
+    }
+    var promotionDiscount = 0.0;
+    if (promotion != null) {
+      final value = (promotion['value'] as num?)?.toDouble() ?? 0;
+      promotionDiscount = promotion['type'] == 'PERCENTAGE'
+          ? beforePromotion * value / 100
+          : value;
+      final cap = (promotion['maximumDiscount'] as num?)?.toDouble();
+      if (cap != null && promotionDiscount > cap) promotionDiscount = cap;
+    }
+    final taxable = (beforePromotion - promotionDiscount).clamp(
+      0,
+      double.infinity,
+    );
+    final tax = taxable * (double.tryParse(_taxCtrl.text) ?? 0) / 100;
+    setState(() => _total = taxable + tax);
   }
 
   @override
@@ -68,6 +119,9 @@ class _SaleFormScreenState extends State<SaleFormScreen> {
     _quantityCtrl.dispose();
     _unitPriceCtrl.dispose();
     _notesCtrl.dispose();
+    _discountCtrl.dispose();
+    _taxCtrl.dispose();
+    _paidCtrl.dispose();
     super.dispose();
   }
 
@@ -100,13 +154,20 @@ class _SaleFormScreenState extends State<SaleFormScreen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _loading = true);
     final payload = {
-      'product_id': _selectedProductId,
-      'product_name': _productNameCtrl.text.trim(),
+      'productId': _selectedProductId,
+      'productName': _productNameCtrl.text.trim(),
       'quantity': int.tryParse(_quantityCtrl.text) ?? 0,
-      'unit_price': double.tryParse(_unitPriceCtrl.text) ?? 0,
-      'total_amount': _total,
-      'payment_method': _paymentMethod,
-      'sale_date': DateFormat('yyyy-MM-dd').format(_saleDate),
+      'unitPrice': double.tryParse(_unitPriceCtrl.text) ?? 0,
+      'totalAmount': _total,
+      'customerId': _customerId,
+      'promotionId': _promotionId,
+      'discount': double.tryParse(_discountCtrl.text) ?? 0,
+      'taxRate': double.tryParse(_taxCtrl.text) ?? 0,
+      'paidAmount': _paidCtrl.text.isEmpty
+          ? (_paymentMethod == 'CREDIT' ? 0 : _total)
+          : double.tryParse(_paidCtrl.text) ?? 0,
+      'paymentMethod': _paymentMethod,
+      'saleDate': DateFormat('yyyy-MM-dd').format(_saleDate),
       'notes': _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
     };
     try {
@@ -117,18 +178,19 @@ class _SaleFormScreenState extends State<SaleFormScreen> {
         await provider.createSale(payload);
       }
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(_isEditing ? 'Sale updated!' : 'Sale recorded!'),
-          backgroundColor: kPrimaryGreen,
-        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_isEditing ? 'Sale updated!' : 'Sale recorded!'),
+            backgroundColor: kPrimaryGreen,
+          ),
+        );
         context.pop();
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(e.toString()),
-          backgroundColor: Colors.red,
-        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+        );
       }
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -174,10 +236,14 @@ class _SaleFormScreenState extends State<SaleFormScreen> {
                             hintText: 'Select a product',
                           ),
                           items: products
-                              .map((p) => DropdownMenuItem(
-                                    value: p.id,
-                                    child: Text('${p.name} (${p.stockQuantity} in stock)'),
-                                  ))
+                              .map(
+                                (p) => DropdownMenuItem(
+                                  value: p.id,
+                                  child: Text(
+                                    '${p.name} (${p.stockQuantity} in stock)',
+                                  ),
+                                ),
+                              )
                               .toList(),
                           onChanged: (id) {
                             final p = products.firstWhere((p) => p.id == id);
@@ -218,7 +284,9 @@ class _SaleFormScreenState extends State<SaleFormScreen> {
                     label: 'Unit Price',
                     child: TextFormField(
                       controller: _unitPriceCtrl,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
                       decoration: const InputDecoration(
                         hintText: '0.00',
                         prefixIcon: Icon(Icons.attach_money_outlined),
@@ -245,9 +313,10 @@ class _SaleFormScreenState extends State<SaleFormScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Total Amount',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w600, color: kDark)),
+                  const Text(
+                    'Total Amount',
+                    style: TextStyle(fontWeight: FontWeight.w600, color: kDark),
+                  ),
                   Text(
                     NumberFormat('#,##0.00').format(_total),
                     style: const TextStyle(
@@ -264,12 +333,120 @@ class _SaleFormScreenState extends State<SaleFormScreen> {
               label: 'Payment Method',
               value: _paymentMethod,
               items: Sale.paymentMethods
-                  .map((m) => DropdownMenuItem(
-                        value: m,
-                        child: Text(Sale.paymentMethodLabel(m)),
-                      ))
+                  .map(
+                    (m) => DropdownMenuItem(
+                      value: m,
+                      child: Text(Sale.paymentMethodLabel(m)),
+                    ),
+                  )
                   .toList(),
               onChanged: (v) => setState(() => _paymentMethod = v!),
+            ),
+
+            if (_customers.isNotEmpty)
+              DropdownButtonFormField<String>(
+                initialValue: _customerId,
+                decoration: const InputDecoration(
+                  labelText: 'Customer (required for credit)',
+                  prefixIcon: Icon(Icons.person_outline),
+                ),
+                items: [
+                  const DropdownMenuItem<String>(
+                    value: '',
+                    child: Text('Walk-in customer'),
+                  ),
+                  ..._customers.map(
+                    (c) => DropdownMenuItem<String>(
+                      value: c['id'].toString(),
+                      child: Text(c['name'].toString()),
+                    ),
+                  ),
+                ],
+                onChanged: (value) => setState(
+                  () => _customerId = value == null || value.isEmpty
+                      ? null
+                      : value,
+                ),
+              ),
+            const SizedBox(height: 12),
+            if (_promotions.isNotEmpty)
+              DropdownButtonFormField<String>(
+                initialValue: _promotionId,
+                decoration: const InputDecoration(
+                  labelText: 'Promotion',
+                  prefixIcon: Icon(Icons.local_offer_outlined),
+                ),
+                items: [
+                  const DropdownMenuItem<String>(
+                    value: '',
+                    child: Text('No promotion'),
+                  ),
+                  ..._promotions.map(
+                    (p) => DropdownMenuItem<String>(
+                      value: p['id'].toString(),
+                      child: Text(
+                        '${p['code']} · ${p['value']}${p['type'] == 'PERCENTAGE' ? '%' : ''} off',
+                      ),
+                    ),
+                  ),
+                ],
+                onChanged: (value) {
+                  setState(
+                    () => _promotionId = value == null || value.isEmpty
+                        ? null
+                        : value,
+                  );
+                  _calcTotal();
+                },
+              ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: FormFieldWrapper(
+                    label: 'Discount',
+                    child: TextFormField(
+                      controller: _discountCtrl,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      decoration: const InputDecoration(
+                        prefixIcon: Icon(Icons.discount_outlined),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: FormFieldWrapper(
+                    label: 'Tax / VAT %',
+                    child: TextFormField(
+                      controller: _taxCtrl,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      decoration: const InputDecoration(
+                        prefixIcon: Icon(Icons.percent),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            FormFieldWrapper(
+              label: 'Amount paid',
+              child: TextFormField(
+                controller: _paidCtrl,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.payments_outlined),
+                  hintText: _paymentMethod == 'CREDIT'
+                      ? '0.00'
+                      : _total.toStringAsFixed(2),
+                ),
+              ),
             ),
 
             FormFieldWrapper(
@@ -305,7 +482,9 @@ class _SaleFormScreenState extends State<SaleFormScreen> {
                       height: 20,
                       width: 20,
                       child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white),
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
                     )
                   : Text(_isEditing ? 'Update Sale' : 'Record Sale'),
             ),

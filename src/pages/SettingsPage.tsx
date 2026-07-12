@@ -91,7 +91,7 @@ function readSettings(user: User | null): SettingsFields {
     email: user?.email ?? "",
     phone: "",
     country: user?.country ?? "Tanzania",
-    currency: user?.currency ?? "USD",
+    currency: user?.currency ?? "TZS",
     taxName: "VAT",
     taxNumber: "",
     defaultTaxRate: "0",

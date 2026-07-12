@@ -129,7 +129,7 @@ class AuthController extends Controller
             'last_login_at' => now(),
         ]);
 
-        $business = Business::where('user_id', $user->id)->first();
+        $business = Business::forUser($user);
         $token = JWTAuth::fromUser($user);
 
         AuditService::log([
@@ -199,7 +199,7 @@ class AuthController extends Controller
             }
 
             $user->update(['last_login_at' => now()]);
-            $business = Business::where('user_id', $user->id)->first();
+            $business = Business::forUser($user);
             $jwtToken = JWTAuth::fromUser($user);
 
             return response()->json([
@@ -258,7 +258,7 @@ class AuthController extends Controller
             'target_id' => $user->id,
         ]);
 
-        $business = Business::where('user_id', $user->id)->first();
+        $business = Business::forUser($user);
         $token = JWTAuth::fromUser($user);
 
         return response()->json([
@@ -416,7 +416,7 @@ class AuthController extends Controller
             'last_login_at' => now(),
         ]);
 
-        $business = Business::where('user_id', $user->id)->first();
+        $business = Business::forUser($user);
         $token = JWTAuth::fromUser($user);
 
         return response()->json([
@@ -431,7 +431,7 @@ class AuthController extends Controller
     public function me(Request $request): JsonResponse
     {
         $user = auth()->user();
-        $business = Business::where('user_id', $user->id)->first();
+        $business = Business::forUser($user);
 
         return response()->json([
             'success' => true,
@@ -470,6 +470,7 @@ class AuthController extends Controller
 
     private function formatUser(User $user, ?Business $business = null): array
     {
+        $membership = $business?->memberships()->where('user_id', $user->id)->with('branch')->first();
         return [
             'id' => $user->id,
             'name' => $user->name,
@@ -477,6 +478,9 @@ class AuthController extends Controller
             'phone' => $user->phone,
             'role' => $user->role,
             'status' => $user->status,
+            'businessRole' => $membership?->role ?? ($business?->user_id === $user->id ? 'OWNER' : null),
+            'permissions' => $membership?->permissions ?? ($business?->user_id === $user->id ? ['*'] : []),
+            'branch' => $membership?->branch ? ['id' => $membership->branch->id, 'name' => $membership->branch->name] : null,
             'emailVerifiedAt' => $user->email_verified_at,
             'lastLoginAt' => $user->last_login_at,
             'createdAt' => $user->created_at,

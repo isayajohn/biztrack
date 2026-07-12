@@ -74,14 +74,20 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               color: kLightGreen,
               borderRadius: BorderRadius.circular(20),
             ),
-            child:
-                const Icon(Icons.mark_email_read_outlined, size: 48, color: kPrimaryGreen),
+            child: const Icon(
+              Icons.mark_email_read_outlined,
+              size: 48,
+              color: kPrimaryGreen,
+            ),
           ),
           const SizedBox(height: 24),
           const Text(
             'Check your email',
             style: TextStyle(
-                fontSize: 24, fontWeight: FontWeight.w800, color: kDark),
+              fontSize: 24,
+              fontWeight: FontWeight.w800,
+              color: kDark,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
@@ -106,7 +112,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         const Text(
           'Reset your password',
           style: TextStyle(
-              fontSize: 26, fontWeight: FontWeight.w800, color: kDark),
+            fontSize: 26,
+            fontWeight: FontWeight.w800,
+            color: kDark,
+          ),
         ),
         const SizedBox(height: 8),
         const Text(
@@ -144,14 +153,19 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.error_outline,
-                          color: Colors.red.shade600, size: 16),
+                      Icon(
+                        Icons.error_outline,
+                        color: Colors.red.shade600,
+                        size: 16,
+                      ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           _error!,
                           style: TextStyle(
-                              color: Colors.red.shade700, fontSize: 13),
+                            color: Colors.red.shade700,
+                            fontSize: 13,
+                          ),
                         ),
                       ),
                     ],
@@ -166,7 +180,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         height: 20,
                         width: 20,
                         child: CircularProgressIndicator(
-                            strokeWidth: 2, color: Colors.white),
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
                       )
                     : const Text('Send Reset Link'),
               ),

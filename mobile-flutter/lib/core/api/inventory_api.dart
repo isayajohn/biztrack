@@ -61,8 +61,7 @@ class InventoryApi {
     final data = await _client.get('/notifications', params: params);
     final list = _extractList(data);
     return list
-        .map((e) =>
-            InventoryNotification.fromJson(e as Map<String, dynamic>))
+        .map((e) => InventoryNotification.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 

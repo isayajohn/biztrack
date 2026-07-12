@@ -8,6 +8,7 @@ import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import {
   Boxes,
+  Barcode,
   Pencil,
   Plus,
   Search,
@@ -192,6 +193,7 @@ function ProductCard({
           </div>
         ) : (
           <div className="flex gap-2">
+            <Link to={`/products/${p.id}/label`} className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-leaf/20 py-2 text-xs font-bold text-leaf hover:bg-mint transition-colors"><Barcode size={13} /> Label</Link>
             <Link
               to={`/products/${p.id}/edit`}
               className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-ink/15 py-2 text-xs font-bold text-ink hover:bg-[#eef8f4] transition-colors"
@@ -285,6 +287,7 @@ function ProductRow({
           </div>
         ) : (
           <div className="flex items-center justify-end gap-1.5">
+            <Link to={`/products/${p.id}/label`} className="grid h-8 w-8 place-items-center rounded-lg border border-leaf/20 text-leaf hover:bg-mint transition-colors" aria-label={`Print ${p.name} label`}><Barcode size={14} /></Link>
             <Link
               to={`/products/${p.id}/edit`}
               className="grid h-8 w-8 place-items-center rounded-lg border border-ink/15 text-ink/50 hover:bg-[#eef8f4] hover:text-ink transition-colors"

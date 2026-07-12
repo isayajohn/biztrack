@@ -53,7 +53,10 @@ class AuthInputField extends StatelessWidget {
       onFieldSubmitted: onSubmitted,
       validator: validator,
       style: const TextStyle(
-          fontSize: 15, color: kDark, fontWeight: FontWeight.w500),
+        fontSize: 15,
+        color: kDark,
+        fontWeight: FontWeight.w500,
+      ),
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: Icon(icon, size: 20, color: kMuted),
@@ -81,8 +84,10 @@ class AuthInputField extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide(color: Colors.red.shade400, width: 2),
         ),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
       ),
     );
   }
@@ -126,8 +131,10 @@ class AuthDropdownField<T> extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           borderSide: const BorderSide(color: kPrimaryGreen, width: 2),
         ),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
       ),
       style: const TextStyle(fontSize: 15, color: kDark),
       dropdownColor: Colors.white,
@@ -182,7 +189,9 @@ class AuthGradientButton extends StatelessWidget {
                   width: 22,
                   height: 22,
                   child: CircularProgressIndicator(
-                      strokeWidth: 2.5, color: Colors.white),
+                    strokeWidth: 2.5,
+                    color: Colors.white,
+                  ),
                 )
               : Text(
                   label,
@@ -215,14 +224,20 @@ class AuthErrorBox extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.error_outline_rounded,
-              color: Colors.red.shade500, size: 18),
+          Icon(
+            Icons.error_outline_rounded,
+            color: Colors.red.shade500,
+            size: 18,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               message,
               style: TextStyle(
-                  color: Colors.red.shade700, fontSize: 13, height: 1.4),
+                color: Colors.red.shade700,
+                fontSize: 13,
+                height: 1.4,
+              ),
             ),
           ),
         ],

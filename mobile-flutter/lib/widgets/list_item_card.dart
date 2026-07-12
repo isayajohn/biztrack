@@ -33,10 +33,7 @@ class ListItemCard extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
             children: [
-              if (leading != null) ...[
-                leading!,
-                const SizedBox(width: 12),
-              ],
+              if (leading != null) ...[leading!, const SizedBox(width: 12)],
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -105,8 +102,9 @@ class ListItemCard extends StatelessWidget {
         return await showDialog<bool>(
           context: context,
           builder: (ctx) => AlertDialog(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
             title: const Text('Delete'),
             content: const Text('Are you sure you want to delete this item?'),
             actions: [
@@ -115,8 +113,7 @@ class ListItemCard extends StatelessWidget {
                 child: const Text('Cancel'),
               ),
               TextButton(
-                style:
-                    TextButton.styleFrom(foregroundColor: Colors.red),
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
                 onPressed: () => Navigator.pop(ctx, true),
                 child: const Text('Delete'),
               ),

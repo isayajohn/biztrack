@@ -53,15 +53,17 @@ class SettingsScreen extends StatelessWidget {
                         const SizedBox(height: 2),
                         Text(
                           user?.email ?? '',
-                          style: const TextStyle(
-                              color: kMuted, fontSize: 13),
+                          style: const TextStyle(color: kMuted, fontSize: 13),
                         ),
                         if (user?.businessName.isNotEmpty == true) ...[
                           const SizedBox(height: 4),
                           Row(
                             children: [
-                              const Icon(Icons.storefront_outlined,
-                                  size: 13, color: kPrimaryGreen),
+                              const Icon(
+                                Icons.storefront_outlined,
+                                size: 13,
+                                color: kPrimaryGreen,
+                              ),
                               const SizedBox(width: 4),
                               Text(
                                 user!.businessName,
@@ -97,7 +99,7 @@ class SettingsScreen extends StatelessWidget {
                 _infoTile(
                   icon: Icons.attach_money_outlined,
                   title: 'Currency',
-                  value: user?.currency ?? 'USD',
+                  value: user?.currency ?? 'TZS',
                 ),
                 const Divider(height: 1, indent: 56),
                 _infoTile(
@@ -145,17 +147,25 @@ class SettingsScreen extends StatelessWidget {
                 ListTile(
                   leading: const Icon(Icons.lock_outline, color: kPrimaryGreen),
                   title: const Text('Change Password'),
-                  trailing: const Icon(Icons.chevron_right_rounded,
-                      color: kMuted, size: 20),
+                  trailing: const Icon(
+                    Icons.chevron_right_rounded,
+                    color: kMuted,
+                    size: 20,
+                  ),
                   onTap: () => context.push('/forgot-password'),
                 ),
                 const Divider(height: 1, indent: 56),
                 ListTile(
-                  leading: Icon(Icons.bar_chart_rounded,
-                      color: Colors.blue.shade700),
+                  leading: Icon(
+                    Icons.bar_chart_rounded,
+                    color: Colors.blue.shade700,
+                  ),
                   title: const Text('View Reports'),
-                  trailing: const Icon(Icons.chevron_right_rounded,
-                      color: kMuted, size: 20),
+                  trailing: const Icon(
+                    Icons.chevron_right_rounded,
+                    color: kMuted,
+                    size: 20,
+                  ),
                   onTap: () => context.go('/reports'),
                 ),
               ],
@@ -170,7 +180,9 @@ class SettingsScreen extends StatelessWidget {
               title: Text(
                 'Log Out',
                 style: TextStyle(
-                    color: Colors.red.shade600, fontWeight: FontWeight.w600),
+                  color: Colors.red.shade600,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               onTap: () => _confirmLogout(context, auth),
             ),
@@ -238,11 +250,15 @@ class SettingsScreen extends StatelessWidget {
   }) {
     return ListTile(
       leading: Icon(icon, color: kPrimaryGreen, size: 20),
-      title: Text(title,
-          style: const TextStyle(fontSize: 13, color: kMuted)),
-      subtitle: Text(value,
-          style: const TextStyle(
-              fontSize: 15, fontWeight: FontWeight.w600, color: kDark)),
+      title: Text(title, style: const TextStyle(fontSize: 13, color: kMuted)),
+      subtitle: Text(
+        value,
+        style: const TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w600,
+          color: kDark,
+        ),
+      ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
     );
   }

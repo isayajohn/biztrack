@@ -16,6 +16,8 @@ import { formatCurrency } from "../utils/format";
 import { getCustomers } from "../services/customerApi";
 import type { Customer } from "../services/customerApi";
 import { getBusinessProfile } from "../services/authApi";
+import { getPromotions } from "../services/promotionApi";
+import type { Promotion } from "../services/promotionApi";
 
 // ─── Validation ───────────────────────────────────────────────────────────────
 
@@ -24,6 +26,7 @@ type FormErrors = Partial<Record<keyof SaleFormData, string>>;
 function validate(
   f: SaleFormData,
   effectiveStock: number,
+  promotionDiscount: number,
 ): FormErrors {
   const e: FormErrors = {};
 
@@ -54,14 +57,14 @@ function validate(
   const subtotal = (Number.isNaN(qty) ? 0 : qty) * (Number.isNaN(price) ? 0 : price);
   const discount = Number(f.discount || 0);
   const taxRate = Number(f.taxRate || 0);
-  const taxAmount = (subtotal - discount) * taxRate / 100;
+  const taxAmount = (subtotal - discount - promotionDiscount) * taxRate / 100;
   const paid = f.paidAmount === "" && f.paymentMethod !== "Credit"
-    ? subtotal - discount + taxAmount
+    ? subtotal - discount - promotionDiscount + taxAmount
     : Number(f.paidAmount || 0);
   if (discount < 0 || discount > subtotal) e.discount = "Discount must be between 0 and the subtotal.";
   if (taxRate < 0 || taxRate > 100) e.taxRate = "Tax rate must be between 0 and 100%.";
-  if (paid < 0 || paid > subtotal - discount + taxAmount) e.paidAmount = "Paid amount cannot exceed the amount due.";
-  if (subtotal - discount + taxAmount - paid > 0 && !f.customerId) e.customerId = "Select a customer for an unpaid or credit sale.";
+  if (paid < 0 || paid > subtotal - discount - promotionDiscount + taxAmount) e.paidAmount = "Paid amount cannot exceed the amount due.";
+  if (subtotal - discount - promotionDiscount + taxAmount - paid > 0 && !f.customerId) e.customerId = "Select a customer for an unpaid or credit sale.";
 
   return e;
 }
@@ -84,6 +87,7 @@ const todayIso = new Date().toISOString().split("T")[0];
 
 const EMPTY_FORM: SaleFormData = {
   customerId: "",
+  promotionId: "",
   productId: "",
   quantity: "",
   unitPrice: "",
@@ -111,6 +115,7 @@ export default function SaleFormPage({ embedded = false, onClose, onSaved }: Emb
 
   const [products, setProducts] = useState<Product[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [promotions, setPromotions] = useState<Promotion[]>([]);
   const [fields, setFields] = useState<SaleFormData>(EMPTY_FORM);
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSaving, setIsSaving] = useState(false);
@@ -122,11 +127,12 @@ export default function SaleFormPage({ embedded = false, onClose, onSaved }: Emb
   useEffect(() => {
     let alive = true;
     setIsLoading(true);
-    Promise.all([getProducts(), getCustomers({ isActive: true }), getBusinessProfile(), isEdit ? getSaleById(id) : Promise.resolve(undefined)])
-      .then(([nextProducts, customerResult, business, sale]) => {
+    Promise.all([getProducts(), getCustomers({ isActive: true }), getPromotions(true), getBusinessProfile(), isEdit ? getSaleById(id) : Promise.resolve(undefined)])
+      .then(([nextProducts, customerResult, nextPromotions, business, sale]) => {
         if (!alive) return;
         setProducts(nextProducts);
         setCustomers(customerResult.customers);
+        setPromotions(nextPromotions);
         if (isEdit) {
           if (!sale) {
             setNotFound(true);
@@ -135,6 +141,7 @@ export default function SaleFormPage({ embedded = false, onClose, onSaved }: Emb
           setOriginalSale(sale);
           setFields({
             customerId: sale.customerId ?? "",
+            promotionId: sale.promotionId ?? "",
             productId: sale.productId,
             quantity: String(sale.quantity),
             unitPrice: String(sale.unitPrice),
@@ -190,9 +197,13 @@ export default function SaleFormPage({ embedded = false, onClose, onSaved }: Emb
       ? qtyNum * priceNum
       : null;
   const discountNum = Number(fields.discount || 0);
+  const selectedPromotion = promotions.find((promotion) => promotion.id === fields.promotionId);
+  const promotionBase = Math.max(0, (computedTotal ?? 0) - discountNum);
+  const rawPromotionDiscount = selectedPromotion ? (selectedPromotion.type === "PERCENTAGE" ? promotionBase * selectedPromotion.value / 100 : selectedPromotion.value) : 0;
+  const promotionDiscount = Math.min(promotionBase, selectedPromotion?.maximumDiscount ? Math.min(rawPromotionDiscount, selectedPromotion.maximumDiscount) : rawPromotionDiscount);
   const taxRateNum = Number(fields.taxRate || 0);
-  const taxAmount = computedTotal === null ? 0 : Math.max(0, computedTotal - discountNum) * taxRateNum / 100;
-  const netTotal = computedTotal === null ? null : Math.max(0, computedTotal - discountNum + taxAmount);
+  const taxAmount = computedTotal === null ? 0 : Math.max(0, computedTotal - discountNum - promotionDiscount) * taxRateNum / 100;
+  const netTotal = computedTotal === null ? null : Math.max(0, computedTotal - discountNum - promotionDiscount + taxAmount);
   const paidNum = fields.paidAmount === "" && fields.paymentMethod !== "Credit"
     ? netTotal ?? 0
     : Number(fields.paidAmount || 0);
@@ -242,7 +253,7 @@ export default function SaleFormPage({ embedded = false, onClose, onSaved }: Emb
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const errs = validate(fields, effectiveStock);
+    const errs = validate(fields, effectiveStock, promotionDiscount);
     if (Object.keys(errs).length > 0) {
       setErrors(errs);
       return;
@@ -258,6 +269,7 @@ export default function SaleFormPage({ embedded = false, onClose, onSaved }: Emb
 
       const data = {
         customerId: fields.customerId || undefined,
+        promotionId: fields.promotionId || undefined,
         productId: fields.productId,
         productName: product.name,
         quantity: qty,
@@ -507,6 +519,12 @@ export default function SaleFormPage({ embedded = false, onClose, onSaved }: Emb
               {customers.map((customer) => <option key={customer.id} value={customer.id}>{customer.name} · owing {formatCurrency(customer.creditBalance)}</option>)}
             </select>
             {errors.customerId && <p className="mt-1 text-xs font-medium text-red-500">{errors.customerId}</p>}
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="promotionId" className="mb-1.5 block text-sm font-semibold text-ink">Promotion <span className="font-normal text-ink/40">(optional)</span></label>
+            <select id="promotionId" value={fields.promotionId} onChange={setField("promotionId")} className={inputCls()}><option value="">No promotion</option>{promotions.map((promotion) => <option key={promotion.id} value={promotion.id}>{promotion.code} · {promotion.type === "PERCENTAGE" ? `${promotion.value}% off` : `${promotion.value} off`}</option>)}</select>
+            {selectedPromotion && <p className="mt-1 text-xs font-bold text-leaf">Promotion discount: {formatCurrency(promotionDiscount)}</p>}
           </div>
 
           {/* Payment method */}

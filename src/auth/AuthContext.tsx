@@ -10,6 +10,9 @@ export type User = {
   email: string;
   role: "USER" | "SUPER_ADMIN";
   status: "ACTIVE" | "SUSPENDED";
+  businessRole?: "OWNER" | "MANAGER" | "CASHIER" | "INVENTORY" | "ACCOUNTANT" | "CUSTOM";
+  permissions?: string[];
+  branch?: { id: string; name: string } | null;
   businessName: string;
   businessId?: string;
   currency: string;

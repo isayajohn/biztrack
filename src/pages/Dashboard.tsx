@@ -209,7 +209,7 @@ export default function Dashboard() {
     };
   }, []);
 
-  const currency = user?.currency ?? "USD";
+  const currency = user?.currency ?? "TZS";
   const fmt = (n: number) => formatCurrency(n, currency);
   const greeting = getGreeting();
   const firstName = user?.name?.split(" ")[0] ?? "there";

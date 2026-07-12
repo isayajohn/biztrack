@@ -17,6 +17,22 @@ class Business extends Model
 
     protected $casts = ['default_tax_rate' => 'decimal:2'];
 
+    public static function forUser(?User $user): ?self
+    {
+        if (!$user) return null;
+        $owned = static::where('user_id', $user->id)->first();
+        if ($owned) return $owned;
+        return static::whereHas('memberships', fn ($query) => $query->where('user_id', $user->id)->where('status', 'ACTIVE'))->first();
+    }
+
+    public function branchIdForUser(User $user, ?string $requested = null): ?string
+    {
+        $membership = $this->memberships()->where('user_id', $user->id)->where('status', 'ACTIVE')->first();
+        if ($membership?->branch_id) return $membership->branch_id;
+        if ($requested && $this->branches()->where('id', $requested)->where('is_active', true)->exists()) return $requested;
+        return $this->branches()->where('is_default', true)->value('id');
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -41,6 +57,14 @@ class Business extends Model
     {
         return $this->hasMany(Customer::class);
     }
+
+    public function brands()
+    {
+        return $this->hasMany(Brand::class);
+    }
+
+    public function branches() { return $this->hasMany(Branch::class); }
+    public function memberships() { return $this->hasMany(BusinessMembership::class); }
 
     public function subscriptions()
     {

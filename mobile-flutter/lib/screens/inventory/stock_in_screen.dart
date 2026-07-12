@@ -56,10 +56,10 @@ class _StockInScreenState extends State<StockInScreen> {
     setState(() => _loading = true);
     try {
       await context.read<InventoryProvider>().stockIn(
-            _selectedProductId!,
-            qty,
-            reason,
-          );
+        _selectedProductId!,
+        qty,
+        reason,
+      );
       // Refresh products too so stock quantities update
       if (mounted) {
         context.read<ProductProvider>().fetchProducts();
@@ -75,10 +75,7 @@ class _StockInScreenState extends State<StockInScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString()),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
       );
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -117,8 +114,11 @@ class _StockInScreenState extends State<StockInScreen> {
                       color: kPrimaryGreen.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(Icons.add_circle_rounded,
-                        color: kPrimaryGreen, size: 22),
+                    child: const Icon(
+                      Icons.add_circle_rounded,
+                      color: kPrimaryGreen,
+                      size: 22,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   const Expanded(
@@ -158,13 +158,15 @@ class _StockInScreenState extends State<StockInScreen> {
                       hintText: 'Select a product',
                     ),
                     items: products
-                        .map((p) => DropdownMenuItem(
-                              value: p.id,
-                              child: Text(
-                                '${p.name} (${p.stockQuantity} in stock)',
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ))
+                        .map(
+                          (p) => DropdownMenuItem(
+                            value: p.id,
+                            child: Text(
+                              '${p.name} (${p.stockQuantity} in stock)',
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        )
                         .toList(),
                     onChanged: (id) => setState(() => _selectedProductId = id),
                     validator: (v) =>
@@ -217,7 +219,9 @@ class _StockInScreenState extends State<StockInScreen> {
                       height: 20,
                       width: 20,
                       child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white),
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
                     )
                   : const Text('Add Stock'),
             ),

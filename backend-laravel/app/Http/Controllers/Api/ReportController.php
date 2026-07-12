@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Business;
 use App\Models\Expense;
 use App\Models\InventoryNotification;
+use App\Models\CustomerPayment;
+use App\Models\PurchaseOrder;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\StockMovement;
@@ -17,7 +19,7 @@ class ReportController extends Controller
 {
     private function getBusiness(): ?Business
     {
-        return Business::where('user_id', auth()->id())->first();
+        return Business::forUser(auth()->user());
     }
 
     public function getDashboard(Request $request): JsonResponse
@@ -247,6 +249,83 @@ class ReportController extends Controller
                 ->where('is_read', false)->count(),
             'topProducts' => $topProducts,
         ]]);
+    }
+
+    public function cashFlow(Request $request): JsonResponse
+    {
+        $business = $this->getBusiness();
+        if (!$business) return response()->json(['success' => true, 'data' => $this->emptyCashFlow()]);
+
+        $startDate = $request->get('startDate', now()->startOfMonth()->toDateString());
+        $endDate = $request->get('endDate', now()->endOfMonth()->toDateString());
+
+        $saleReceipts = Sale::where('business_id', $business->id)
+            ->whereBetween('sale_date', [$startDate, $endDate])
+            ->where('initial_paid_amount', '>', 0)
+            ->get()
+            ->map(fn (Sale $sale) => ['date' => $sale->sale_date->format('Y-m-d'), 'type' => 'SALE', 'description' => $sale->receipt_number ?: 'Sale receipt', 'method' => $sale->payment_method, 'inflow' => (float) $sale->initial_paid_amount, 'outflow' => 0]);
+
+        $creditPayments = CustomerPayment::where('business_id', $business->id)
+            ->whereBetween('payment_date', [$startDate, $endDate])
+            ->with('customer')
+            ->get()
+            ->map(fn (CustomerPayment $payment) => ['date' => $payment->payment_date->format('Y-m-d'), 'type' => 'CREDIT_PAYMENT', 'description' => 'Payment from ' . ($payment->customer?->name ?? 'customer'), 'method' => $payment->payment_method, 'inflow' => (float) $payment->amount, 'outflow' => 0]);
+
+        $expenses = Expense::where('business_id', $business->id)
+            ->whereBetween('expense_date', [$startDate, $endDate])
+            ->get()
+            ->map(fn (Expense $expense) => ['date' => $expense->expense_date->format('Y-m-d'), 'type' => 'EXPENSE', 'description' => $expense->description ?: $expense->category, 'method' => $expense->payment_method, 'inflow' => 0, 'outflow' => (float) $expense->amount]);
+
+        $purchasePayments = PurchaseOrder::where('business_id', $business->id)
+            ->where('paid_amount', '>', 0)
+            ->whereBetween(DB::raw('DATE(COALESCE(received_date, created_at))'), [$startDate, $endDate])
+            ->with('supplier')
+            ->get()
+            ->map(fn (PurchaseOrder $purchase) => ['date' => ($purchase->received_date ?? $purchase->created_at)->format('Y-m-d'), 'type' => 'PURCHASE', 'description' => $purchase->order_number . ' · ' . ($purchase->supplier?->name ?? 'Supplier'), 'method' => 'PURCHASE_PAYMENT', 'inflow' => 0, 'outflow' => (float) $purchase->paid_amount]);
+
+        $transactions = collect()->concat($saleReceipts)->concat($creditPayments)->concat($expenses)->concat($purchasePayments)->sortByDesc('date')->values();
+        $totalInflow = (float) $transactions->sum('inflow');
+        $totalOutflow = (float) $transactions->sum('outflow');
+
+        $daily = $transactions->groupBy('date')->map(fn ($rows, $date) => [
+            'date' => $date,
+            'inflow' => (float) $rows->sum('inflow'),
+            'outflow' => (float) $rows->sum('outflow'),
+            'net' => (float) $rows->sum('inflow') - (float) $rows->sum('outflow'),
+        ])->sortKeys()->values();
+
+        return response()->json(['success' => true, 'data' => [
+            'period' => ['startDate' => $startDate, 'endDate' => $endDate],
+            'summary' => ['totalInflow' => $totalInflow, 'totalOutflow' => $totalOutflow, 'netCashFlow' => $totalInflow - $totalOutflow],
+            'daily' => $daily,
+            'transactions' => $transactions,
+        ]]);
+    }
+
+    public function purchaseReport(Request $request): JsonResponse
+    {
+        $business = $this->getBusiness();
+        if (!$business) return response()->json(['success' => true, 'data' => ['summary' => ['totalPurchases' => 0, 'paid' => 0, 'outstanding' => 0, 'orders' => 0], 'bySupplier' => [], 'byStatus' => [], 'purchases' => []]]);
+        $startDate = $request->get('startDate', now()->startOfMonth()->toDateString());
+        $endDate = $request->get('endDate', now()->endOfMonth()->toDateString());
+        $purchases = PurchaseOrder::where('business_id', $business->id)->whereBetween(DB::raw('DATE(created_at)'), [$startDate, $endDate])->with(['supplier', 'items'])->orderByDesc('created_at')->get();
+        $total = (float) $purchases->where('status', '<>', 'CANCELLED')->sum('total_amount');
+        $paid = (float) $purchases->where('status', '<>', 'CANCELLED')->sum('paid_amount');
+        $bySupplier = $purchases->where('status', '<>', 'CANCELLED')->groupBy(fn ($purchase) => $purchase->supplier?->name ?? 'No supplier')->map(fn ($rows, $name) => ['name' => $name, 'orders' => $rows->count(), 'total' => (float) $rows->sum('total_amount'), 'paid' => (float) $rows->sum('paid_amount')])->values()->sortByDesc('total')->values();
+        $byStatus = $purchases->groupBy('status')->map(fn ($rows, $status) => ['status' => $status, 'orders' => $rows->count(), 'total' => (float) $rows->sum('total_amount')])->values();
+
+        return response()->json(['success' => true, 'data' => [
+            'period' => ['startDate' => $startDate, 'endDate' => $endDate],
+            'summary' => ['totalPurchases' => $total, 'paid' => $paid, 'outstanding' => $total - $paid, 'orders' => $purchases->count()],
+            'bySupplier' => $bySupplier,
+            'byStatus' => $byStatus,
+            'purchases' => $purchases->map(fn (PurchaseOrder $purchase) => ['id' => $purchase->id, 'orderNumber' => $purchase->order_number, 'supplier' => $purchase->supplier?->name, 'status' => $purchase->status, 'totalAmount' => (float) $purchase->total_amount, 'paidAmount' => (float) $purchase->paid_amount, 'outstanding' => max(0, (float) $purchase->total_amount - (float) $purchase->paid_amount), 'items' => $purchase->items->count(), 'createdAt' => $purchase->created_at->format('Y-m-d')]),
+        ]]);
+    }
+
+    private function emptyCashFlow(): array
+    {
+        return ['summary' => ['totalInflow' => 0, 'totalOutflow' => 0, 'netCashFlow' => 0], 'daily' => [], 'transactions' => []];
     }
 
     private function emptyDashboard(): array

@@ -238,8 +238,21 @@ export async function createAdjustment(data: {
   return single<StockAdjustment>(response);
 }
 
+export async function getAdjustments(params?: {
+  status?: string;
+  productId?: string;
+}): Promise<StockAdjustment[]> {
+  const response = await apiClient.get("/stock/adjustments", { params });
+  return arr<StockAdjustment>(response, "adjustments");
+}
+
 export async function approveAdjustment(id: string): Promise<StockAdjustment> {
   const response = await apiClient.put(`/stock/adjustment/${id}/approve`);
+  return single<StockAdjustment>(response);
+}
+
+export async function rejectAdjustment(id: string): Promise<StockAdjustment> {
+  const response = await apiClient.put(`/stock/adjustment/${id}/reject`);
   return single<StockAdjustment>(response);
 }
 

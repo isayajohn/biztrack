@@ -45,7 +45,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
     }
   }
 
-  Future<void> _confirmDelete(BuildContext context, Product p, ProductProvider provider) async {
+  Future<void> _confirmDelete(
+    BuildContext context,
+    Product p,
+    ProductProvider provider,
+  ) async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -53,7 +57,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
         title: const Text('Delete product?'),
         content: Text('Delete "${p.name}"? This cannot be undone.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
           TextButton(
             style: TextButton.styleFrom(foregroundColor: Colors.red),
             onPressed: () => Navigator.pop(ctx, true),
@@ -67,7 +74,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
       await provider.deleteProduct(p.id);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${p.name} deleted'), backgroundColor: kPrimaryGreen),
+          SnackBar(
+            content: Text('${p.name} deleted'),
+            backgroundColor: kPrimaryGreen,
+          ),
         );
       }
     } catch (e) {
@@ -81,7 +91,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final currency = context.watch<AuthProvider>().user?.currency ?? 'USD';
+    final currency = context.watch<AuthProvider>().user?.currency ?? 'TZS';
     const accentColor = Color(0xFF6366F1); // indigo
 
     return Scaffold(
@@ -124,14 +134,28 @@ class _ProductsScreenState extends State<ProductsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          const Text('Products', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w800)),
+                          const Text(
+                            'Products',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
                           const SizedBox(height: 8),
                           Row(
                             children: [
-                              _HeaderBadge(label: '${allProducts.length} total', icon: Icons.inventory_2_outlined),
+                              _HeaderBadge(
+                                label: '${allProducts.length} total',
+                                icon: Icons.inventory_2_outlined,
+                              ),
                               const SizedBox(width: 12),
                               if (lowCount > 0)
-                                _HeaderBadge(label: '$lowCount low stock', icon: Icons.warning_amber_rounded, color: Colors.orange.shade300),
+                                _HeaderBadge(
+                                  label: '$lowCount low stock',
+                                  icon: Icons.warning_amber_rounded,
+                                  color: Colors.orange.shade300,
+                                ),
                             ],
                           ),
                         ],
@@ -144,7 +168,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
                 SliverToBoxAdapter(
                   child: Container(
                     color: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
@@ -156,9 +183,14 @@ class _ProductsScreenState extends State<ProductsScreen> {
                               onTap: () => setState(() => _filter = f.$1),
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 180),
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 8,
+                                ),
                                 decoration: BoxDecoration(
-                                  color: sel ? accentColor : accentColor.withValues(alpha: 0.1),
+                                  color: sel
+                                      ? accentColor
+                                      : accentColor.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(30),
                                 ),
                                 child: Text(
@@ -183,11 +215,17 @@ class _ProductsScreenState extends State<ProductsScreen> {
                 // ── Content ───────────────────────────────────────────
                 if (provider.loading)
                   SliverFillRemaining(
-                    child: Center(child: CircularProgressIndicator(color: accentColor)),
+                    child: Center(
+                      child: CircularProgressIndicator(color: accentColor),
+                    ),
                   )
                 else if (provider.error != null)
                   SliverFillRemaining(
-                    child: _ErrorView(message: provider.error!, onRetry: provider.fetchProducts, color: accentColor),
+                    child: _ErrorView(
+                      message: provider.error!,
+                      onRetry: provider.fetchProducts,
+                      color: accentColor,
+                    ),
                   )
                 else if (displayed.isEmpty)
                   const SliverFillRemaining(
@@ -207,8 +245,12 @@ class _ProductsScreenState extends State<ProductsScreen> {
                         product: displayed[i],
                         currency: currency,
                         accentColor: accentColor,
-                        onTap: () => context.push('/products/edit/${displayed[i].id}', extra: displayed[i]),
-                        onDelete: () => _confirmDelete(ctx, displayed[i], provider),
+                        onTap: () => context.push(
+                          '/products/edit/${displayed[i].id}',
+                          extra: displayed[i],
+                        ),
+                        onDelete: () =>
+                            _confirmDelete(ctx, displayed[i], provider),
                       ),
                     ),
                   ),
@@ -222,7 +264,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
 }
 
 class _HeaderBadge extends StatelessWidget {
-  const _HeaderBadge({required this.label, required this.icon, this.color = Colors.white70});
+  const _HeaderBadge({
+    required this.label,
+    required this.icon,
+    this.color = Colors.white70,
+  });
   final String label;
   final IconData icon;
   final Color color;
@@ -234,14 +280,27 @@ class _HeaderBadge extends StatelessWidget {
       children: [
         Icon(icon, size: 14, color: color),
         const SizedBox(width: 4),
-        Text(label, style: TextStyle(color: color, fontSize: 13, fontWeight: FontWeight.w600)),
+        Text(
+          label,
+          style: TextStyle(
+            color: color,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ],
     );
   }
 }
 
 class _ProductCard extends StatelessWidget {
-  const _ProductCard({required this.product, required this.currency, required this.accentColor, required this.onTap, required this.onDelete});
+  const _ProductCard({
+    required this.product,
+    required this.currency,
+    required this.accentColor,
+    required this.onTap,
+    required this.onDelete,
+  });
   final Product product;
   final String currency;
   final Color accentColor;
@@ -268,7 +327,11 @@ class _ProductCard extends StatelessWidget {
           color: Colors.red.shade100,
           borderRadius: BorderRadius.circular(16),
         ),
-        child: Icon(Icons.delete_outline_rounded, color: Colors.red.shade600, size: 24),
+        child: Icon(
+          Icons.delete_outline_rounded,
+          color: Colors.red.shade600,
+          size: 24,
+        ),
       ),
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 5),
@@ -286,7 +349,9 @@ class _ProductCard extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: isActive ? accentColor.withValues(alpha: 0.1) : Colors.grey.shade100,
+                    color: isActive
+                        ? accentColor.withValues(alpha: 0.1)
+                        : Colors.grey.shade100,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -303,17 +368,30 @@ class _ProductCard extends StatelessWidget {
                       Row(
                         children: [
                           Expanded(
-                            child: Text(product.name,
-                                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: kDark),
-                                maxLines: 1, overflow: TextOverflow.ellipsis),
+                            child: Text(
+                              product.name,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 14,
+                                color: kDark,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                           if (!isActive)
-                            _Badge(label: 'Inactive', bg: Colors.grey.shade100, fg: kMuted),
+                            _Badge(
+                              label: 'Inactive',
+                              bg: Colors.grey.shade100,
+                              fg: kMuted,
+                            ),
                         ],
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        product.sku != null && product.sku!.isNotEmpty ? 'SKU: ${product.sku}' : 'No SKU',
+                        product.sku != null && product.sku!.isNotEmpty
+                            ? 'SKU: ${product.sku}'
+                            : 'No SKU',
                         style: const TextStyle(fontSize: 11, color: kMuted),
                       ),
                       const SizedBox(height: 6),
@@ -321,7 +399,11 @@ class _ProductCard extends StatelessWidget {
                         children: [
                           Text(
                             '$currency ${NumberFormat('#,##0').format(product.sellingPrice)}',
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: accentColor),
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: accentColor,
+                            ),
                           ),
                           const Spacer(),
                           _Badge(
@@ -336,7 +418,11 @@ class _ProductCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 6),
-                const Icon(Icons.chevron_right_rounded, color: kMuted, size: 20),
+                const Icon(
+                  Icons.chevron_right_rounded,
+                  color: kMuted,
+                  size: 20,
+                ),
               ],
             ),
           ),
@@ -347,7 +433,12 @@ class _ProductCard extends StatelessWidget {
 }
 
 class _Badge extends StatelessWidget {
-  const _Badge({required this.label, required this.bg, required this.fg, this.icon});
+  const _Badge({
+    required this.label,
+    required this.bg,
+    required this.fg,
+    this.icon,
+  });
   final String label;
   final Color bg;
   final Color fg;
@@ -357,12 +448,25 @@ class _Badge extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(8)),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(8),
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (icon != null) ...[Icon(icon, size: 11, color: fg), const SizedBox(width: 3)],
-          Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: fg)),
+          if (icon != null) ...[
+            Icon(icon, size: 11, color: fg),
+            const SizedBox(width: 3),
+          ],
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: fg,
+            ),
+          ),
         ],
       ),
     );
@@ -370,7 +474,12 @@ class _Badge extends StatelessWidget {
 }
 
 class _EmptyView extends StatelessWidget {
-  const _EmptyView({required this.icon, required this.message, required this.hint, required this.color});
+  const _EmptyView({
+    required this.icon,
+    required this.message,
+    required this.hint,
+    required this.color,
+  });
   final IconData icon;
   final String message;
   final String hint;
@@ -386,13 +495,27 @@ class _EmptyView extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
               child: Icon(icon, size: 40, color: color),
             ),
             const SizedBox(height: 20),
-            Text(message, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: kDark)),
+            Text(
+              message,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: kDark,
+              ),
+            ),
             const SizedBox(height: 8),
-            Text(hint, style: const TextStyle(fontSize: 13, color: kMuted), textAlign: TextAlign.center),
+            Text(
+              hint,
+              style: const TextStyle(fontSize: 13, color: kMuted),
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
       ),
@@ -401,7 +524,11 @@ class _EmptyView extends StatelessWidget {
 }
 
 class _ErrorView extends StatelessWidget {
-  const _ErrorView({required this.message, required this.onRetry, required this.color});
+  const _ErrorView({
+    required this.message,
+    required this.onRetry,
+    required this.color,
+  });
   final String message;
   final VoidCallback onRetry;
   final Color color;
@@ -416,7 +543,11 @@ class _ErrorView extends StatelessWidget {
           children: [
             const Icon(Icons.wifi_off_rounded, size: 48, color: kMuted),
             const SizedBox(height: 16),
-            Text(message, textAlign: TextAlign.center, style: const TextStyle(color: kMuted, fontSize: 13)),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: kMuted, fontSize: 13),
+            ),
             const SizedBox(height: 20),
             FilledButton(
               style: FilledButton.styleFrom(backgroundColor: color),

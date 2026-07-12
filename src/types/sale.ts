@@ -16,6 +16,8 @@ export type Sale = {
   receiptNumber?: string;
   customerId?: string;
   customerName?: string;
+  promotionId?: string;
+  promotionDiscount: number;
   productId: string;
   productName: string; // denormalized — survives product renames / deletes
   quantity: number;
@@ -38,6 +40,7 @@ export type Sale = {
 
 export type SaleFormData = {
   customerId: string;
+  promotionId: string;
   productId: string;
   quantity: string;
   unitPrice: string;

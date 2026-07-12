@@ -68,5 +68,7 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>BizTrack uses the camera to scan product barcodes and QR codes.</string>
 </dict>
 </plist>

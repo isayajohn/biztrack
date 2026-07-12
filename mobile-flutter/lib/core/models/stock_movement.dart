@@ -24,17 +24,17 @@ class StockMovement {
   });
 
   factory StockMovement.fromJson(Map<String, dynamic> json) => StockMovement(
-        id: json['id']?.toString() ?? '',
-        productId:
-            json['productId']?.toString() ?? json['product_id']?.toString() ?? '',
-        productName: json['productName'] ?? json['product_name'] ?? '',
-        movementType: json['movementType'] ?? json['movement_type'] ?? '',
-        quantity: json['quantity'] ?? 0,
-        stockBefore: json['stockBefore'] ?? json['stock_before'] ?? 0,
-        stockAfter: json['stockAfter'] ?? json['stock_after'] ?? 0,
-        reason: json['reason'] as String?,
-        createdAt: json['createdAt'] ?? json['created_at'] ?? '',
-      );
+    id: json['id']?.toString() ?? '',
+    productId:
+        json['productId']?.toString() ?? json['product_id']?.toString() ?? '',
+    productName: json['productName'] ?? json['product_name'] ?? '',
+    movementType: json['movementType'] ?? json['movement_type'] ?? '',
+    quantity: json['quantity'] ?? 0,
+    stockBefore: json['stockBefore'] ?? json['stock_before'] ?? 0,
+    stockAfter: json['stockAfter'] ?? json['stock_after'] ?? 0,
+    reason: json['reason'] as String?,
+    createdAt: json['createdAt'] ?? json['created_at'] ?? '',
+  );
 
   bool get isInbound => quantity > 0;
 

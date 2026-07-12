@@ -6,11 +6,10 @@ class AuthApi {
   AuthApi(this._client);
 
   Future<Map<String, dynamic>> login(String email, String password) async {
-    final data = await _client.post(
-      '/auth/login',
-      {'email': email, 'password': password},
-      auth: false,
-    );
+    final data = await _client.post('/auth/login', {
+      'email': email,
+      'password': password,
+    }, auth: false);
     return _extractAuthResponse(data);
   }
 
@@ -22,19 +21,15 @@ class AuthApi {
     required String currency,
     required String country,
   }) async {
-    final data = await _client.post(
-      '/auth/register',
-      {
-        'name': name,
-        'email': email,
-        'password': password,
-        'password_confirmation': password,
-        'businessName': businessName,
-        'currency': currency,
-        'country': country,
-      },
-      auth: false,
-    );
+    final data = await _client.post('/auth/register', {
+      'name': name,
+      'email': email,
+      'password': password,
+      'password_confirmation': password,
+      'businessName': businessName,
+      'currency': currency,
+      'country': country,
+    }, auth: false);
     return _extractAuthResponse(data);
   }
 

@@ -2,6 +2,9 @@ export type Product = {
   id: string;
   name: string;
   sku?: string;
+  barcode?: string;
+  brand?: string;
+  brandId?: string | null;
   categoryId?: string | null;
   category?: { id: string; name: string } | null;
   supplierId?: string | null;
@@ -18,6 +21,8 @@ export type Product = {
 export type ProductFormData = {
   name: string;
   sku: string;
+  barcode: string;
+  brandId: string;
   categoryId: string;
   supplierId: string;
   buyingPrice: string;

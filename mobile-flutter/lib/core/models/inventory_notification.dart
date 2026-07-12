@@ -26,11 +26,11 @@ class InventoryNotification {
       );
 
   InventoryNotification copyWith({bool? isRead}) => InventoryNotification(
-        id: id,
-        title: title,
-        message: message,
-        type: type,
-        isRead: isRead ?? this.isRead,
-        createdAt: createdAt,
-      );
+    id: id,
+    title: title,
+    message: message,
+    type: type,
+    isRead: isRead ?? this.isRead,
+    createdAt: createdAt,
+  );
 }

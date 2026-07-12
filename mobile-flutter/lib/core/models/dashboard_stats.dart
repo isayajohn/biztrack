@@ -28,19 +28,38 @@ class DashboardStats {
 
     return DashboardStats(
       totalSales: _toDouble(
-          revenue?['current'] ?? json['total_sales'] ?? json['totalSales'] ?? 0),
+        revenue?['current'] ?? json['total_sales'] ?? json['totalSales'] ?? 0,
+      ),
       totalExpenses: _toDouble(
-          expenses?['current'] ?? json['total_expenses'] ?? json['totalExpenses'] ?? 0),
+        expenses?['current'] ??
+            json['total_expenses'] ??
+            json['totalExpenses'] ??
+            0,
+      ),
       profit: _toDouble(
-          profit?['current'] ?? json['net_profit'] ?? json['netProfit'] ?? 0),
+        profit?['current'] ?? json['net_profit'] ?? json['netProfit'] ?? 0,
+      ),
       salesCount: _toInt(
-          sales?['current'] ?? json['sales_count'] ?? json['salesCount'] ?? 0),
+        sales?['current'] ?? json['sales_count'] ?? json['salesCount'] ?? 0,
+      ),
       expensesCount: _toInt(
-          expenses?['current'] ?? json['expenses_count'] ?? json['expensesCount'] ?? 0),
+        expenses?['current'] ??
+            json['expenses_count'] ??
+            json['expensesCount'] ??
+            0,
+      ),
       lowStockCount: _toInt(
-          products?['lowStock'] ?? json['low_stock_count'] ?? json['lowStockCount'] ?? 0),
+        products?['lowStock'] ??
+            json['low_stock_count'] ??
+            json['lowStockCount'] ??
+            0,
+      ),
       totalProducts: _toInt(
-          products?['total'] ?? json['total_products'] ?? json['totalProducts'] ?? 0),
+        products?['total'] ??
+            json['total_products'] ??
+            json['totalProducts'] ??
+            0,
+      ),
     );
   }
 

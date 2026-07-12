@@ -18,12 +18,12 @@ class Supplier {
   });
 
   factory Supplier.fromJson(Map<String, dynamic> json) => Supplier(
-        id: json['id']?.toString() ?? '',
-        name: json['name'] ?? '',
-        phone: json['phone'] as String?,
-        email: json['email'] as String?,
-        address: json['address'] as String?,
-        balance: (json['balance'] ?? 0).toDouble(),
-        isActive: json['isActive'] ?? json['is_active'] ?? true,
-      );
+    id: json['id']?.toString() ?? '',
+    name: json['name'] ?? '',
+    phone: json['phone'] as String?,
+    email: json['email'] as String?,
+    address: json['address'] as String?,
+    balance: (json['balance'] ?? 0).toDouble(),
+    isActive: json['isActive'] ?? json['is_active'] ?? true,
+  );
 }

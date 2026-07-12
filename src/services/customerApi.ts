@@ -43,7 +43,7 @@ type CustomerListPayload = {
   totalCreditOutstanding: number;
 };
 
-type CustomerStatement = {
+export type CustomerStatement = {
   customer: Customer;
   creditSales: CreditSale[];
   payments: CustomerPayment[];

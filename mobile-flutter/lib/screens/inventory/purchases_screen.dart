@@ -28,7 +28,10 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
   }
 
   Future<void> _load() async {
-    setState(() { _loading = true; _error = null; });
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
       final list = await _api.getPurchases();
       if (mounted) setState(() => _purchases = list);
@@ -41,7 +44,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final currency = context.watch<AuthProvider>().user?.currency ?? 'USD';
+    final currency = context.watch<AuthProvider>().user?.currency ?? 'TZS';
 
     return Scaffold(
       body: CustomScrollView(
@@ -64,11 +67,21 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Purchases', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
+                        const Text(
+                          'Purchases',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
                         const SizedBox(height: 4),
                         Text(
                           '${_purchases.length} order${_purchases.length == 1 ? '' : 's'}',
-                          style: const TextStyle(color: Colors.white70, fontSize: 13),
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 13,
+                          ),
                         ),
                       ],
                     ),
@@ -78,19 +91,37 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
             ),
           ),
           if (_loading)
-            const SliverFillRemaining(child: Center(child: CircularProgressIndicator(color: kPrimaryGreen)))
+            const SliverFillRemaining(
+              child: Center(
+                child: CircularProgressIndicator(color: kPrimaryGreen),
+              ),
+            )
           else if (_error != null)
             SliverFillRemaining(
               child: Center(
                 child: Padding(
                   padding: const EdgeInsets.all(24),
-                  child: Column(mainAxisSize: MainAxisSize.min, children: [
-                    const Icon(Icons.cloud_off_outlined, size: 48, color: kMuted),
-                    const SizedBox(height: 12),
-                    Text(_error!, textAlign: TextAlign.center, style: const TextStyle(color: kMuted)),
-                    const SizedBox(height: 16),
-                    ElevatedButton(onPressed: _load, child: const Text('Retry')),
-                  ]),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.cloud_off_outlined,
+                        size: 48,
+                        color: kMuted,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        _error!,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: kMuted),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _load,
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             )
@@ -99,13 +130,31 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
               child: Center(
                 child: Padding(
                   padding: EdgeInsets.all(32),
-                  child: Column(mainAxisSize: MainAxisSize.min, children: [
-                    Icon(Icons.shopping_cart_outlined, size: 64, color: kMuted),
-                    SizedBox(height: 16),
-                    Text('No purchases yet', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: kDark)),
-                    SizedBox(height: 8),
-                    Text('Purchase orders will appear here.', style: TextStyle(color: kMuted), textAlign: TextAlign.center),
-                  ]),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.shopping_cart_outlined,
+                        size: 64,
+                        color: kMuted,
+                      ),
+                      SizedBox(height: 16),
+                      Text(
+                        'No purchases yet',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: kDark,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        'Purchase orders will appear here.',
+                        style: TextStyle(color: kMuted),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             )
@@ -114,7 +163,10 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
               padding: const EdgeInsets.all(16),
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate(
-                  (_, i) => _PurchaseCard(purchase: _purchases[i], currency: currency),
+                  (_, i) => _PurchaseCard(
+                    purchase: _purchases[i],
+                    currency: currency,
+                  ),
                   childCount: _purchases.length,
                 ),
               ),
@@ -132,9 +184,12 @@ class _PurchaseCard extends StatelessWidget {
 
   Color get _statusColor {
     switch (purchase.status) {
-      case 'RECEIVED': return Colors.green.shade600;
-      case 'CANCELLED': return Colors.red.shade600;
-      default: return Colors.orange.shade700;
+      case 'RECEIVED':
+        return Colors.green.shade600;
+      case 'CANCELLED':
+        return Colors.red.shade600;
+      default:
+        return Colors.orange.shade700;
     }
   }
 
@@ -161,29 +216,54 @@ class _PurchaseCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     purchase.supplierName ?? 'Unknown Supplier',
-                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: kDark),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 15,
+                      color: kDark,
+                    ),
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: _statusColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Text(purchase.statusLabel, style: TextStyle(color: _statusColor, fontSize: 11, fontWeight: FontWeight.w700)),
+                  child: Text(
+                    purchase.statusLabel,
+                    style: TextStyle(
+                      color: _statusColor,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 8),
             Row(
               children: [
-                const Icon(Icons.calendar_today_outlined, size: 13, color: kMuted),
+                const Icon(
+                  Icons.calendar_today_outlined,
+                  size: 13,
+                  color: kMuted,
+                ),
                 const SizedBox(width: 4),
-                Text(dateStr, style: const TextStyle(color: kMuted, fontSize: 12)),
+                Text(
+                  dateStr,
+                  style: const TextStyle(color: kMuted, fontSize: 12),
+                ),
                 const Spacer(),
                 Text(
                   '$currency ${fmt.format(purchase.totalAmount)}',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: kDark),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: kDark,
+                  ),
                 ),
               ],
             ),
@@ -191,21 +271,42 @@ class _PurchaseCard extends StatelessWidget {
               const SizedBox(height: 8),
               const Divider(height: 1),
               const SizedBox(height: 8),
-              ...purchase.items.take(3).map((item) => Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Row(
-                  children: [
-                    const Icon(Icons.circle, size: 6, color: kMuted),
-                    const SizedBox(width: 6),
-                    Expanded(child: Text(item.productName, style: const TextStyle(fontSize: 12, color: kDark))),
-                    Text('x${item.quantity}', style: const TextStyle(fontSize: 12, color: kMuted)),
-                    const SizedBox(width: 8),
-                    Text('$currency ${fmt.format(item.totalCost)}', style: const TextStyle(fontSize: 12, color: kMuted)),
-                  ],
-                ),
-              )),
+              ...purchase.items
+                  .take(3)
+                  .map(
+                    (item) => Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.circle, size: 6, color: kMuted),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              item.productName,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: kDark,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            'x${item.quantity}',
+                            style: const TextStyle(fontSize: 12, color: kMuted),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '$currency ${fmt.format(item.totalCost)}',
+                            style: const TextStyle(fontSize: 12, color: kMuted),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
               if (purchase.items.length > 3)
-                Text('+ ${purchase.items.length - 3} more items', style: const TextStyle(fontSize: 11, color: kMuted)),
+                Text(
+                  '+ ${purchase.items.length - 3} more items',
+                  style: const TextStyle(fontSize: 11, color: kMuted),
+                ),
             ],
           ],
         ),

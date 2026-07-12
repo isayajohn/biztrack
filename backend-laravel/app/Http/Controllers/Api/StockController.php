@@ -16,7 +16,7 @@ class StockController extends Controller
 {
     private function getBusiness(): ?Business
     {
-        return Business::where('user_id', auth()->id())->first();
+        return Business::forUser(auth()->user());
     }
 
     public function stockIn(Request $request): JsonResponse
@@ -279,6 +279,25 @@ class StockController extends Controller
             'success' => true,
             'data'    => $this->formatAdjustment($adjustment->load('product')),
         ], 201);
+    }
+
+    public function getAdjustments(Request $request): JsonResponse
+    {
+        $business = $this->getBusiness();
+        if (!$business) {
+            return response()->json(['success' => true, 'data' => ['adjustments' => [], 'total' => 0]]);
+        }
+
+        $query = StockAdjustment::where('business_id', $business->id)->with('product');
+        if ($request->filled('status')) $query->where('status', $request->status);
+        if ($request->filled('productId')) $query->where('product_id', $request->productId);
+
+        $adjustments = $query->orderByDesc('created_at')->get();
+
+        return response()->json(['success' => true, 'data' => [
+            'adjustments' => $adjustments->map(fn (StockAdjustment $adjustment) => $this->formatAdjustment($adjustment)),
+            'total' => $adjustments->count(),
+        ]]);
     }
 
     public function approveAdjustment(string $id): JsonResponse

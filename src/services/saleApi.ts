@@ -41,6 +41,8 @@ function normalizeSale(sale: ApiSale): Sale {
     receiptNumber: sale.receiptNumber,
     customerId: sale.customerId,
     customerName: sale.customerName,
+    promotionId: sale.promotionId,
+    promotionDiscount: Number(sale.promotionDiscount ?? 0),
     quantity: Number(sale.quantity ?? 0),
     unitPrice: Number(sale.unitPrice ?? 0),
     totalAmount: Number(sale.totalAmount ?? 0),
@@ -81,7 +83,7 @@ export async function getSaleById(id: string): Promise<Sale | undefined> {
 }
 
 export async function createSale(
-  data: Omit<Sale, "id" | "createdAt" | "updatedAt" | "balanceDue" | "discount" | "taxRate" | "taxAmount" | "paidAmount"> & {
+  data: Omit<Sale, "id" | "createdAt" | "updatedAt" | "balanceDue" | "discount" | "promotionDiscount" | "taxRate" | "taxAmount" | "paidAmount"> & {
     discount?: number;
     taxRate?: number;
     paidAmount?: number;

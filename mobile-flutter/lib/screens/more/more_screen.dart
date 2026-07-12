@@ -23,7 +23,7 @@ class MoreScreen extends StatelessWidget {
               background: Container(
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Color(0xFF0D47A1), Color(0xFF1565C0)],
+                    colors: [kSecondaryGreen, kPrimaryGreen],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -39,10 +39,18 @@ class MoreScreen extends StatelessWidget {
                           children: [
                             CircleAvatar(
                               radius: 24,
-                              backgroundColor: Colors.white.withValues(alpha: 0.25),
+                              backgroundColor: Colors.white.withValues(
+                                alpha: 0.25,
+                              ),
                               child: Text(
-                                user?.name.isNotEmpty == true ? user!.name[0].toUpperCase() : 'B',
-                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 20),
+                                user?.name.isNotEmpty == true
+                                    ? user!.name[0].toUpperCase()
+                                    : 'B',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 20,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 14),
@@ -50,8 +58,21 @@ class MoreScreen extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(user?.name ?? 'User', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
-                                  Text(user?.businessName ?? 'My Business', style: const TextStyle(color: Colors.white70, fontSize: 13)),
+                                  Text(
+                                    user?.name ?? 'User',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  Text(
+                                    user?.businessName ?? 'My Business',
+                                    style: const TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 13,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -70,12 +91,69 @@ class MoreScreen extends StatelessWidget {
               delegate: SliverChildListDelegate([
                 _sectionHeader('Analytics'),
                 const SizedBox(height: 8),
-                _tile(context, icon: Icons.bar_chart_rounded, color: Colors.indigo.shade600, label: 'Reports & P&L', subtitle: 'Profit, loss & top products', route: '/reports'),
+                _tile(
+                  context,
+                  icon: Icons.bar_chart_rounded,
+                  color: Colors.indigo.shade600,
+                  label: 'Reports & P&L',
+                  subtitle: 'Profit, loss & top products',
+                  route: '/reports',
+                ),
+                _tile(
+                  context,
+                  icon: Icons.account_balance_wallet_outlined,
+                  color: kPrimaryGreen,
+                  label: 'Cash Flow & Purchases',
+                  subtitle: 'Cash movements and purchase analytics',
+                  route: '/reports/advanced',
+                ),
+                if (user?.can('customers.view') == true)
+                  _tile(
+                    context,
+                    icon: Icons.people_outline,
+                    color: kSecondaryGreen,
+                    label: 'Customers & Credit',
+                    subtitle: 'Customers, balances and repayments',
+                    route: '/customers',
+                  ),
+                if (user?.can('promotions.manage') == true)
+                  _tile(
+                    context,
+                    icon: Icons.local_offer_outlined,
+                    color: kSun,
+                    label: 'Promotions',
+                    subtitle: 'Discount codes and campaigns',
+                    route: '/promotions',
+                  ),
+                if (user?.can('branches.manage') == true ||
+                    user?.can('staff.manage') == true)
+                  _tile(
+                    context,
+                    icon: Icons.corporate_fare_outlined,
+                    color: kClay,
+                    label: 'Branches & Staff',
+                    subtitle: 'Locations, roles and permissions',
+                    route: '/organization',
+                  ),
                 const SizedBox(height: 20),
                 _sectionHeader('Account'),
                 const SizedBox(height: 8),
-                _tile(context, icon: Icons.notifications_outlined, color: Colors.amber.shade700, label: 'Notifications', subtitle: 'Alerts & stock warnings', route: '/notifications'),
-                _tile(context, icon: Icons.settings_outlined, color: kMuted, label: 'Settings', subtitle: 'Profile & business settings', route: '/settings'),
+                _tile(
+                  context,
+                  icon: Icons.notifications_outlined,
+                  color: Colors.amber.shade700,
+                  label: 'Notifications',
+                  subtitle: 'Alerts & stock warnings',
+                  route: '/notifications',
+                ),
+                _tile(
+                  context,
+                  icon: Icons.settings_outlined,
+                  color: kMuted,
+                  label: 'Settings',
+                  subtitle: 'Profile & business settings',
+                  route: '/settings',
+                ),
                 const SizedBox(height: 24),
               ]),
             ),
@@ -87,10 +165,16 @@ class MoreScreen extends StatelessWidget {
 
   Widget _sectionHeader(String title) => Text(
     title,
-    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kMuted, letterSpacing: 0.5),
+    style: const TextStyle(
+      fontSize: 13,
+      fontWeight: FontWeight.w700,
+      color: kMuted,
+      letterSpacing: 0.5,
+    ),
   );
 
-  Widget _tile(BuildContext context, {
+  Widget _tile(
+    BuildContext context, {
     required IconData icon,
     required Color color,
     required String label,
@@ -102,17 +186,36 @@ class MoreScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        boxShadow: [BoxShadow(color: kDark.withValues(alpha: 0.05), blurRadius: 6, offset: const Offset(0, 2))],
+        boxShadow: [
+          BoxShadow(
+            color: kDark.withValues(alpha: 0.05),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: ListTile(
         onTap: () => context.push(route),
         leading: Container(
           padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(12)),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(12),
+          ),
           child: Icon(icon, color: color, size: 22),
         ),
-        title: Text(label, style: const TextStyle(fontWeight: FontWeight.w600, color: kDark, fontSize: 14)),
-        subtitle: Text(subtitle, style: const TextStyle(color: kMuted, fontSize: 12)),
+        title: Text(
+          label,
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            color: kDark,
+            fontSize: 14,
+          ),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: const TextStyle(color: kMuted, fontSize: 12),
+        ),
         trailing: const Icon(Icons.chevron_right_rounded, color: kMuted),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       ),

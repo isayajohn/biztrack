@@ -29,10 +29,14 @@ class _LoginScreenState extends State<LoginScreen>
   void initState() {
     super.initState();
     _animCtrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 550));
+      vsync: this,
+      duration: const Duration(milliseconds: 550),
+    );
     _fadeAnim = CurvedAnimation(parent: _animCtrl, curve: Curves.easeOut);
-    _slideAnim = Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero)
-        .animate(CurvedAnimation(parent: _animCtrl, curve: Curves.easeOut));
+    _slideAnim = Tween<Offset>(
+      begin: const Offset(0, 0.1),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _animCtrl, curve: Curves.easeOut));
     _animCtrl.forward();
   }
 
@@ -52,9 +56,9 @@ class _LoginScreenState extends State<LoginScreen>
     });
     try {
       await context.read<AuthProvider>().login(
-            _emailCtrl.text.trim(),
-            _passCtrl.text,
-          );
+        _emailCtrl.text.trim(),
+        _passCtrl.text,
+      );
       if (mounted) context.go('/');
     } catch (e) {
       setState(() => _error = e.toString());
@@ -91,21 +95,25 @@ class _LoginScreenState extends State<LoginScreen>
 
           // Decorative circles
           Positioned(
-              top: -70,
-              right: -70,
-              child: AuthDecorCircle(size: 240, opacity: 0.07)),
+            top: -70,
+            right: -70,
+            child: AuthDecorCircle(size: 240, opacity: 0.07),
+          ),
           Positioned(
-              top: 90,
-              left: -50,
-              child: AuthDecorCircle(size: 160, opacity: 0.05)),
+            top: 90,
+            left: -50,
+            child: AuthDecorCircle(size: 160, opacity: 0.05),
+          ),
           Positioned(
-              top: size.height * 0.2,
-              right: 24,
-              child: AuthDecorCircle(size: 60, opacity: 0.09)),
+            top: size.height * 0.2,
+            right: 24,
+            child: AuthDecorCircle(size: 60, opacity: 0.09),
+          ),
           Positioned(
-              top: size.height * 0.1,
-              left: size.width * 0.42,
-              child: AuthDecorCircle(size: 38, opacity: 0.06)),
+            top: size.height * 0.1,
+            left: size.width * 0.42,
+            child: AuthDecorCircle(size: 38, opacity: 0.06),
+          ),
 
           SafeArea(
             child: Column(
@@ -128,8 +136,11 @@ class _LoginScreenState extends State<LoginScreen>
                               width: 1.5,
                             ),
                           ),
-                          child: const Icon(Icons.trending_up_rounded,
-                              size: 40, color: Colors.white),
+                          child: const Icon(
+                            Icons.trending_up_rounded,
+                            size: 40,
+                            color: Colors.white,
+                          ),
                         ),
                         const SizedBox(height: 16),
                         const Text(
@@ -173,8 +184,7 @@ class _LoginScreenState extends State<LoginScreen>
                           ),
                         ),
                         child: SingleChildScrollView(
-                          padding:
-                              const EdgeInsets.fromLTRB(28, 16, 28, 20),
+                          padding: const EdgeInsets.fromLTRB(28, 16, 28, 20),
                           child: Form(
                             key: _formKey,
                             child: Column(
@@ -245,8 +255,8 @@ class _LoginScreenState extends State<LoginScreen>
                                       color: kMuted,
                                       size: 20,
                                     ),
-                                    onPressed: () => setState(
-                                        () => _obscure = !_obscure),
+                                    onPressed: () =>
+                                        setState(() => _obscure = !_obscure),
                                   ),
                                   validator: (v) {
                                     if (v == null || v.isEmpty) {
@@ -269,13 +279,16 @@ class _LoginScreenState extends State<LoginScreen>
                                     style: TextButton.styleFrom(
                                       foregroundColor: kPrimaryGreen,
                                       padding: const EdgeInsets.symmetric(
-                                          vertical: 8, horizontal: 4),
+                                        vertical: 8,
+                                        horizontal: 4,
+                                      ),
                                     ),
                                     child: const Text(
                                       'Forgot password?',
                                       style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 13),
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 13,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -288,21 +301,24 @@ class _LoginScreenState extends State<LoginScreen>
                                 ),
                                 const SizedBox(height: 24),
 
-                                Row(children: [
-                                  const Expanded(child: Divider()),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 12),
-                                    child: Text(
-                                      'New to BizTrack?',
-                                      style: TextStyle(
-                                          color:
-                                              kMuted.withValues(alpha: 0.7),
-                                          fontSize: 12),
+                                Row(
+                                  children: [
+                                    const Expanded(child: Divider()),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                      ),
+                                      child: Text(
+                                        'New to BizTrack?',
+                                        style: TextStyle(
+                                          color: kMuted.withValues(alpha: 0.7),
+                                          fontSize: 12,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                  const Expanded(child: Divider()),
-                                ]),
+                                    const Expanded(child: Divider()),
+                                  ],
+                                ),
                                 const SizedBox(height: 14),
 
                                 GestureDetector(
@@ -310,10 +326,11 @@ class _LoginScreenState extends State<LoginScreen>
                                   child: Container(
                                     height: 50,
                                     decoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.circular(14),
+                                      borderRadius: BorderRadius.circular(14),
                                       border: Border.all(
-                                          color: kPrimaryGreen, width: 1.5),
+                                        color: kPrimaryGreen,
+                                        width: 1.5,
+                                      ),
                                     ),
                                     child: const Center(
                                       child: Text(

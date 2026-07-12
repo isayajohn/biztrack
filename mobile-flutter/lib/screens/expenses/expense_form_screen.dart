@@ -74,8 +74,8 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
       'category': _category,
       'description': _descCtrl.text.trim(),
       'amount': double.tryParse(_amountCtrl.text) ?? 0,
-      'payment_method': _paymentMethod,
-      'expense_date': DateFormat('yyyy-MM-dd').format(_expenseDate),
+      'paymentMethod': _paymentMethod,
+      'expenseDate': DateFormat('yyyy-MM-dd').format(_expenseDate),
       'notes': _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
     };
     try {
@@ -86,18 +86,19 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
         await provider.createExpense(payload);
       }
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(_isEditing ? 'Expense updated!' : 'Expense added!'),
-          backgroundColor: kPrimaryGreen,
-        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_isEditing ? 'Expense updated!' : 'Expense added!'),
+            backgroundColor: kPrimaryGreen,
+          ),
+        );
         context.pop();
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(e.toString()),
-          backgroundColor: Colors.red,
-        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+        );
       }
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -123,10 +124,12 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
               label: 'Category',
               value: _category,
               items: Expense.categories
-                  .map((c) => DropdownMenuItem(
-                        value: c,
-                        child: Text(Expense.categoryLabel(c)),
-                      ))
+                  .map(
+                    (c) => DropdownMenuItem(
+                      value: c,
+                      child: Text(Expense.categoryLabel(c)),
+                    ),
+                  )
                   .toList(),
               onChanged: (v) => setState(() => _category = v!),
             ),
@@ -149,8 +152,9 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
               label: 'Amount',
               child: TextFormField(
                 controller: _amountCtrl,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 textInputAction: TextInputAction.next,
                 decoration: const InputDecoration(
                   hintText: '0.00',
@@ -169,10 +173,12 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
               label: 'Payment Method',
               value: _paymentMethod,
               items: Expense.paymentMethods
-                  .map((m) => DropdownMenuItem(
-                        value: m,
-                        child: Text(Expense.paymentMethodLabel(m)),
-                      ))
+                  .map(
+                    (m) => DropdownMenuItem(
+                      value: m,
+                      child: Text(Expense.paymentMethodLabel(m)),
+                    ),
+                  )
                   .toList(),
               onChanged: (v) => setState(() => _paymentMethod = v!),
             ),
@@ -210,7 +216,9 @@ class _ExpenseFormScreenState extends State<ExpenseFormScreen> {
                       height: 20,
                       width: 20,
                       child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white),
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
                     )
                   : Text(_isEditing ? 'Update Expense' : 'Add Expense'),
             ),

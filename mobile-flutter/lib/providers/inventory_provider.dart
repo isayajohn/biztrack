@@ -27,10 +27,7 @@ class InventoryProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchMovements({
-    String? productId,
-    String? movementType,
-  }) async {
+  Future<void> fetchMovements({String? productId, String? movementType}) async {
     loading = true;
     notifyListeners();
     try {
@@ -48,8 +45,7 @@ class InventoryProvider extends ChangeNotifier {
 
   Future<void> fetchNotifications({bool unreadOnly = false}) async {
     try {
-      notifications =
-          await _api.getNotifications(unreadOnly: unreadOnly);
+      notifications = await _api.getNotifications(unreadOnly: unreadOnly);
       unreadCount = notifications.where((n) => !n.isRead).length;
       notifyListeners();
     } catch (_) {}

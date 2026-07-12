@@ -22,22 +22,40 @@ class ReportData {
     final summary = json['summary'] is Map ? json['summary'] as Map : null;
 
     List<Map<String, dynamic>> products = [];
-    final raw = json['topProducts'] ?? json['top_products'] ?? json['products'] ?? [];
+    final raw =
+        json['topProducts'] ?? json['top_products'] ?? json['products'] ?? [];
     if (raw is List) {
       products = raw.map((e) => Map<String, dynamic>.from(e as Map)).toList();
     }
 
     return ReportData(
       totalSales: _toDouble(
-          summary?['totalRevenue'] ?? json['total_sales'] ?? json['totalSales'] ?? 0),
+        summary?['totalRevenue'] ??
+            json['total_sales'] ??
+            json['totalSales'] ??
+            0,
+      ),
       totalExpenses: _toDouble(
-          summary?['totalExpenses'] ?? json['total_expenses'] ?? json['totalExpenses'] ?? 0),
+        summary?['totalExpenses'] ??
+            json['total_expenses'] ??
+            json['totalExpenses'] ??
+            0,
+      ),
       netProfit: _toDouble(
-          summary?['profit'] ?? json['net_profit'] ?? json['netProfit'] ?? 0),
+        summary?['profit'] ?? json['net_profit'] ?? json['netProfit'] ?? 0,
+      ),
       salesCount: _toInt(
-          summary?['totalSales'] ?? json['sales_count'] ?? json['salesCount'] ?? 0),
+        summary?['totalSales'] ??
+            json['sales_count'] ??
+            json['salesCount'] ??
+            0,
+      ),
       expensesCount: _toInt(
-          summary?['totalExpenseCount'] ?? json['expenses_count'] ?? json['expensesCount'] ?? 0),
+        summary?['totalExpenseCount'] ??
+            json['expenses_count'] ??
+            json['expensesCount'] ??
+            0,
+      ),
       topProducts: products,
     );
   }
@@ -71,12 +89,14 @@ class ReportApi {
   final ApiClient _client;
   ReportApi(this._client);
 
-  Future<ReportData> getReports(
-      {required String startDate, required String endDate}) async {
-    final data = await _client.get('/reports', params: {
-      'startDate': startDate,
-      'endDate': endDate,
-    });
+  Future<ReportData> getReports({
+    required String startDate,
+    required String endDate,
+  }) async {
+    final data = await _client.get(
+      '/reports',
+      params: {'startDate': startDate, 'endDate': endDate},
+    );
     if (data is Map<String, dynamic>) {
       return ReportData.fromJson(data);
     }

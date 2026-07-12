@@ -17,7 +17,7 @@ class PurchaseController extends Controller
 {
     private function getBusiness(): ?Business
     {
-        return Business::where('user_id', auth()->id())->first();
+        return Business::forUser(auth()->user());
     }
 
     public function listPurchases(Request $request): JsonResponse
@@ -140,6 +140,7 @@ class PurchaseController extends Controller
         $purchase = PurchaseOrder::create([
             'id'            => Str::uuid()->toString(),
             'business_id'   => $business->id,
+            'branch_id'     => $business->branchIdForUser(auth()->user(), $request->header('X-Branch-Id')),
             'supplier_id'   => $data['supplierId'] ?? null,
             'order_number'  => $orderNumber,
             'total_amount'  => $totalAmount,

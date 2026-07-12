@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Product;
 use App\Models\StockMovement;
+use App\Models\Business;
 use Illuminate\Support\Str;
 
 class StockService
@@ -37,6 +38,7 @@ class StockService
         $movement = StockMovement::create([
             'id'             => Str::uuid()->toString(),
             'business_id'    => $product->business_id,
+            'branch_id'      => Business::find($product->business_id)?->branchIdForUser(auth()->user(), request()->header('X-Branch-Id')),
             'product_id'     => $product->id,
             'movement_type'  => $movementType,
             'quantity'       => $quantity,

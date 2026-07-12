@@ -7,6 +7,8 @@ import {
   updateProduct,
 } from "../services/productService";
 import { getCategories, getSuppliers } from "../services/inventoryApi";
+import { getBrands } from "../services/brandApi";
+import type { Brand } from "../services/brandApi";
 import type { Category, Supplier } from "../services/inventoryApi";
 import { getApiErrorMessage } from "../services/apiClient";
 import type { ProductFormData } from "../types/product";
@@ -72,6 +74,8 @@ function inputCls(hasError?: boolean) {
 const EMPTY_FORM: ProductFormData = {
   name: "",
   sku: "",
+  barcode: "",
+  brandId: "",
   categoryId: "",
   supplierId: "",
   buyingPrice: "",
@@ -80,6 +84,12 @@ const EMPTY_FORM: ProductFormData = {
   lowStockLevel: "5",
   isActive: true,
 };
+
+function generateBarcode(): string {
+  const body = `${Date.now()}`.slice(-11).padStart(11, "0");
+  const checksum = body.split("").reduce((sum, digit, index) => sum + Number(digit) * (index % 2 === 0 ? 3 : 1), 0);
+  return `${body}${(10 - (checksum % 10)) % 10}`;
+}
 
 // ─── ProductFormPage ──────────────────────────────────────────────────────────
 
@@ -102,13 +112,15 @@ export default function ProductFormPage({ embedded = false, onClose, onSaved }: 
   const [notFound, setNotFound] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [brands, setBrands] = useState<Brand[]>([]);
 
   // Load categories and suppliers for dropdowns
   useEffect(() => {
-    Promise.all([getCategories(), getSuppliers()])
-      .then(([cats, sups]) => {
+    Promise.all([getCategories(), getSuppliers(), getBrands({ isActive: true })])
+      .then(([cats, sups, nextBrands]) => {
         setCategories(cats.filter((c) => c.isActive));
         setSuppliers(sups.filter((s) => s.isActive));
+        setBrands(nextBrands);
       })
       .catch(() => {});
   }, []);
@@ -128,6 +140,8 @@ export default function ProductFormPage({ embedded = false, onClose, onSaved }: 
         setFields({
           name: product.name,
           sku: product.sku ?? "",
+          barcode: product.barcode ?? "",
+          brandId: product.brandId ?? "",
           categoryId: product.categoryId ?? "",
           supplierId: product.supplierId ?? "",
           buyingPrice: String(product.buyingPrice),
@@ -193,6 +207,8 @@ export default function ProductFormPage({ embedded = false, onClose, onSaved }: 
       const data = {
         name: fields.name.trim(),
         sku: fields.sku.trim() || undefined,
+        barcode: fields.barcode.trim() || undefined,
+        brandId: fields.brandId || null,
         categoryId: fields.categoryId || null,
         supplierId: fields.supplierId || null,
         buyingPrice: parseFloat(fields.buyingPrice),
@@ -296,7 +312,8 @@ export default function ProductFormPage({ embedded = false, onClose, onSaved }: 
           </div>
 
           {/* SKU */}
-          <div className="mt-4">
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <div>
             <label
               htmlFor="sku"
               className="mb-1.5 block text-sm font-semibold text-ink"
@@ -312,10 +329,15 @@ export default function ProductFormPage({ embedded = false, onClose, onSaved }: 
               onChange={set("sku")}
               className={inputCls()}
             />
+            </div>
+            <div>
+              <label htmlFor="barcode" className="mb-1.5 block text-sm font-semibold text-ink">Barcode <span className="font-normal text-ink/40">(optional)</span></label>
+              <div className="flex gap-2"><input id="barcode" type="text" placeholder="Scan or enter barcode" value={fields.barcode} onChange={set("barcode")} className={inputCls()} /><button type="button" onClick={() => setFields((current) => ({ ...current, barcode: generateBarcode() }))} className="rounded-xl border border-ink/15 px-3 text-xs font-bold text-ink/55">Generate</button></div>
+            </div>
           </div>
 
           {/* Category + Supplier */}
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div className="mt-4 grid gap-4 sm:grid-cols-3">
             <div>
               <label
                 htmlFor="categoryId"
@@ -359,6 +381,10 @@ export default function ProductFormPage({ embedded = false, onClose, onSaved }: 
                   </option>
                 ))}
               </select>
+            </div>
+            <div>
+              <label htmlFor="brandId" className="mb-1.5 block text-sm font-semibold text-ink">Brand <span className="font-normal text-ink/40">(optional)</span></label>
+              <select id="brandId" value={fields.brandId} onChange={setSelect("brandId")} className={inputCls()}><option value="">— No brand —</option>{brands.map((brand) => <option key={brand.id} value={brand.id}>{brand.name}</option>)}</select>
             </div>
           </div>
         </section>

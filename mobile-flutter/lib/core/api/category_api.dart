@@ -8,12 +8,16 @@ class CategoryApi {
   Future<List<Category>> getCategories() async {
     final data = await _client.get('/categories');
     if (data is List) {
-      return data.map((e) => Category.fromJson(e as Map<String, dynamic>)).toList();
+      return data
+          .map((e) => Category.fromJson(e as Map<String, dynamic>))
+          .toList();
     }
     if (data is Map) {
       final inner = data['categories'] ?? data['data'];
       if (inner is List) {
-        return inner.map((e) => Category.fromJson(e as Map<String, dynamic>)).toList();
+        return inner
+            .map((e) => Category.fromJson(e as Map<String, dynamic>))
+            .toList();
       }
     }
     return [];
@@ -22,12 +26,17 @@ class CategoryApi {
   Future<Category> createCategory(String name, {String? description}) async {
     final data = await _client.post('/categories', {
       'name': name,
-      if (description != null && description.isNotEmpty) 'description': description,
+      if (description != null && description.isNotEmpty)
+        'description': description,
     });
     return Category.fromJson(data as Map<String, dynamic>);
   }
 
-  Future<Category> updateCategory(String id, String name, {String? description}) async {
+  Future<Category> updateCategory(
+    String id,
+    String name, {
+    String? description,
+  }) async {
     final data = await _client.put('/categories/$id', {
       'name': name,
       if (description != null) 'description': description,

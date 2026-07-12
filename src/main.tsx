@@ -25,15 +25,24 @@ import ExpensesPage from "./pages/ExpensesPage";
 import ExpenseFormPage from "./pages/ExpenseFormPage";
 import ProductsPage from "./pages/ProductsPage";
 import ProductFormPage from "./pages/ProductFormPage";
+import ProductLabelPage from "./pages/ProductLabelPage";
 import ReportsPage from "./pages/ReportsPage";
+import CashFlowReportPage from "./pages/CashFlowReportPage";
+import PurchaseReportPage from "./pages/PurchaseReportPage";
 import SubscriptionPage from "./pages/SubscriptionPage";
 import SettingsPage from "./pages/SettingsPage";
 import OnboardingPage from "./pages/OnboardingPage";
 import CategoriesPage from "./pages/CategoriesPage";
+import BrandsPage from "./pages/BrandsPage";
+import PromotionsPage from "./pages/PromotionsPage";
+import BranchesPage from "./pages/BranchesPage";
+import StaffPage from "./pages/StaffPage";
 import SuppliersPage from "./pages/SuppliersPage";
 import CustomersPage from "./pages/CustomersPage";
+import CustomerStatementPage from "./pages/CustomerStatementPage";
 import PurchasesPage from "./pages/PurchasesPage";
 import StockMovementsPage from "./pages/StockMovementsPage";
+import StockAdjustmentsPage from "./pages/StockAdjustmentsPage";
 import StockInPage from "./pages/StockInPage";
 import DamagedStockPage from "./pages/DamagedStockPage";
 import InventoryReportsPage from "./pages/InventoryReportsPage";
@@ -95,16 +104,25 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 <Route path="/products" element={<ProductsPage />} />
                 <Route path="/products/new" element={<ProductFormPage />} />
                 <Route path="/products/:id/edit" element={<ProductFormPage />} />
+                <Route path="/products/:id/label" element={<ProductLabelPage />} />
                 <Route path="/reports" element={<ReportsPage />} />
+                <Route path="/reports/cash-flow" element={<CashFlowReportPage />} />
+                <Route path="/reports/purchases" element={<PurchaseReportPage />} />
                 <Route path="/subscription" element={<SubscriptionPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
                 {/* Inventory module */}
                 <Route path="/inventory/categories" element={<CategoriesPage />} />
+                <Route path="/inventory/brands" element={<BrandsPage />} />
+                <Route path="/promotions" element={<PromotionsPage />} />
+                <Route path="/branches" element={<BranchesPage />} />
+                <Route path="/staff" element={<StaffPage />} />
                 <Route path="/inventory/suppliers" element={<SuppliersPage />} />
                 <Route path="/customers" element={<CustomersPage />} />
+                <Route path="/customers/:id/statement" element={<CustomerStatementPage />} />
                 <Route path="/inventory/purchases" element={<PurchasesPage />} />
                 <Route path="/inventory/stock-in" element={<StockInPage />} />
                 <Route path="/inventory/stock-movements" element={<StockMovementsPage />} />
+                <Route path="/inventory/stock-adjustments" element={<StockAdjustmentsPage />} />
                 <Route path="/inventory/damaged-stock" element={<DamagedStockPage />} />
                 <Route path="/inventory/reports" element={<InventoryReportsPage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />

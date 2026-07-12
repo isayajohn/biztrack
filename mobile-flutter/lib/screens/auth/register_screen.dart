@@ -17,19 +17,36 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
   final _bizNameCtrl = TextEditingController();
-  String _currency = 'USD';
+  String _currency = 'TZS';
   String _country = 'Tanzania';
   bool _loading = false;
   bool _obscure = true;
   String? _error;
 
   static const _currencies = [
-    'USD', 'TZS', 'KES', 'UGX', 'ZAR', 'NGN', 'GHS', 'EUR', 'GBP',
+    'USD',
+    'TZS',
+    'KES',
+    'UGX',
+    'ZAR',
+    'NGN',
+    'GHS',
+    'EUR',
+    'GBP',
   ];
 
   static const _countries = [
-    'Tanzania', 'Kenya', 'Uganda', 'South Africa', 'Nigeria', 'Ghana',
-    'Rwanda', 'Ethiopia', 'Zambia', 'Zimbabwe', 'Other',
+    'Tanzania',
+    'Kenya',
+    'Uganda',
+    'South Africa',
+    'Nigeria',
+    'Ghana',
+    'Rwanda',
+    'Ethiopia',
+    'Zambia',
+    'Zimbabwe',
+    'Other',
   ];
 
   @override
@@ -49,13 +66,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
     try {
       await context.read<AuthProvider>().register(
-            name: _nameCtrl.text.trim(),
-            email: _emailCtrl.text.trim(),
-            password: _passCtrl.text,
-            businessName: _bizNameCtrl.text.trim(),
-            currency: _currency,
-            country: _country,
-          );
+        name: _nameCtrl.text.trim(),
+        email: _emailCtrl.text.trim(),
+        password: _passCtrl.text,
+        businessName: _bizNameCtrl.text.trim(),
+        currency: _currency,
+        country: _country,
+      );
       if (mounted) context.go('/');
     } catch (e) {
       setState(() => _error = e.toString());
@@ -136,9 +153,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     labelText: 'Password',
                     prefixIcon: const Icon(Icons.lock_outline),
                     suffixIcon: IconButton(
-                      icon: Icon(_obscure
-                          ? Icons.visibility_off_outlined
-                          : Icons.visibility_outlined),
+                      icon: Icon(
+                        _obscure
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                      ),
                       onPressed: () => setState(() => _obscure = !_obscure),
                     ),
                   ),
@@ -195,14 +214,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.error_outline,
-                            color: Colors.red.shade600, size: 16),
+                        Icon(
+                          Icons.error_outline,
+                          color: Colors.red.shade600,
+                          size: 16,
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             _error!,
                             style: TextStyle(
-                                color: Colors.red.shade700, fontSize: 13),
+                              color: Colors.red.shade700,
+                              fontSize: 13,
+                            ),
                           ),
                         ),
                       ],
@@ -217,7 +241,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           height: 20,
                           width: 20,
                           child: CircularProgressIndicator(
-                              strokeWidth: 2, color: Colors.white),
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
                         )
                       : const Text('Create Account'),
                 ),
@@ -225,8 +251,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('Already have an account? ',
-                        style: TextStyle(color: kMuted)),
+                    const Text(
+                      'Already have an account? ',
+                      style: TextStyle(color: kMuted),
+                    ),
                     GestureDetector(
                       onTap: () => context.go('/login'),
                       child: const Text(

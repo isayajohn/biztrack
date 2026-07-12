@@ -1,21 +1,26 @@
 import 'package:flutter/material.dart';
 
-const kPrimaryGreen = Color(0xFF2D7A4F);
-const kLightGreen = Color(0xFFE8F5EE);
-const kDark = Color(0xFF1A1F1E);
-const kBg = Color(0xFFF7F5EE);
-const kMuted = Color(0xFF6B7280);
+// Shared with the web design tokens in tailwind.config.js.
+const kPrimaryGreen = Color(0xFF18BD97);
+const kSecondaryGreen = Color(0xFF0B9279);
+const kLightGreen = Color(0xFFE7FAF5);
+const kDark = Color(0xFF10231E);
+const kBg = Color(0xFFF7FAF9);
+const kMuted = Color(0xFF60756E);
+const kSun = Color(0xFFF59E0B);
+const kClay = Color(0xFFB45309);
 
 // API host selection:
-//   Physical Android/iOS device → uses Mac mDNS hostname (works on any network, never changes)
-//   Android emulator            → flutter run --dart-define=BIZTRACK_API_BASE_URL=http://10.0.2.2:8000/api
-//   iOS simulator               → flutter run --dart-define=BIZTRACK_API_BASE_URL=http://127.0.0.1:8000/api
-const _kMdnsHost = 'Isayas-MacBook-Pro.local'; // Mac mDNS hostname — always works on same WiFi
+//   Physical Android/iOS device → uses the Mac mDNS hostname on the same local network
+//   Android emulator            → flutter run --dart-define=BIZTRACK_API_BASE_URL=http://10.0.2.2:8002/api
+//   iOS simulator               → flutter run --dart-define=BIZTRACK_API_BASE_URL=http://127.0.0.1:8002/api
+const _kMdnsHost =
+    'Isayas-MacBook-Pro.local'; // Mac mDNS hostname for same-network devices
 
 String get kApiBaseUrl {
   const override = String.fromEnvironment('BIZTRACK_API_BASE_URL');
   if (override.isNotEmpty) return override;
-  return 'http://$_kMdnsHost:8000/api';
+  return 'http://$_kMdnsHost:8002/api';
 }
 
 ThemeData buildAppTheme() {

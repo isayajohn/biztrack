@@ -41,6 +41,13 @@ class SaleProvider extends ChangeNotifier {
     return sale;
   }
 
+  Future<Sale> createPosSale(Map<String, dynamic> payload) async {
+    final sale = await _api.createPosSale(payload);
+    _sales.insert(0, sale);
+    notifyListeners();
+    return sale;
+  }
+
   Future<Sale> updateSale(String id, Map<String, dynamic> payload) async {
     final updated = await _api.updateSale(id, payload);
     final idx = _sales.indexWhere((s) => s.id == id);

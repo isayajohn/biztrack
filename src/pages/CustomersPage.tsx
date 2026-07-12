@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
-import { CreditCard, Pencil, Plus, Search, Trash2, UserRound, X } from "lucide-react";
+import { CreditCard, FileText, Pencil, Plus, Search, Trash2, UserRound, X } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { getApiErrorMessage } from "../services/apiClient";
 import {
@@ -35,7 +36,7 @@ function today() {
 
 export default function CustomersPage() {
   const { user } = useAuth();
-  const currency = user?.currency ?? "USD";
+  const currency = user?.currency ?? "TZS";
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -194,6 +195,7 @@ export default function CustomersPage() {
                     <td className="px-4 py-3 font-semibold">{formatCurrency(customer.creditLimit, currency)}</td>
                     <td className={`px-4 py-3 font-extrabold ${customer.creditBalance > 0 ? "text-red-600" : "text-leaf"}`}>{formatCurrency(customer.creditBalance, currency)}</td>
                     <td className="px-4 py-3"><div className="flex justify-end gap-1.5">
+                      <Link to={`/customers/${customer.id}/statement`} className="rounded-lg border border-ink/10 p-2 text-ink/60" title="Statement"><FileText size={15} /></Link>
                       {customer.creditBalance > 0 && <button type="button" onClick={() => { setPaymentCustomer(customer); setPayment((current) => ({ ...current, amount: String(customer.creditBalance) })); }} className="rounded-lg border border-leaf/20 bg-mint p-2 text-leaf" title="Record payment"><CreditCard size={15} /></button>}
                       <button type="button" onClick={() => openEdit(customer)} className="rounded-lg border border-ink/10 p-2 text-ink/60" title="Edit"><Pencil size={15} /></button>
                       <button type="button" onClick={() => void removeCustomer(customer)} className="rounded-lg border border-red-100 p-2 text-red-500" title="Delete"><Trash2 size={15} /></button>

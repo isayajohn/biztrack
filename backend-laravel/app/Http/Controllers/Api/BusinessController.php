@@ -14,7 +14,7 @@ class BusinessController extends Controller
     public function getBusinessProfile(Request $request): JsonResponse
     {
         $user = auth()->user();
-        $business = Business::where('user_id', $user->id)->with('activeSubscription.package')->first();
+        $business = Business::forUser($user)?->load('activeSubscription.package');
 
         if (!$business) {
             return response()->json(['success' => false, 'error' => 'Business not found'], 404);
@@ -35,7 +35,7 @@ class BusinessController extends Controller
             'defaultTaxRate' => 'nullable|numeric|min:0|max:100',
         ]);
 
-        $business = Business::where('user_id', $user->id)->first();
+        $business = Business::forUser($user);
 
         if (!$business) {
             $business = Business::create([

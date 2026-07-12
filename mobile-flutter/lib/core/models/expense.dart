@@ -23,8 +23,7 @@ class Expense {
       category: json['category'] ?? 'OTHER',
       description: json['description'] ?? '',
       amount: _toDouble(json['amount']),
-      paymentMethod:
-          json['payment_method'] ?? json['paymentMethod'] ?? 'CASH',
+      paymentMethod: json['payment_method'] ?? json['paymentMethod'] ?? 'CASH',
       expenseDate: json['expense_date'] ?? json['expenseDate'] ?? '',
       notes: json['notes'],
     );

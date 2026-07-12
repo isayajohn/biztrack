@@ -13,7 +13,9 @@ class SaleApi {
     if (data is Map) {
       final inner = data['sales'] ?? data['data'];
       if (inner is List) {
-        return inner.map((e) => Sale.fromJson(e as Map<String, dynamic>)).toList();
+        return inner
+            .map((e) => Sale.fromJson(e as Map<String, dynamic>))
+            .toList();
       }
     }
     return [];
@@ -26,6 +28,11 @@ class SaleApi {
 
   Future<Sale> createSale(Map<String, dynamic> payload) async {
     final data = await _client.post('/sales', payload);
+    return Sale.fromJson(data as Map<String, dynamic>);
+  }
+
+  Future<Sale> createPosSale(Map<String, dynamic> payload) async {
+    final data = await _client.post('/sales/pos', payload);
     return Sale.fromJson(data as Map<String, dynamic>);
   }
 

@@ -1,7 +1,11 @@
+import { useEffect, useState } from "react";
 import { LogOut, ShieldCheck } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import BrandLogo from "../BrandLogo";
+import { getBranches } from "../../services/organizationApi";
+import type { Branch } from "../../services/organizationApi";
+import { ACTIVE_BRANCH_KEY } from "../../services/apiClient";
 
 type Props = {
   isAdminSection?: boolean;
@@ -10,6 +14,10 @@ type Props = {
 export default function Topbar({ isAdminSection = false }: Props) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [branches, setBranches] = useState<Branch[]>([]);
+  const [activeBranch, setActiveBranch] = useState(() => localStorage.getItem(ACTIVE_BRANCH_KEY) ?? user?.branch?.id ?? "");
+
+  useEffect(() => { if (user?.businessRole === "OWNER" || user?.businessRole === "MANAGER") getBranches().then((items) => { setBranches(items.filter((branch) => branch.isActive)); if (!activeBranch) { const selected = items.find((branch) => branch.isDefault)?.id ?? ""; if (selected) { setActiveBranch(selected); localStorage.setItem(ACTIVE_BRANCH_KEY, selected); } } }).catch(() => undefined); }, [user?.businessRole]);
 
   const handleLogout = () => {
     logout();
@@ -35,6 +43,7 @@ export default function Topbar({ isAdminSection = false }: Props) {
 
       {/* Right side: user info (mobile) + logout */}
       <div className="ml-auto flex items-center gap-3 lg:ml-0">
+        {branches.length > 1 && <select value={activeBranch} onChange={(event) => { setActiveBranch(event.target.value); localStorage.setItem(ACTIVE_BRANCH_KEY, event.target.value); window.location.reload(); }} className="hidden rounded-xl border border-ink/15 bg-white px-3 py-1.5 text-xs font-bold text-ink/60 sm:block">{branches.map((branch) => <option key={branch.id} value={branch.id}>{branch.name}</option>)}</select>}
         {user?.role === "SUPER_ADMIN" && !isAdminSection && (
           <Link
             to="/admin"

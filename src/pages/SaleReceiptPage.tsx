@@ -22,7 +22,7 @@ export default function SaleReceiptPage() {
   if (error) return <div className="mx-auto max-w-3xl p-6 text-sm font-semibold text-red-600">{error}</div>;
   if (!sale) return <div className="mx-auto max-w-3xl p-6 text-sm font-semibold text-ink/45">Loading document...</div>;
 
-  const netAmount = sale.totalAmount - sale.discount + sale.taxAmount;
+  const netAmount = sale.totalAmount - sale.discount - sale.promotionDiscount + sale.taxAmount;
   const documentLabel = sale.balanceDue > 0 ? "INVOICE" : "RECEIPT";
 
   return (
@@ -51,6 +51,7 @@ export default function SaleReceiptPage() {
         <section className="ml-auto mt-6 max-w-sm space-y-2 text-sm">
           <Line label="Subtotal" value={formatCurrency(sale.totalAmount, user?.currency)} />
           <Line label="Discount" value={`- ${formatCurrency(sale.discount, user?.currency)}`} />
+          {sale.promotionDiscount > 0 && <Line label="Promotion" value={`- ${formatCurrency(sale.promotionDiscount, user?.currency)}`} />}
           <Line label={`Tax / VAT (${sale.taxRate}%)`} value={formatCurrency(sale.taxAmount, user?.currency)} />
           <Line label="Total" value={formatCurrency(netAmount, user?.currency)} strong />
           <Line label="Paid" value={formatCurrency(sale.paidAmount, user?.currency)} />

@@ -58,8 +58,10 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
               expandedHeight: 140,
               pinned: true,
               leading: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                    color: Colors.white),
+                icon: const Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: Colors.white,
+                ),
                 onPressed: () => context.pop(),
               ),
               flexibleSpace: FlexibleSpaceBar(
@@ -88,7 +90,9 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                           const SizedBox(height: 4),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 3),
+                              horizontal: 10,
+                              vertical: 3,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.white.withValues(alpha: 0.25),
                               borderRadius: BorderRadius.circular(20),
@@ -96,9 +100,10 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                             child: Text(
                               '${_suppliers.length} supplier${_suppliers.length == 1 ? '' : 's'}',
                               style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600),
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ],
@@ -122,12 +127,17 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.cloud_off_outlined,
-                            size: 48, color: kMuted),
+                        const Icon(
+                          Icons.cloud_off_outlined,
+                          size: 48,
+                          color: kMuted,
+                        ),
                         const SizedBox(height: 12),
-                        Text(_error!,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(color: kMuted)),
+                        Text(
+                          _error!,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(color: kMuted),
+                        ),
                         const SizedBox(height: 16),
                         ElevatedButton(
                           onPressed: _loadSuppliers,
@@ -146,8 +156,11 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.people_outline_rounded,
-                            size: 64, color: kMuted),
+                        Icon(
+                          Icons.people_outline_rounded,
+                          size: 64,
+                          color: kMuted,
+                        ),
                         SizedBox(height: 16),
                         Text(
                           'No suppliers added yet',
@@ -244,33 +257,37 @@ class _SupplierCard extends StatelessWidget {
                       _ActiveBadge(isActive: supplier.isActive),
                     ],
                   ),
-                  if (supplier.phone != null &&
-                      supplier.phone!.isNotEmpty) ...[
+                  if (supplier.phone != null && supplier.phone!.isNotEmpty) ...[
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(Icons.phone_outlined,
-                            size: 13, color: kMuted),
+                        const Icon(
+                          Icons.phone_outlined,
+                          size: 13,
+                          color: kMuted,
+                        ),
                         const SizedBox(width: 4),
-                        Text(supplier.phone!,
-                            style: const TextStyle(
-                                color: kMuted, fontSize: 12)),
+                        Text(
+                          supplier.phone!,
+                          style: const TextStyle(color: kMuted, fontSize: 12),
+                        ),
                       ],
                     ),
                   ],
-                  if (supplier.email != null &&
-                      supplier.email!.isNotEmpty) ...[
+                  if (supplier.email != null && supplier.email!.isNotEmpty) ...[
                     const SizedBox(height: 2),
                     Row(
                       children: [
-                        const Icon(Icons.email_outlined,
-                            size: 13, color: kMuted),
+                        const Icon(
+                          Icons.email_outlined,
+                          size: 13,
+                          color: kMuted,
+                        ),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             supplier.email!,
-                            style:
-                                const TextStyle(color: kMuted, fontSize: 12),
+                            style: const TextStyle(color: kMuted, fontSize: 12),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -282,7 +299,9 @@ class _SupplierCard extends StatelessWidget {
                     const SizedBox(height: 6),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 3),
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.orange.shade50,
                         borderRadius: BorderRadius.circular(8),

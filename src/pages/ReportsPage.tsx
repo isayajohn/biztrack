@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
+import { Link } from "react-router-dom";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -28,6 +29,8 @@ import {
   CircleDollarSign,
   Download,
   FileText,
+  FileDown,
+  Sheet,
   PackageSearch,
   Printer,
   TrendingUp,
@@ -51,6 +54,7 @@ import {
   getDefaultReportRange,
 } from "../utils/reportUtils";
 import type { ProductPerformanceRow, ReportRangePreset } from "../utils/reportUtils";
+import { exportTableExcel, exportTablePdf } from "../utils/exportUtils";
 
 const RANGE_OPTIONS: { key: ReportRangePreset; label: string }[] = [
   { key: "today", label: "Today" },
@@ -223,7 +227,7 @@ function PerformanceList({
 
 export default function ReportsPage() {
   const { user } = useAuth();
-  const currency = user?.currency ?? "USD";
+  const currency = user?.currency ?? "TZS";
 
   const [products, setProducts] = useState<Product[]>([]);
   const [sales, setSales] = useState<Sale[]>([]);
@@ -317,6 +321,17 @@ export default function ReportsPage() {
   };
 
   const handlePrint = () => window.print();
+  const exportColumns = [
+    { header: "Date", value: (row: ReportTableRow) => row.date },
+    { header: "Type", value: (row: ReportTableRow) => row.type },
+    { header: "Title", value: (row: ReportTableRow) => row.title },
+    { header: "Detail", value: (row: ReportTableRow) => row.detail },
+    { header: "Payment", value: (row: ReportTableRow) => row.paymentMethod },
+    { header: "Amount", value: (row: ReportTableRow) => row.amount },
+    { header: "Profit", value: (row: ReportTableRow) => row.profit ?? 0 },
+  ];
+  const handleExportPdf = () => exportTablePdf({ title: "Sales, Expenses & Profit Report", subtitle: rangeLabel, fileName: `biztrack-report-${range.startDate}-${range.endDate}.pdf`, columns: exportColumns, rows: reportRows, summary: [["Sales", fmt(report.summary.totalSales)], ["Expenses", fmt(report.summary.totalExpenses)], ["Net profit", fmt(report.summary.netProfit)]] });
+  const handleExportExcel = () => exportTableExcel({ sheetName: "Business Report", fileName: `biztrack-report-${range.startDate}-${range.endDate}.xlsx`, columns: exportColumns, rows: reportRows });
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6">
@@ -334,6 +349,8 @@ export default function ReportsPage() {
         </div>
 
         <div className="flex flex-wrap gap-2">
+          <Link to="/reports/cash-flow" className="inline-flex items-center gap-1.5 rounded-xl border border-leaf/20 bg-mint px-3.5 py-2 text-xs font-bold text-leaf">Cash Flow</Link>
+          <Link to="/reports/purchases" className="inline-flex items-center gap-1.5 rounded-xl border border-leaf/20 bg-mint px-3.5 py-2 text-xs font-bold text-leaf">Purchases</Link>
           <button
             type="button"
             onClick={handleExportCsv}
@@ -343,6 +360,8 @@ export default function ReportsPage() {
             <Download size={14} aria-hidden="true" />
             Export CSV
           </button>
+          <button type="button" onClick={handleExportPdf} disabled={!hasTransactions} className="inline-flex items-center gap-1.5 rounded-xl border border-ink/15 bg-white px-3.5 py-2 text-xs font-bold text-ink disabled:opacity-45"><FileDown size={14} /> PDF</button>
+          <button type="button" onClick={() => void handleExportExcel()} disabled={!hasTransactions} className="inline-flex items-center gap-1.5 rounded-xl border border-ink/15 bg-white px-3.5 py-2 text-xs font-bold text-ink disabled:opacity-45"><Sheet size={14} /> Excel</button>
           <button
             type="button"
             onClick={handlePrint}

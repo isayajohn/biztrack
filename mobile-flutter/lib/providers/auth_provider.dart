@@ -40,6 +40,11 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> login(String email, String password) async {
+    if (!await _apiClient.healthCheck()) {
+      throw ApiException(
+        'BizTrack server is unreachable. Confirm the phone is on the same network as the API and try again.',
+      );
+    }
     final result = await _authApi.login(email, password);
     _token = result['token'] as String;
     _user = result['user'] as User;

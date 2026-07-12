@@ -17,6 +17,9 @@ type ApiUser = {
   email: string;
   role: "USER" | "SUPER_ADMIN";
   status: "ACTIVE" | "SUSPENDED";
+  businessRole?: User["businessRole"];
+  permissions?: string[];
+  branch?: { id: string; name: string } | null;
   business?: ApiBusiness | null;
   businesses?: ApiBusiness[];
 };
@@ -47,9 +50,12 @@ export function mapApiUser(user: ApiUser): User {
     email: user.email,
     role: user.role,
     status: user.status,
+    businessRole: user.businessRole,
+    permissions: user.permissions ?? [],
+    branch: user.branch ?? null,
     businessName: business?.name ?? "My Business",
     businessId: business?.id,
-    currency: business?.currency ?? "USD",
+    currency: business?.currency ?? "TZS",
     country: business?.country,
   };
 }

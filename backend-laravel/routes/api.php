@@ -7,6 +7,10 @@ use App\Http\Controllers\Api\AdminSubscriptionController;
 use App\Http\Controllers\Api\AiController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BusinessController;
+use App\Http\Controllers\Api\BrandController;
+use App\Http\Controllers\Api\BranchController;
+use App\Http\Controllers\Api\PromotionController;
+use App\Http\Controllers\Api\StaffController;
 use App\Http\Controllers\Api\EmailConfigController;
 use App\Http\Controllers\Api\EmailTemplateController;
 use App\Http\Controllers\Api\ExpenseController;
@@ -74,90 +78,123 @@ Route::middleware('jwt.auth')->group(function () {
 
     // Business
     Route::get('/business', [BusinessController::class, 'getBusinessProfile']);
-    Route::put('/business', [BusinessController::class, 'updateBusinessProfile']);
+    Route::put('/business', [BusinessController::class, 'updateBusinessProfile'])->middleware('permission:settings.manage');
 
     // Products
     Route::prefix('products')->group(function () {
-        Route::get('/', [ProductController::class, 'listProducts']);
-        Route::post('/', [ProductController::class, 'createProduct']);
-        Route::get('/{id}', [ProductController::class, 'getProduct']);
-        Route::put('/{id}', [ProductController::class, 'updateProduct']);
-        Route::delete('/{id}', [ProductController::class, 'deleteProduct']);
+        Route::get('/', [ProductController::class, 'listProducts'])->middleware('permission:products.view');
+        Route::post('/', [ProductController::class, 'createProduct'])->middleware('permission:products.manage');
+        Route::get('/{id}', [ProductController::class, 'getProduct'])->middleware('permission:products.view');
+        Route::put('/{id}', [ProductController::class, 'updateProduct'])->middleware('permission:products.manage');
+        Route::delete('/{id}', [ProductController::class, 'deleteProduct'])->middleware('permission:products.manage');
+    });
+
+    Route::prefix('brands')->group(function () {
+        Route::get('/', [BrandController::class, 'index'])->middleware('permission:products.view');
+        Route::post('/', [BrandController::class, 'store'])->middleware('permission:products.manage');
+        Route::put('/{id}', [BrandController::class, 'update'])->middleware('permission:products.manage');
+        Route::delete('/{id}', [BrandController::class, 'destroy'])->middleware('permission:products.manage');
+    });
+
+    Route::get('/promotions', [PromotionController::class, 'index']);
+    Route::middleware('permission:promotions.manage')->prefix('promotions')->group(function () {
+        Route::post('/', [PromotionController::class, 'store']);
+        Route::put('/{id}', [PromotionController::class, 'update']);
+        Route::delete('/{id}', [PromotionController::class, 'destroy']);
+    });
+
+    Route::get('/branches', [BranchController::class, 'index']);
+    Route::middleware('permission:branches.manage')->prefix('branches')->group(function () {
+        Route::post('/', [BranchController::class, 'store']);
+        Route::put('/{id}', [BranchController::class, 'update']);
+        Route::put('/{id}/default', [BranchController::class, 'makeDefault']);
+        Route::delete('/{id}', [BranchController::class, 'destroy']);
+    });
+
+    Route::middleware('permission:staff.manage')->prefix('staff')->group(function () {
+        Route::get('/', [StaffController::class, 'index']);
+        Route::post('/', [StaffController::class, 'store']);
+        Route::put('/{id}', [StaffController::class, 'update']);
+        Route::delete('/{id}', [StaffController::class, 'destroy']);
     });
 
     // Sales
     Route::prefix('sales')->group(function () {
-        Route::get('/', [SaleController::class, 'listSales']);
-        Route::post('/', [SaleController::class, 'createSale']);
-        Route::get('/{id}', [SaleController::class, 'getSale']);
-        Route::put('/{id}', [SaleController::class, 'updateSale']);
-        Route::delete('/{id}', [SaleController::class, 'deleteSale']);
+        Route::get('/', [SaleController::class, 'listSales'])->middleware('permission:sales.view');
+        Route::post('/', [SaleController::class, 'createSale'])->middleware('permission:sales.create');
+        Route::post('/pos', [SaleController::class, 'createPosSale'])->middleware('permission:sales.create');
+        Route::get('/{id}', [SaleController::class, 'getSale'])->middleware('permission:sales.view');
+        Route::put('/{id}', [SaleController::class, 'updateSale'])->middleware('permission:sales.edit');
+        Route::delete('/{id}', [SaleController::class, 'deleteSale'])->middleware('permission:sales.delete');
     });
 
     // Expenses
     Route::prefix('expenses')->group(function () {
-        Route::get('/', [ExpenseController::class, 'listExpenses']);
-        Route::post('/', [ExpenseController::class, 'createExpense']);
-        Route::get('/{id}', [ExpenseController::class, 'getExpense']);
-        Route::put('/{id}', [ExpenseController::class, 'updateExpense']);
-        Route::delete('/{id}', [ExpenseController::class, 'deleteExpense']);
+        Route::get('/', [ExpenseController::class, 'listExpenses'])->middleware('permission:expenses.view');
+        Route::post('/', [ExpenseController::class, 'createExpense'])->middleware('permission:expenses.manage');
+        Route::get('/{id}', [ExpenseController::class, 'getExpense'])->middleware('permission:expenses.view');
+        Route::put('/{id}', [ExpenseController::class, 'updateExpense'])->middleware('permission:expenses.manage');
+        Route::delete('/{id}', [ExpenseController::class, 'deleteExpense'])->middleware('permission:expenses.manage');
     });
 
     // Dashboard
-    Route::get('/dashboard', [ReportController::class, 'getDashboard']);
+    Route::get('/dashboard', [ReportController::class, 'getDashboard'])->middleware('permission:dashboard.view');
 
     // Reports
-    Route::get('/reports', [ReportController::class, 'getReports']);
-    Route::get('/reports/inventory-dashboard', [ReportController::class, 'inventoryDashboard']);
+    Route::get('/reports', [ReportController::class, 'getReports'])->middleware('permission:reports.view');
+    Route::get('/reports/inventory-dashboard', [ReportController::class, 'inventoryDashboard'])->middleware('permission:inventory.view');
+    Route::get('/reports/cash-flow', [ReportController::class, 'cashFlow'])->middleware('permission:reports.view');
+    Route::get('/reports/purchases', [ReportController::class, 'purchaseReport'])->middleware('permission:reports.view');
 
     // Categories
     Route::prefix('categories')->group(function () {
-        Route::get('/', [CategoryController::class, 'listCategories']);
-        Route::post('/', [CategoryController::class, 'createCategory']);
-        Route::put('/{id}', [CategoryController::class, 'updateCategory']);
-        Route::delete('/{id}', [CategoryController::class, 'deleteCategory']);
+        Route::get('/', [CategoryController::class, 'listCategories'])->middleware('permission:products.view');
+        Route::post('/', [CategoryController::class, 'createCategory'])->middleware('permission:products.manage');
+        Route::put('/{id}', [CategoryController::class, 'updateCategory'])->middleware('permission:products.manage');
+        Route::delete('/{id}', [CategoryController::class, 'deleteCategory'])->middleware('permission:products.manage');
     });
 
     // Suppliers
     Route::prefix('suppliers')->group(function () {
-        Route::get('/', [SupplierController::class, 'listSuppliers']);
-        Route::post('/', [SupplierController::class, 'createSupplier']);
-        Route::get('/{id}', [SupplierController::class, 'getSupplier']);
-        Route::put('/{id}', [SupplierController::class, 'updateSupplier']);
-        Route::delete('/{id}', [SupplierController::class, 'deleteSupplier']);
+        Route::get('/', [SupplierController::class, 'listSuppliers'])->middleware('permission:purchases.view');
+        Route::post('/', [SupplierController::class, 'createSupplier'])->middleware('permission:purchases.manage');
+        Route::get('/{id}', [SupplierController::class, 'getSupplier'])->middleware('permission:purchases.view');
+        Route::put('/{id}', [SupplierController::class, 'updateSupplier'])->middleware('permission:purchases.manage');
+        Route::delete('/{id}', [SupplierController::class, 'deleteSupplier'])->middleware('permission:purchases.manage');
     });
 
     // Customers and customer credit
     Route::prefix('customers')->group(function () {
-        Route::get('/', [CustomerController::class, 'index']);
-        Route::post('/', [CustomerController::class, 'store']);
-        Route::get('/{id}', [CustomerController::class, 'show']);
-        Route::put('/{id}', [CustomerController::class, 'update']);
-        Route::delete('/{id}', [CustomerController::class, 'destroy']);
-        Route::get('/{id}/statement', [CustomerController::class, 'statement']);
-        Route::post('/{id}/payments', [CustomerController::class, 'recordPayment']);
+        Route::get('/', [CustomerController::class, 'index'])->middleware('permission:customers.view');
+        Route::post('/', [CustomerController::class, 'store'])->middleware('permission:customers.manage');
+        Route::get('/{id}', [CustomerController::class, 'show'])->middleware('permission:customers.view');
+        Route::put('/{id}', [CustomerController::class, 'update'])->middleware('permission:customers.manage');
+        Route::delete('/{id}', [CustomerController::class, 'destroy'])->middleware('permission:customers.manage');
+        Route::get('/{id}/statement', [CustomerController::class, 'statement'])->middleware('permission:customers.view');
+        Route::post('/{id}/payments', [CustomerController::class, 'recordPayment'])->middleware('permission:customers.manage');
     });
 
     // Stock
     Route::prefix('stock')->group(function () {
-        Route::post('/in', [StockController::class, 'stockIn']);
-        Route::post('/out', [StockController::class, 'stockOut']);
-        Route::get('/movements', [StockController::class, 'getMovements']);
-        Route::get('/low-stock', [StockController::class, 'getLowStock']);
-        Route::get('/expired', [StockController::class, 'getExpired']);
-        Route::post('/adjustment', [StockController::class, 'createAdjustment']);
-        Route::put('/adjustment/{id}/approve', [StockController::class, 'approveAdjustment']);
-        Route::put('/adjustment/{id}/reject', [StockController::class, 'rejectAdjustment']);
+        Route::post('/in', [StockController::class, 'stockIn'])->middleware('permission:inventory.manage');
+        Route::post('/out', [StockController::class, 'stockOut'])->middleware('permission:inventory.manage');
+        Route::get('/movements', [StockController::class, 'getMovements'])->middleware('permission:inventory.view');
+        Route::get('/low-stock', [StockController::class, 'getLowStock'])->middleware('permission:inventory.view');
+        Route::get('/expired', [StockController::class, 'getExpired'])->middleware('permission:inventory.view');
+        Route::get('/adjustments', [StockController::class, 'getAdjustments'])->middleware('permission:inventory.view');
+        Route::post('/adjustment', [StockController::class, 'createAdjustment'])->middleware('permission:inventory.manage');
+        Route::put('/adjustment/{id}/approve', [StockController::class, 'approveAdjustment'])->middleware('permission:inventory.manage');
+        Route::put('/adjustment/{id}/reject', [StockController::class, 'rejectAdjustment'])->middleware('permission:inventory.manage');
     });
 
     // Purchases
     Route::prefix('purchases')->group(function () {
-        Route::get('/', [PurchaseController::class, 'listPurchases']);
-        Route::post('/', [PurchaseController::class, 'createPurchase']);
-        Route::get('/{id}', [PurchaseController::class, 'getPurchase']);
-        Route::put('/{id}', [PurchaseController::class, 'updatePurchase']);
-        Route::put('/{id}/receive', [PurchaseController::class, 'receivePurchase']);
-        Route::delete('/{id}', [PurchaseController::class, 'deletePurchase']);
+        Route::get('/', [PurchaseController::class, 'listPurchases'])->middleware('permission:purchases.view');
+        Route::post('/', [PurchaseController::class, 'createPurchase'])->middleware('permission:purchases.manage');
+        Route::get('/{id}', [PurchaseController::class, 'getPurchase'])->middleware('permission:purchases.view');
+        Route::put('/{id}', [PurchaseController::class, 'updatePurchase'])->middleware('permission:purchases.manage');
+        Route::put('/{id}/receive', [PurchaseController::class, 'receivePurchase'])->middleware('permission:purchases.manage');
+        Route::delete('/{id}', [PurchaseController::class, 'deletePurchase'])->middleware('permission:purchases.manage');
     });
 
     // Damaged stock

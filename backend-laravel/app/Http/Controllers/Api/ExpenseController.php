@@ -14,7 +14,7 @@ class ExpenseController extends Controller
 {
     private function getBusiness(): ?Business
     {
-        return Business::where('user_id', auth()->id())->first();
+        return Business::forUser(auth()->user());
     }
 
     public function listExpenses(Request $request): JsonResponse
@@ -62,6 +62,7 @@ class ExpenseController extends Controller
         $expense = Expense::create([
             'id' => Str::uuid(),
             'business_id' => $business->id,
+            'branch_id' => $business->branchIdForUser(auth()->user(), $request->header('X-Branch-Id')),
             'category' => $data['category'],
             'description' => $data['description'],
             'amount' => $data['amount'],

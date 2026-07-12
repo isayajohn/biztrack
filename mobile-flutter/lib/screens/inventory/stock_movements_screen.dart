@@ -35,22 +35,22 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
 
   void _loadMovements() {
     context.read<InventoryProvider>().fetchMovements(
-          movementType: _selectedFilter.isEmpty ? null : _selectedFilter,
-        );
+      movementType: _selectedFilter.isEmpty ? null : _selectedFilter,
+    );
   }
 
   Future<void> _refresh() async {
     context.read<InventoryProvider>().fetchMovements(
-          movementType: _selectedFilter.isEmpty ? null : _selectedFilter,
-        );
+      movementType: _selectedFilter.isEmpty ? null : _selectedFilter,
+    );
   }
 
   void _selectFilter(String value) {
     if (_selectedFilter == value) return;
     setState(() => _selectedFilter = value);
     context.read<InventoryProvider>().fetchMovements(
-          movementType: value.isEmpty ? null : value,
-        );
+      movementType: value.isEmpty ? null : value,
+    );
   }
 
   String _formatDate(String raw) {
@@ -98,13 +98,16 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 6),
+                      horizontal: 14,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: selected ? kPrimaryGreen : Colors.white,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color:
-                            selected ? kPrimaryGreen : const Color(0xFFE5E7EB),
+                        color: selected
+                            ? kPrimaryGreen
+                            : const Color(0xFFE5E7EB),
                       ),
                     ),
                     child: Text(
@@ -138,12 +141,17 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.cloud_off_outlined,
-                              size: 48, color: kMuted),
+                          const Icon(
+                            Icons.cloud_off_outlined,
+                            size: 48,
+                            color: kMuted,
+                          ),
                           const SizedBox(height: 12),
-                          Text(provider.error!,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(color: kMuted)),
+                          Text(
+                            provider.error!,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(color: kMuted),
+                          ),
                           const SizedBox(height: 16),
                           ElevatedButton(
                             onPressed: _refresh,
@@ -165,15 +173,19 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
                         Center(
                           child: Column(
                             children: [
-                              Icon(Icons.swap_horiz_rounded,
-                                  size: 56, color: kMuted),
+                              Icon(
+                                Icons.swap_horiz_rounded,
+                                size: 56,
+                                color: kMuted,
+                              ),
                               SizedBox(height: 16),
                               Text(
                                 'No movements found',
                                 style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: kDark),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: kDark,
+                                ),
                               ),
                               SizedBox(height: 6),
                               Text(
@@ -193,7 +205,9 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
                   color: kPrimaryGreen,
                   child: ListView.builder(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 8),
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     itemCount: provider.movements.length,
                     itemBuilder: (_, i) {
                       final m = provider.movements[i];
@@ -217,16 +231,15 @@ class _MovementCard extends StatelessWidget {
   final StockMovement movement;
   final String formattedDate;
 
-  const _MovementCard({
-    required this.movement,
-    required this.formattedDate,
-  });
+  const _MovementCard({required this.movement, required this.formattedDate});
 
   @override
   Widget build(BuildContext context) {
     final color = StockMovement.typeColor(movement.movementType);
     final isPositive = movement.quantity > 0;
-    final qtyColor = isPositive ? const Color(0xFF10B981) : const Color(0xFFEF4444);
+    final qtyColor = isPositive
+        ? const Color(0xFF10B981)
+        : const Color(0xFFEF4444);
     final qtyPrefix = isPositive ? '+' : '';
 
     return Card(
@@ -279,17 +292,18 @@ class _MovementCard extends StatelessWidget {
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        _TypeBadge(
-                            label: movement.typeLabel, color: color),
+                        _TypeBadge(label: movement.typeLabel, color: color),
                         const Spacer(),
                         Text(
                           '${movement.stockBefore} → ${movement.stockAfter}',
-                          style: const TextStyle(
-                              color: kMuted, fontSize: 12),
+                          style: const TextStyle(color: kMuted, fontSize: 12),
                         ),
                         const SizedBox(width: 4),
-                        const Icon(Icons.arrow_right_alt_rounded,
-                            color: kMuted, size: 16),
+                        const Icon(
+                          Icons.arrow_right_alt_rounded,
+                          color: kMuted,
+                          size: 16,
+                        ),
                       ],
                     ),
                     if (movement.reason != null &&
@@ -305,8 +319,7 @@ class _MovementCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       formattedDate,
-                      style:
-                          const TextStyle(color: kMuted, fontSize: 11),
+                      style: const TextStyle(color: kMuted, fontSize: 11),
                     ),
                   ],
                 ),

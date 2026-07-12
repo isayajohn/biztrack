@@ -19,7 +19,7 @@ class InventoryHubScreen extends StatelessWidget {
               background: Container(
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Color(0xFF1B5E20), kPrimaryGreen],
+                    colors: [kSecondaryGreen, kPrimaryGreen],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -41,10 +41,7 @@ class InventoryHubScreen extends StatelessWidget {
                         ),
                         Text(
                           'Manage stock, suppliers & purchases',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 13,
-                          ),
+                          style: TextStyle(color: Colors.white70, fontSize: 13),
                         ),
                       ],
                     ),
@@ -87,6 +84,13 @@ class InventoryHubScreen extends StatelessWidget {
                     subtitle: 'Track stock changes',
                     color: Colors.indigo.shade600,
                     route: '/inventory/movements',
+                  ),
+                  const _MenuItem(
+                    icon: Icons.tune_rounded,
+                    label: 'Brands & Counts',
+                    subtitle: 'Brands and stock adjustments',
+                    color: kClay,
+                    route: '/inventory/management',
                   ),
                 ]),
                 const SizedBox(height: 20),

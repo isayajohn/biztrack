@@ -12,7 +12,7 @@ class InventoryNotificationController extends Controller
 {
     private function getBusiness(): ?Business
     {
-        return Business::where('user_id', auth()->id())->first();
+        return Business::forUser(auth()->user());
     }
 
     public function list(Request $request): JsonResponse

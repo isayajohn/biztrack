@@ -15,8 +15,9 @@ export default function AppLayout() {
   const navItems = useMemo(() => {
     if (isAdminSection) return ADMIN_NAV_ITEMS;
     if (user?.role === "SUPER_ADMIN") return [...NAV_ITEMS, ADMIN_BUTTON_NAV_ITEM];
-    return NAV_ITEMS;
-  }, [isAdminSection, user?.role]);
+    const permissions = user?.permissions ?? [];
+    return NAV_ITEMS.filter((item) => !item.permission || permissions.includes("*") || permissions.includes(item.permission));
+  }, [isAdminSection, user?.role, user?.permissions]);
 
   return (
     <div className="flex min-h-screen bg-[#f7faf9] text-ink">

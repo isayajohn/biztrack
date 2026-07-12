@@ -30,10 +30,7 @@ class FormFieldWrapper extends StatelessWidget {
         child,
         if (hint != null) ...[
           const SizedBox(height: 4),
-          Text(
-            hint!,
-            style: const TextStyle(fontSize: 11, color: kMuted),
-          ),
+          Text(hint!, style: const TextStyle(fontSize: 11, color: kMuted)),
         ],
         const SizedBox(height: 16),
       ],
@@ -81,8 +78,10 @@ class AppDropdownField<T> extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             borderSide: const BorderSide(color: kPrimaryGreen, width: 2),
           ),
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 14,
+          ),
         ),
         isExpanded: true,
         validator: (v) => v == null ? 'Please select $label' : null,

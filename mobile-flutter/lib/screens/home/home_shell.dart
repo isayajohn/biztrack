@@ -25,13 +25,18 @@ class HomeShell extends StatelessWidget {
         child: SafeArea(
           child: BottomNavigationBar(
             currentIndex: navigationShell.currentIndex,
-            onTap: (index) => navigationShell.goBranch(index,
-                initialLocation: index == navigationShell.currentIndex),
+            onTap: (index) => navigationShell.goBranch(
+              index,
+              initialLocation: index == navigationShell.currentIndex,
+            ),
             type: BottomNavigationBarType.fixed,
             backgroundColor: Colors.white,
             selectedItemColor: kPrimaryGreen,
             unselectedItemColor: kMuted,
-            selectedLabelStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+            selectedLabelStyle: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
             unselectedLabelStyle: const TextStyle(fontSize: 11),
             elevation: 0,
             items: const [

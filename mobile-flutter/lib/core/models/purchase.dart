@@ -19,7 +19,8 @@ class PurchaseItem {
     return PurchaseItem(
       id: json['id']?.toString() ?? '',
       productId: (json['product_id'] ?? json['productId'])?.toString() ?? '',
-      productName: json['product_name'] ??
+      productName:
+          json['product_name'] ??
           json['productName'] ??
           (json['product'] is Map ? json['product']['name'] : null) ??
           '',
@@ -68,20 +69,25 @@ class Purchase {
     final rawItems = json['items'] ?? json['purchase_items'] ?? [];
     final items = rawItems is List
         ? rawItems
-            .map((e) => PurchaseItem.fromJson(e as Map<String, dynamic>))
-            .toList()
+              .map((e) => PurchaseItem.fromJson(e as Map<String, dynamic>))
+              .toList()
         : <PurchaseItem>[];
 
     return Purchase(
       id: json['id']?.toString() ?? '',
       supplierId: (json['supplier_id'] ?? json['supplierId'])?.toString(),
-      supplierName: json['supplier_name'] ??
+      supplierName:
+          json['supplier_name'] ??
           json['supplierName'] ??
           (json['supplier'] is Map ? json['supplier']['name'] : null),
       status: json['status'] ?? 'PENDING',
       totalAmount: _toDouble(json['total_amount'] ?? json['totalAmount']),
       notes: json['notes'],
-      purchaseDate: json['purchase_date'] ?? json['purchaseDate'] ?? json['created_at'] ?? '',
+      purchaseDate:
+          json['purchase_date'] ??
+          json['purchaseDate'] ??
+          json['created_at'] ??
+          '',
       items: items,
     );
   }

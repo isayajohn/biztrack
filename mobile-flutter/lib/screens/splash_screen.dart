@@ -20,7 +20,9 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
     _controller = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 800));
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
     _fadeAnim = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
     _controller.forward();
     _init();
@@ -61,8 +63,11 @@ class _SplashScreenState extends State<SplashScreen>
                   color: Colors.white.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(24),
                 ),
-                child: const Icon(Icons.store_rounded,
-                    size: 64, color: Colors.white),
+                child: const Icon(
+                  Icons.store_rounded,
+                  size: 64,
+                  color: Colors.white,
+                ),
               ),
               const SizedBox(height: 24),
               const Text(
@@ -90,7 +95,8 @@ class _SplashScreenState extends State<SplashScreen>
                 child: CircularProgressIndicator(
                   strokeWidth: 2.5,
                   valueColor: AlwaysStoppedAnimation<Color>(
-                      Colors.white.withValues(alpha: 0.7)),
+                    Colors.white.withValues(alpha: 0.7),
+                  ),
                 ),
               ),
             ],

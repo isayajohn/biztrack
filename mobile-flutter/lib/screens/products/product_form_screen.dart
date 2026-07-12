@@ -5,6 +5,9 @@ import '../../core/models/product.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/product_provider.dart';
 import '../../widgets/form_field_wrapper.dart';
+import '../../core/api/business_api.dart';
+import '../../core/api/api_client.dart';
+import '../scanner/barcode_scanner_screen.dart';
 
 class ProductFormScreen extends StatefulWidget {
   final Product? product;
@@ -19,6 +22,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
   final _skuCtrl = TextEditingController();
+  final _barcodeCtrl = TextEditingController();
+  String? _brandId;
+  List<Map<String, dynamic>> _brands = [];
   final _buyingCtrl = TextEditingController();
   final _sellingCtrl = TextEditingController();
   final _stockCtrl = TextEditingController();
@@ -31,10 +37,22 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        final values = await BusinessApi(context.read<ApiClient>()).brands();
+        if (mounted) {
+          setState(
+            () => _brands = values.where((b) => b['isActive'] == true).toList(),
+          );
+        }
+      } catch (_) {}
+    });
     if (_isEditing) {
       final p = widget.product!;
       _nameCtrl.text = p.name;
       _skuCtrl.text = p.sku ?? '';
+      _barcodeCtrl.text = p.barcode ?? '';
+      _brandId = p.brandId;
       _buyingCtrl.text = p.buyingPrice.toString();
       _sellingCtrl.text = p.sellingPrice.toString();
       _stockCtrl.text = p.stockQuantity.toString();
@@ -50,6 +68,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   void dispose() {
     _nameCtrl.dispose();
     _skuCtrl.dispose();
+    _barcodeCtrl.dispose();
     _buyingCtrl.dispose();
     _sellingCtrl.dispose();
     _stockCtrl.dispose();
@@ -63,11 +82,15 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     final payload = {
       'name': _nameCtrl.text.trim(),
       'sku': _skuCtrl.text.trim().isEmpty ? null : _skuCtrl.text.trim(),
-      'buying_price': double.tryParse(_buyingCtrl.text) ?? 0,
-      'selling_price': double.tryParse(_sellingCtrl.text) ?? 0,
-      'stock_quantity': int.tryParse(_stockCtrl.text) ?? 0,
-      'low_stock_level': int.tryParse(_lowStockCtrl.text) ?? 5,
-      'is_active': _isActive,
+      'barcode': _barcodeCtrl.text.trim().isEmpty
+          ? null
+          : _barcodeCtrl.text.trim(),
+      'brandId': _brandId,
+      'buyingPrice': double.tryParse(_buyingCtrl.text) ?? 0,
+      'sellingPrice': double.tryParse(_sellingCtrl.text) ?? 0,
+      'stockQuantity': int.tryParse(_stockCtrl.text) ?? 0,
+      'lowStockLevel': int.tryParse(_lowStockCtrl.text) ?? 5,
+      'isActive': _isActive,
     };
     try {
       final provider = context.read<ProductProvider>();
@@ -77,23 +100,30 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         await provider.createProduct(payload);
       }
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content:
-              Text(_isEditing ? 'Product updated!' : 'Product created!'),
-          backgroundColor: kPrimaryGreen,
-        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_isEditing ? 'Product updated!' : 'Product created!'),
+            backgroundColor: kPrimaryGreen,
+          ),
+        );
         context.pop();
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(e.toString()),
-          backgroundColor: Colors.red,
-        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+        );
       }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
+  }
+
+  Future<void> _scanBarcode() async {
+    final value = await Navigator.of(context).push<String>(
+      MaterialPageRoute(builder: (_) => const BarcodeScannerScreen()),
+    );
+    if (value != null && mounted) setState(() => _barcodeCtrl.text = value);
   }
 
   @override
@@ -126,6 +156,56 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
             ),
 
             FormFieldWrapper(
+              label: 'Barcode',
+              child: TextFormField(
+                controller: _barcodeCtrl,
+                decoration: InputDecoration(
+                  hintText: 'Scan or enter barcode',
+                  prefixIcon: const Icon(Icons.barcode_reader),
+                  suffixIcon: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        tooltip: 'Scan barcode',
+                        icon: const Icon(Icons.qr_code_scanner),
+                        onPressed: _scanBarcode,
+                      ),
+                      IconButton(
+                        tooltip: 'Generate barcode',
+                        icon: const Icon(Icons.auto_awesome),
+                        onPressed: () => setState(
+                          () => _barcodeCtrl.text = DateTime.now()
+                              .millisecondsSinceEpoch
+                              .toString()
+                              .substring(1),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            if (_brands.isNotEmpty)
+              FormFieldWrapper(
+                label: 'Brand',
+                child: DropdownButtonFormField<String>(
+                  initialValue: _brandId,
+                  decoration: const InputDecoration(
+                    prefixIcon: Icon(Icons.branding_watermark_outlined),
+                  ),
+                  items: _brands
+                      .map(
+                        (b) => DropdownMenuItem<String>(
+                          value: b['id'].toString(),
+                          child: Text(b['name'].toString()),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (value) => setState(() => _brandId = value),
+                ),
+              ),
+
+            FormFieldWrapper(
               label: 'SKU / Code (optional)',
               child: TextFormField(
                 controller: _skuCtrl,
@@ -144,7 +224,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                     label: 'Buying Price',
                     child: TextFormField(
                       controller: _buyingCtrl,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
                       textInputAction: TextInputAction.next,
                       decoration: const InputDecoration(
                         hintText: '0.00',
@@ -164,7 +246,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                     label: 'Selling Price',
                     child: TextFormField(
                       controller: _sellingCtrl,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
                       textInputAction: TextInputAction.next,
                       decoration: const InputDecoration(
                         hintText: '0.00',
@@ -236,9 +320,14 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               ),
               child: SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('Product Active',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w600, fontSize: 14, color: kDark)),
+                title: const Text(
+                  'Product Active',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                    color: kDark,
+                  ),
+                ),
                 subtitle: Text(
                   _isActive
                       ? 'Visible and available for sale'
@@ -259,7 +348,9 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                       height: 20,
                       width: 20,
                       child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white),
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
                     )
                   : Text(_isEditing ? 'Update Product' : 'Create Product'),
             ),

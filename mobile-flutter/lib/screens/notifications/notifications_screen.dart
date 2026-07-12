@@ -20,22 +20,21 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<InventoryProvider>().fetchNotifications(
-            unreadOnly: _unreadOnly,
-          );
+        unreadOnly: _unreadOnly,
+      );
     });
   }
 
-  Future<void> _refresh() =>
-      context.read<InventoryProvider>().fetchNotifications(
-            unreadOnly: _unreadOnly,
-          );
+  Future<void> _refresh() => context
+      .read<InventoryProvider>()
+      .fetchNotifications(unreadOnly: _unreadOnly);
 
   void _setFilter(bool unreadOnly) {
     if (_unreadOnly == unreadOnly) return;
     setState(() => _unreadOnly = unreadOnly);
     context.read<InventoryProvider>().fetchNotifications(
-          unreadOnly: unreadOnly,
-        );
+      unreadOnly: unreadOnly,
+    );
   }
 
   Future<void> _markAllRead() async {
@@ -116,7 +115,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 7, vertical: 2),
+                      horizontal: 7,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.red.shade500,
                       borderRadius: BorderRadius.circular(12),
@@ -124,9 +125,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     child: Text(
                       '$unread',
                       style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700),
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                 ],
@@ -179,18 +181,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           Expanded(
             child: Consumer<InventoryProvider>(
               builder: (context, provider, _) {
-                if (provider.notifications.isEmpty &&
-                    provider.loading) {
+                if (provider.notifications.isEmpty && provider.loading) {
                   return const Center(
-                    child:
-                        CircularProgressIndicator(color: kPrimaryGreen),
+                    child: CircularProgressIndicator(color: kPrimaryGreen),
                   );
                 }
 
                 final items = _unreadOnly
-                    ? provider.notifications
-                        .where((n) => !n.isRead)
-                        .toList()
+                    ? provider.notifications.where((n) => !n.isRead).toList()
                     : provider.notifications;
 
                 if (items.isEmpty) {
@@ -251,9 +249,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         timeAgo: _timeAgo(n.createdAt),
                         onTap: () {
                           if (!n.isRead) {
-                            context
-                                .read<InventoryProvider>()
-                                .markRead(n.id);
+                            context.read<InventoryProvider>().markRead(n.id);
                           }
                         },
                       );
@@ -294,8 +290,7 @@ class _NotificationTile extends StatelessWidget {
         color: isUnread
             ? kPrimaryGreen.withValues(alpha: 0.04)
             : Colors.transparent,
-        padding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -332,8 +327,7 @@ class _NotificationTile extends StatelessWidget {
                       const SizedBox(width: 8),
                       Text(
                         timeAgo,
-                        style: const TextStyle(
-                            color: kMuted, fontSize: 11),
+                        style: const TextStyle(color: kMuted, fontSize: 11),
                       ),
                     ],
                   ),
@@ -386,8 +380,7 @@ class _FilterPill extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
         decoration: BoxDecoration(
           color: selected ? kPrimaryGreen : Colors.white,
           borderRadius: BorderRadius.circular(20),

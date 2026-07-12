@@ -23,7 +23,8 @@ class DamagedStock {
     return DamagedStock(
       id: json['id']?.toString() ?? '',
       productId: (json['product_id'] ?? json['productId'])?.toString() ?? '',
-      productName: json['product_name'] ??
+      productName:
+          json['product_name'] ??
           json['productName'] ??
           (json['product'] is Map ? json['product']['name'] : null) ??
           '',
@@ -31,7 +32,8 @@ class DamagedStock {
       estimatedLoss: _toDouble(json['estimated_loss'] ?? json['estimatedLoss']),
       reason: json['reason'] ?? '',
       status: json['status'] ?? 'PENDING',
-      reportedAt: json['reported_at'] ?? json['reportedAt'] ?? json['created_at'] ?? '',
+      reportedAt:
+          json['reported_at'] ?? json['reportedAt'] ?? json['created_at'] ?? '',
     );
   }
 

@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'jwt.auth' => \App\Http\Middleware\JwtMiddleware::class,
             'super.admin' => \App\Http\Middleware\SuperAdminMiddleware::class,
+            'permission' => \App\Http\Middleware\PermissionMiddleware::class,
         ]);
         // $middleware->statefulApi(); // removed: using JWT, not Sanctum
     })

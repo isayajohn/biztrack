@@ -55,7 +55,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<AuthProvider>().user;
-    final currency = user?.currency ?? 'USD';
+    final currency = user?.currency ?? 'TZS';
     final firstName = user?.name.split(' ').first ?? 'there';
 
     return Scaffold(
@@ -68,9 +68,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
               radius: 16,
               backgroundColor: Colors.white.withValues(alpha: 0.25),
               child: Text(
-                user?.name.isNotEmpty == true ? user!.name[0].toUpperCase() : 'B',
+                user?.name.isNotEmpty == true
+                    ? user!.name[0].toUpperCase()
+                    : 'B',
                 style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.w700),
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
           ),
@@ -80,10 +84,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
         onRefresh: _loadStats,
         color: kPrimaryGreen,
         child: _loading
-            ? const Center(child: CircularProgressIndicator(color: kPrimaryGreen))
+            ? const Center(
+                child: CircularProgressIndicator(color: kPrimaryGreen),
+              )
             : _error != null
-                ? _buildError()
-                : _buildContent(firstName, currency),
+            ? _buildError()
+            : _buildContent(firstName, currency),
       ),
     );
   }
@@ -97,8 +103,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
           children: [
             const Icon(Icons.cloud_off_outlined, size: 48, color: kMuted),
             const SizedBox(height: 12),
-            Text(_error!, textAlign: TextAlign.center,
-                style: const TextStyle(color: kMuted)),
+            Text(
+              _error!,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: kMuted),
+            ),
             const SizedBox(height: 16),
             ElevatedButton(onPressed: _loadStats, child: const Text('Retry')),
           ],
@@ -117,7 +126,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Text(
           'Hello, $firstName!',
           style: const TextStyle(
-              fontSize: 22, fontWeight: FontWeight.w800, color: kDark),
+            fontSize: 22,
+            fontWeight: FontWeight.w800,
+            color: kDark,
+          ),
         ),
         const SizedBox(height: 2),
         Text(
@@ -142,13 +154,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.trending_up_rounded,
-                      color: Colors.white70, size: 18),
+                  const Icon(
+                    Icons.trending_up_rounded,
+                    color: Colors.white70,
+                    size: 18,
+                  ),
                   const SizedBox(width: 6),
                   Text(
                     'Net Profit',
                     style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.8), fontSize: 13),
+                      color: Colors.white.withValues(alpha: 0.8),
+                      fontSize: 13,
+                    ),
                   ),
                 ],
               ),
@@ -230,7 +247,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         const Text(
           'Quick Actions',
           style: TextStyle(
-              fontSize: 16, fontWeight: FontWeight.w700, color: kDark),
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: kDark,
+          ),
         ),
         const SizedBox(height: 12),
         Row(
@@ -283,16 +303,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label,
-                    style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.7), fontSize: 10)),
-                Text(value,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.7),
+                    fontSize: 10,
+                  ),
+                ),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ],
             ),
           ),
@@ -323,7 +350,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Text(
               label,
               style: TextStyle(
-                  color: color, fontSize: 11, fontWeight: FontWeight.w600),
+                color: color,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
               textAlign: TextAlign.center,
             ),
           ],

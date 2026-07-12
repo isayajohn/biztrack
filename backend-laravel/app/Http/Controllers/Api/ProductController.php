@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Business;
+use App\Models\Brand;
 use App\Models\Product;
 use App\Services\AuditService;
 use Illuminate\Http\JsonResponse;
@@ -14,7 +15,7 @@ class ProductController extends Controller
 {
     private function getBusiness(): ?Business
     {
-        return Business::where('user_id', auth()->id())->first();
+        return Business::forUser(auth()->user());
     }
 
     public function listProducts(Request $request): JsonResponse
@@ -27,7 +28,7 @@ class ProductController extends Controller
         if ($request->filled('search')) {
             $q = $request->search;
             $query->where(function ($q2) use ($q) {
-                $q2->where('name', 'like', "%$q%")->orWhere('sku', 'like', "%$q%");
+                $q2->where('name', 'like', "%$q%")->orWhere('sku', 'like', "%$q%")->orWhere('barcode', 'like', "%$q%");
             });
         }
         if ($request->filled('isActive')) {
@@ -40,7 +41,7 @@ class ProductController extends Controller
         $total = $query->count();
         $page = (int) $request->get('page', 1);
         $limit = (int) $request->get('limit', 50);
-        $products = $query->with(['category', 'supplier'])->orderByDesc('created_at')->skip(($page - 1) * $limit)->take($limit)->get();
+        $products = $query->with(['category', 'supplier', 'managedBrand'])->orderByDesc('created_at')->skip(($page - 1) * $limit)->take($limit)->get();
 
         return response()->json([
             'success' => true,
@@ -63,6 +64,7 @@ class ProductController extends Controller
             'sku'          => 'nullable|string',
             'barcode'      => 'nullable|string|max:255',
             'brand'        => 'nullable|string|max:255',
+            'brandId'      => 'nullable|uuid',
             'unitType'     => 'nullable|in:pcs,box,kg,litre,pack,dozen',
             'categoryId'   => 'nullable|uuid',
             'supplierId'   => 'nullable|uuid',
@@ -81,6 +83,14 @@ class ProductController extends Controller
             $exists = Product::where('business_id', $business->id)->where('sku', $data['sku'])->exists();
             if ($exists) return response()->json(['success' => false, 'error' => 'SKU already exists'], 409);
         }
+        if (!empty($data['barcode']) && Product::where('business_id', $business->id)->where('barcode', $data['barcode'])->exists()) {
+            return response()->json(['success' => false, 'error' => 'Barcode already exists'], 409);
+        }
+
+        $brand = !empty($data['brandId'])
+            ? Brand::where('id', $data['brandId'])->where('business_id', $business->id)->first()
+            : null;
+        if (!empty($data['brandId']) && !$brand) return response()->json(['success' => false, 'error' => 'Brand not found'], 422);
 
         $product = Product::create([
             'id'            => Str::uuid()->toString(),
@@ -88,7 +98,8 @@ class ProductController extends Controller
             'name'          => $data['name'],
             'sku'           => $data['sku'] ?? null,
             'barcode'       => $data['barcode'] ?? null,
-            'brand'         => $data['brand'] ?? null,
+            'brand'         => $brand?->name ?? ($data['brand'] ?? null),
+            'brand_id'      => $brand?->id,
             'unit_type'     => $data['unitType'] ?? 'pcs',
             'category_id'   => $data['categoryId'] ?? null,
             'supplier_id'   => $data['supplierId'] ?? null,
@@ -118,7 +129,7 @@ class ProductController extends Controller
         $business = $this->getBusiness();
         if (!$business) return response()->json(['success' => false, 'error' => 'Not found'], 404);
 
-        $product = Product::with(['category', 'supplier'])->where('id', $id)->where('business_id', $business->id)->first();
+        $product = Product::with(['category', 'supplier', 'managedBrand'])->where('id', $id)->where('business_id', $business->id)->first();
         if (!$product) return response()->json(['success' => false, 'error' => 'Product not found'], 404);
 
         return response()->json(['success' => true, 'data' => $this->formatProduct($product)]);
@@ -137,6 +148,7 @@ class ProductController extends Controller
             'sku'          => 'nullable|string',
             'barcode'      => 'nullable|string|max:255',
             'brand'        => 'nullable|string|max:255',
+            'brandId'      => 'nullable|uuid',
             'unitType'     => 'nullable|in:pcs,box,kg,litre,pack,dozen',
             'categoryId'   => 'nullable|uuid',
             'supplierId'   => 'nullable|uuid',
@@ -151,11 +163,21 @@ class ProductController extends Controller
             'isActive'     => 'sometimes|boolean',
         ]);
 
+        if (!empty($data['barcode']) && Product::where('business_id', $business->id)->where('barcode', $data['barcode'])->where('id', '<>', $product->id)->exists()) {
+            return response()->json(['success' => false, 'error' => 'Barcode already exists'], 409);
+        }
+
+        $brand = array_key_exists('brandId', $data) && $data['brandId']
+            ? Brand::where('id', $data['brandId'])->where('business_id', $business->id)->first()
+            : null;
+        if (!empty($data['brandId']) && !$brand) return response()->json(['success' => false, 'error' => 'Brand not found'], 422);
+
         $product->update([
             'name'          => $data['name'] ?? $product->name,
             'sku'           => array_key_exists('sku', $data) ? $data['sku'] : $product->sku,
             'barcode'       => array_key_exists('barcode', $data) ? $data['barcode'] : $product->barcode,
-            'brand'         => array_key_exists('brand', $data) ? $data['brand'] : $product->brand,
+            'brand'         => $brand?->name ?? (array_key_exists('brand', $data) ? $data['brand'] : $product->brand),
+            'brand_id'      => array_key_exists('brandId', $data) ? $brand?->id : $product->brand_id,
             'unit_type'     => $data['unitType'] ?? $product->unit_type,
             'category_id'   => array_key_exists('categoryId', $data) ? $data['categoryId'] : $product->category_id,
             'supplier_id'   => array_key_exists('supplierId', $data) ? $data['supplierId'] : $product->supplier_id,
@@ -202,12 +224,16 @@ class ProductController extends Controller
 
     private function formatProduct(Product $p): array
     {
-        $p->loadMissing(['category', 'supplier']);
+        $p->loadMissing(['category', 'supplier', 'managedBrand']);
         return [
             'id' => $p->id,
             'businessId' => $p->business_id,
             'name' => $p->name,
             'sku' => $p->sku,
+            'barcode' => $p->barcode,
+            'brand' => $p->managedBrand?->name ?? $p->brand,
+            'brandId' => $p->brand_id,
+            'managedBrand' => $p->managedBrand?->id ? ['id' => $p->managedBrand->id, 'name' => $p->managedBrand->name] : null,
             'categoryId' => $p->category_id,
             'category' => $p->category_id ? ['id' => $p->category->id, 'name' => $p->category->name] : null,
             'supplierId' => $p->supplier_id,

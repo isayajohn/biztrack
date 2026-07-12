@@ -16,7 +16,7 @@ class CustomerController extends Controller
 {
     private function getBusiness(): ?Business
     {
-        return Business::where('user_id', auth()->id())->first();
+        return Business::forUser(auth()->user());
     }
 
     public function index(Request $request): JsonResponse
@@ -172,16 +172,16 @@ class CustomerController extends Controller
         }
 
         $creditSales = Sale::where('customer_id', $customer->id)
-            ->whereRaw('total_amount - discount + tax_amount > paid_amount')
+            ->whereRaw('total_amount - discount - promotion_discount + tax_amount > paid_amount')
             ->orderByDesc('sale_date')
             ->get()
             ->map(fn (Sale $sale) => [
                 'id' => $sale->id,
                 'receiptNumber' => $sale->receipt_number,
                 'date' => $sale->sale_date?->format('Y-m-d'),
-                'total' => (float) $sale->total_amount - (float) $sale->discount + (float) $sale->tax_amount,
+                'total' => (float) $sale->total_amount - (float) $sale->discount - (float) $sale->promotion_discount + (float) $sale->tax_amount,
                 'paid' => (float) $sale->paid_amount,
-                'balance' => max(0, (float) $sale->total_amount - (float) $sale->discount + (float) $sale->tax_amount - (float) $sale->paid_amount),
+                'balance' => max(0, (float) $sale->total_amount - (float) $sale->discount - (float) $sale->promotion_discount + (float) $sale->tax_amount - (float) $sale->paid_amount),
                 'dueDate' => $sale->payment_due_date?->format('Y-m-d'),
             ]);
 
@@ -243,7 +243,7 @@ class CustomerController extends Controller
 
             $remaining = (float) $data['amount'];
             $sales = Sale::where('customer_id', $customer->id)
-                ->whereRaw('total_amount - discount + tax_amount > paid_amount')
+                ->whereRaw('total_amount - discount - promotion_discount + tax_amount > paid_amount')
                 ->when(!empty($data['saleId']), fn ($query) => $query->where('id', $data['saleId']))
                 ->orderBy('sale_date')
                 ->lockForUpdate()
@@ -251,7 +251,7 @@ class CustomerController extends Controller
 
             foreach ($sales as $sale) {
                 if ($remaining <= 0) break;
-                $saleBalance = max(0, (float) $sale->total_amount - (float) $sale->discount + (float) $sale->tax_amount - (float) $sale->paid_amount);
+                $saleBalance = max(0, (float) $sale->total_amount - (float) $sale->discount - (float) $sale->promotion_discount + (float) $sale->tax_amount - (float) $sale->paid_amount);
                 $applied = min($remaining, $saleBalance);
                 $sale->increment('paid_amount', $applied);
                 $remaining -= $applied;

@@ -31,9 +31,14 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text('Delete expense?'),
-        content: Text('Remove "${expense.description}"? This cannot be undone.'),
+        content: Text(
+          'Remove "${expense.description}"? This cannot be undone.',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
           TextButton(
             style: TextButton.styleFrom(foregroundColor: Colors.red),
             onPressed: () => Navigator.pop(ctx, true),
@@ -47,7 +52,10 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       await context.read<ExpenseProvider>().deleteExpense(expense.id);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Expense deleted'), backgroundColor: kPrimaryGreen),
+          const SnackBar(
+            content: Text('Expense deleted'),
+            backgroundColor: kPrimaryGreen,
+          ),
         );
       }
     } catch (e) {
@@ -61,7 +69,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final currency = context.watch<AuthProvider>().user?.currency ?? 'USD';
+    final currency = context.watch<AuthProvider>().user?.currency ?? 'TZS';
     final fmt = NumberFormat('#,##0.00');
     const accentColor = Color(0xFFD97706); // amber-600
 
@@ -105,12 +113,30 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          const Text('Expenses', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w800)),
+                          const Text(
+                            'Expenses',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
                           const SizedBox(height: 8),
-                          Text('$currency ${fmt.format(total)}',
-                              style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700)),
-                          Text('$count expense${count != 1 ? 's' : ''}',
-                              style: const TextStyle(color: Colors.white70, fontSize: 13)),
+                          Text(
+                            '$currency ${fmt.format(total)}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          Text(
+                            '$count expense${count != 1 ? 's' : ''}',
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 13,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -121,7 +147,10 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                 SliverToBoxAdapter(
                   child: Container(
                     color: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
@@ -129,18 +158,22 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                           _CategoryChip(
                             label: 'All',
                             selected: _selectedCategory == null,
-                            onTap: () => setState(() => _selectedCategory = null),
+                            onTap: () =>
+                                setState(() => _selectedCategory = null),
                             color: accentColor,
                           ),
-                          ...Expense.categories.map((cat) => Padding(
-                            padding: const EdgeInsets.only(left: 8),
-                            child: _CategoryChip(
-                              label: Expense.categoryLabel(cat),
-                              selected: _selectedCategory == cat,
-                              onTap: () => setState(() => _selectedCategory = cat),
-                              color: accentColor,
+                          ...Expense.categories.map(
+                            (cat) => Padding(
+                              padding: const EdgeInsets.only(left: 8),
+                              child: _CategoryChip(
+                                label: Expense.categoryLabel(cat),
+                                selected: _selectedCategory == cat,
+                                onTap: () =>
+                                    setState(() => _selectedCategory = cat),
+                                color: accentColor,
+                              ),
                             ),
-                          )),
+                          ),
                         ],
                       ),
                     ),
@@ -152,11 +185,17 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                 // ── Content ───────────────────────────────────────────
                 if (provider.loading)
                   SliverFillRemaining(
-                    child: Center(child: CircularProgressIndicator(color: accentColor)),
+                    child: Center(
+                      child: CircularProgressIndicator(color: accentColor),
+                    ),
                   )
                 else if (provider.error != null)
                   SliverFillRemaining(
-                    child: _ErrorView(message: provider.error!, onRetry: provider.fetchExpenses, color: accentColor),
+                    child: _ErrorView(
+                      message: provider.error!,
+                      onRetry: provider.fetchExpenses,
+                      color: accentColor,
+                    ),
                   )
                 else if (expenses.isEmpty)
                   const SliverFillRemaining(
@@ -175,7 +214,10 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                       itemBuilder: (ctx, i) => _ExpenseCard(
                         expense: expenses[i],
                         currency: currency,
-                        onTap: () => context.push('/expenses/edit/${expenses[i].id}', extra: expenses[i]),
+                        onTap: () => context.push(
+                          '/expenses/edit/${expenses[i].id}',
+                          extra: expenses[i],
+                        ),
                         onDelete: () => _confirmDelete(expenses[i]),
                         accentColor: accentColor,
                       ),
@@ -191,7 +233,12 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 }
 
 class _CategoryChip extends StatelessWidget {
-  const _CategoryChip({required this.label, required this.selected, required this.onTap, required this.color});
+  const _CategoryChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+    required this.color,
+  });
   final String label;
   final bool selected;
   final VoidCallback onTap;
@@ -222,7 +269,13 @@ class _CategoryChip extends StatelessWidget {
 }
 
 class _ExpenseCard extends StatelessWidget {
-  const _ExpenseCard({required this.expense, required this.currency, required this.onTap, required this.onDelete, required this.accentColor});
+  const _ExpenseCard({
+    required this.expense,
+    required this.currency,
+    required this.onTap,
+    required this.onDelete,
+    required this.accentColor,
+  });
   final Expense expense;
   final String currency;
   final VoidCallback onTap;
@@ -232,7 +285,9 @@ class _ExpenseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final date = DateTime.tryParse(expense.expenseDate);
-    final dateStr = date != null ? DateFormat('MMM d, yyyy').format(date) : expense.expenseDate;
+    final dateStr = date != null
+        ? DateFormat('MMM d, yyyy').format(date)
+        : expense.expenseDate;
 
     return Dismissible(
       key: ValueKey(expense.id),
@@ -249,7 +304,11 @@ class _ExpenseCard extends StatelessWidget {
           color: Colors.red.shade100,
           borderRadius: BorderRadius.circular(16),
         ),
-        child: Icon(Icons.delete_outline_rounded, color: Colors.red.shade600, size: 24),
+        child: Icon(
+          Icons.delete_outline_rounded,
+          color: Colors.red.shade600,
+          size: 24,
+        ),
       ),
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 5),
@@ -270,25 +329,44 @@ class _ExpenseCard extends StatelessWidget {
                     color: accentColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(Icons.account_balance_wallet_rounded, color: accentColor, size: 22),
+                  child: Icon(
+                    Icons.account_balance_wallet_rounded,
+                    color: accentColor,
+                    size: 22,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(expense.description,
-                          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: kDark),
-                          maxLines: 1, overflow: TextOverflow.ellipsis),
+                      Text(
+                        expense.description,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                          color: kDark,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                       const SizedBox(height: 3),
-                      Text('$dateStr · ${Expense.categoryLabel(expense.category)}',
-                          style: const TextStyle(fontSize: 12, color: kMuted)),
+                      Text(
+                        '$dateStr · ${Expense.categoryLabel(expense.category)}',
+                        style: const TextStyle(fontSize: 12, color: kMuted),
+                      ),
                     ],
                   ),
                 ),
                 const SizedBox(width: 8),
-                Text('$currency ${NumberFormat('#,##0').format(expense.amount)}',
-                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: accentColor)),
+                Text(
+                  '$currency ${NumberFormat('#,##0').format(expense.amount)}',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 14,
+                    color: accentColor,
+                  ),
+                ),
               ],
             ),
           ),
@@ -299,7 +377,12 @@ class _ExpenseCard extends StatelessWidget {
 }
 
 class _EmptyView extends StatelessWidget {
-  const _EmptyView({required this.icon, required this.message, required this.hint, required this.color});
+  const _EmptyView({
+    required this.icon,
+    required this.message,
+    required this.hint,
+    required this.color,
+  });
   final IconData icon;
   final String message;
   final String hint;
@@ -315,13 +398,27 @@ class _EmptyView extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
               child: Icon(icon, size: 40, color: color),
             ),
             const SizedBox(height: 20),
-            Text(message, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: kDark)),
+            Text(
+              message,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: kDark,
+              ),
+            ),
             const SizedBox(height: 8),
-            Text(hint, style: const TextStyle(fontSize: 13, color: kMuted), textAlign: TextAlign.center),
+            Text(
+              hint,
+              style: const TextStyle(fontSize: 13, color: kMuted),
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
       ),
@@ -330,7 +427,11 @@ class _EmptyView extends StatelessWidget {
 }
 
 class _ErrorView extends StatelessWidget {
-  const _ErrorView({required this.message, required this.onRetry, required this.color});
+  const _ErrorView({
+    required this.message,
+    required this.onRetry,
+    required this.color,
+  });
   final String message;
   final VoidCallback onRetry;
   final Color color;
@@ -345,7 +446,11 @@ class _ErrorView extends StatelessWidget {
           children: [
             const Icon(Icons.wifi_off_rounded, size: 48, color: kMuted),
             const SizedBox(height: 16),
-            Text(message, textAlign: TextAlign.center, style: const TextStyle(color: kMuted, fontSize: 13)),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: kMuted, fontSize: 13),
+            ),
             const SizedBox(height: 20),
             FilledButton(
               style: FilledButton.styleFrom(backgroundColor: color),

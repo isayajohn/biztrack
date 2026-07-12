@@ -15,7 +15,7 @@ class Business {
     return Business(
       id: json['id']?.toString() ?? '',
       name: json['name']?.toString() ?? '',
-      currency: json['currency']?.toString() ?? 'USD',
+      currency: json['currency']?.toString() ?? 'TZS',
       country: json['country']?.toString() ?? '',
     );
   }
@@ -27,6 +27,9 @@ class User {
   final String email;
   final String role;
   final String status;
+  final String businessRole;
+  final List<String> permissions;
+  final Map<String, dynamic>? branch;
   final Business? business;
 
   User({
@@ -35,6 +38,9 @@ class User {
     required this.email,
     required this.role,
     required this.status,
+    this.businessRole = '',
+    this.permissions = const [],
+    this.branch,
     this.business,
   });
 
@@ -43,7 +49,8 @@ class User {
     Map<String, dynamic>? businessJson;
     if (json['business'] is Map<String, dynamic>) {
       businessJson = json['business'] as Map<String, dynamic>;
-    } else if (json['businesses'] is List && (json['businesses'] as List).isNotEmpty) {
+    } else if (json['businesses'] is List &&
+        (json['businesses'] as List).isNotEmpty) {
       businessJson = (json['businesses'] as List).first as Map<String, dynamic>;
     }
 
@@ -53,10 +60,23 @@ class User {
       email: json['email']?.toString() ?? '',
       role: json['role']?.toString() ?? '',
       status: json['status']?.toString() ?? '',
+      businessRole: json['businessRole']?.toString() ?? '',
+      permissions: json['permissions'] is List
+          ? List<String>.from(
+              (json['permissions'] as List).map((e) => e.toString()),
+            )
+          : const [],
+      branch: json['branch'] is Map
+          ? Map<String, dynamic>.from(json['branch'] as Map)
+          : null,
       business: businessJson != null ? Business.fromJson(businessJson) : null,
     );
   }
 
-  String get currency => business?.currency ?? 'USD';
+  String get currency => business?.currency ?? 'TZS';
   String get businessName => business?.name ?? 'My Business';
+  bool can(String permission) =>
+      businessRole == 'OWNER' ||
+      permissions.contains('*') ||
+      permissions.contains(permission);
 }
