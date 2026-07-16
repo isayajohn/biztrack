@@ -12,11 +12,11 @@ const chartPoints = [
 
 export default function AuthShowcasePanel({ title, text }: AuthShowcasePanelProps) {
   return (
-    <aside className="relative hidden min-h-screen overflow-hidden bg-[#064e4a] px-10 py-10 text-white lg:flex lg:flex-col lg:justify-center">
+    <aside className="relative hidden min-h-screen overflow-hidden bg-[#063f3d] px-10 py-10 text-white lg:flex lg:flex-col lg:justify-center">
       <DecorativeSquares />
 
       <div className="relative mx-auto w-full max-w-xl">
-        <div className="relative mx-auto w-full max-w-lg rounded-lg bg-white p-5 text-ink shadow-[0_24px_70px_rgba(0,0,0,0.22)]">
+        <div className="relative mx-auto w-full max-w-lg rounded-xl border border-white/30 bg-white/82 p-5 text-ink shadow-[0_24px_70px_rgba(0,0,0,0.22)] backdrop-blur-xl">
           <div className="mb-4 flex items-center justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.08em] text-leaf">BizTrack</p>
@@ -29,7 +29,7 @@ export default function AuthShowcasePanel({ title, text }: AuthShowcasePanelProp
             </div>
           </div>
 
-          <div className="relative h-40 overflow-hidden rounded-lg border border-ink/10 bg-[#f7faf9]">
+          <div className="relative h-40 overflow-hidden rounded-lg border border-ink/10 bg-white/62">
             <div className="absolute inset-x-0 top-8 h-px bg-ink/10" />
             <div className="absolute inset-x-0 top-16 h-px bg-ink/10" />
             <div className="absolute inset-x-0 top-24 h-px bg-ink/10" />
@@ -58,7 +58,7 @@ export default function AuthShowcasePanel({ title, text }: AuthShowcasePanelProp
           </div>
         </div>
 
-        <div className="absolute -right-2 top-36 w-48 rounded-lg bg-white p-5 text-ink shadow-[0_24px_70px_rgba(0,0,0,0.2)]">
+        <div className="absolute -right-2 top-36 w-48 rounded-xl border border-white/30 bg-white/82 p-5 text-ink shadow-[0_24px_70px_rgba(0,0,0,0.2)] backdrop-blur-xl">
           <div className="relative mx-auto grid h-32 w-32 place-items-center rounded-full bg-[#e5e7eb]">
             <div className="absolute inset-0 rounded-full bg-[conic-gradient(#12b890_0_42%,#e5e7eb_42%_100%)]" />
             <div className="relative grid h-20 w-20 place-items-center rounded-full bg-white text-center shadow-inner">
@@ -98,7 +98,7 @@ function Metric({
   value: string;
 }) {
   return (
-    <div className="rounded-lg border border-white/10 bg-white/8 p-3 backdrop-blur">
+    <div className="rounded-lg border border-white/15 bg-white/10 p-3 shadow-[0_12px_30px_rgba(0,0,0,0.12)] backdrop-blur">
       <Icon size={17} className="text-white/75" aria-hidden="true" />
       <p className="mt-3 text-xs font-semibold text-white/55">{label}</p>
       <p className="mt-1 font-display text-lg font-black text-white">{value}</p>

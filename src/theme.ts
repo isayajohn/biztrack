@@ -9,13 +9,14 @@ export const muiTheme = createTheme({
     secondary: {
       main: "#0b9279",
     },
+    divider: "rgba(16, 35, 30, 0.09)",
     text: {
       primary: "#10231e",
       secondary: "rgba(16, 35, 30, 0.65)",
     },
     background: {
-      default: "#f7faf9",
-      paper: "#ffffff",
+      default: "#eef5f2",
+      paper: "rgba(255, 255, 255, 0.78)",
     },
   },
   typography: {
@@ -27,13 +28,74 @@ export const muiTheme = createTheme({
     },
   },
   shape: {
-    borderRadius: 12,
+    borderRadius: 10,
   },
   components: {
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundImage: "linear-gradient(145deg, rgba(255,255,255,0.9), rgba(255,255,255,0.66))",
+          border: "1px solid rgba(16, 35, 30, 0.09)",
+          boxShadow: "0 18px 54px rgba(13, 60, 52, 0.1)",
+          backdropFilter: "blur(16px) saturate(145%)",
+        },
+        rounded: {
+          borderRadius: 10,
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          borderRadius: 10,
+          backgroundColor: "rgba(255,255,255,0.76)",
+          boxShadow: "0 16px 48px rgba(13, 60, 52, 0.09)",
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 10,
+          fontWeight: 800,
+          boxShadow: "none",
+        },
+        contained: {
+          backgroundColor: "#12977c",
+          "&:hover": {
+            backgroundColor: "#0b7567",
+            boxShadow: "0 14px 32px rgba(11, 146, 121, 0.2)",
+          },
+        },
+        outlined: {
+          backgroundColor: "rgba(255,255,255,0.58)",
+          borderColor: "rgba(16, 35, 30, 0.14)",
+        },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "rgba(255,255,255,0.66)",
+          borderRadius: 10,
+          "& fieldset": {
+            borderColor: "rgba(16, 35, 30, 0.12)",
+          },
+          "&:hover fieldset": {
+            borderColor: "rgba(24, 189, 151, 0.45)",
+          },
+          "&.Mui-focused fieldset": {
+            borderColor: "#18bd97",
+            boxShadow: "0 0 0 3px rgba(24, 189, 151, 0.12)",
+          },
+        },
+      },
+    },
     MuiTableContainer: {
       styleOverrides: {
         root: {
-          backgroundColor: "#ffffff",
+          backgroundColor: "rgba(255, 255, 255, 0.76)",
+          borderRadius: 10,
         },
       },
     },
@@ -51,6 +113,7 @@ export const muiTheme = createTheme({
         root: {
           ".MuiTableCell-root": {
             backgroundColor: "#f7faf9",
+            backgroundImage: "linear-gradient(180deg, rgba(255,255,255,0.72), rgba(231,250,245,0.58))",
             color: "rgba(16, 35, 30, 0.52)",
             fontSize: 11,
             fontWeight: 800,

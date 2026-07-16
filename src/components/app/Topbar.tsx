@@ -59,7 +59,7 @@ export default function Topbar({ isAdminSection = false, onOpenSidebar, onToggle
   };
 
   return (
-    <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center justify-between border-b border-ink/10 bg-white px-4 shadow-sm lg:px-6">
+    <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center justify-between border-b border-white/70 bg-white/62 px-4 shadow-[0_12px_36px_rgba(13,60,52,0.07)] backdrop-blur-xl lg:px-6">
       <div className="flex items-center gap-2">
         <button
           type="button"
@@ -70,7 +70,7 @@ export default function Topbar({ isAdminSection = false, onOpenSidebar, onToggle
               onOpenSidebar?.();
             }
           }}
-          className="grid h-10 w-10 place-items-center rounded-lg text-ink/70 transition-colors hover:bg-emerald-50 hover:text-ink"
+          className="grid h-10 w-10 place-items-center rounded-lg text-ink/70 transition-colors hover:bg-white/70 hover:text-ink"
           aria-label="Open sidebar"
         >
           <Menu size={18} aria-hidden="true" />
@@ -79,7 +79,7 @@ export default function Topbar({ isAdminSection = false, onOpenSidebar, onToggle
       </div>
 
       <div className="ml-auto flex items-center gap-3">
-        {branches.length > 1 && <select value={activeBranch} onChange={(event) => { setActiveBranch(event.target.value); localStorage.setItem(ACTIVE_BRANCH_KEY, event.target.value); window.location.reload(); }} className="hidden h-10 rounded-lg border border-ink/10 bg-white px-3 text-xs font-bold text-ink/70 shadow-sm sm:block">{branches.map((branch) => <option key={branch.id} value={branch.id}>{branch.name}</option>)}</select>}
+        {branches.length > 1 && <select value={activeBranch} onChange={(event) => { setActiveBranch(event.target.value); localStorage.setItem(ACTIVE_BRANCH_KEY, event.target.value); window.location.reload(); }} className="minimal-input hidden h-10 rounded-lg px-3 text-xs font-bold text-ink/70 sm:block">{branches.map((branch) => <option key={branch.id} value={branch.id}>{branch.name}</option>)}</select>}
         {user?.role === "SUPER_ADMIN" && !isAdminSection && (
           <Link
             to="/admin"
@@ -94,7 +94,7 @@ export default function Topbar({ isAdminSection = false, onOpenSidebar, onToggle
           <button
             type="button"
             onClick={() => { setNotificationsOpen((open) => !open); setProfileOpen(false); }}
-            className="relative grid h-10 w-10 place-items-center rounded-full text-ink/70 transition-colors hover:bg-emerald-50 hover:text-ink"
+            className="relative grid h-10 w-10 place-items-center rounded-full text-ink/70 transition-colors hover:bg-white/70 hover:text-ink"
             aria-label="Notifications"
             aria-expanded={notificationsOpen}
           >
@@ -102,7 +102,7 @@ export default function Topbar({ isAdminSection = false, onOpenSidebar, onToggle
             {unreadNotifications > 0 && <span className="absolute right-1.5 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-emerald-600 px-1 text-[10px] font-extrabold leading-none text-white">{unreadNotifications > 9 ? "9+" : unreadNotifications}</span>}
           </button>
           {notificationsOpen && (
-            <div className="absolute right-0 top-12 z-50 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-ink/10 bg-white shadow-soft">
+            <div className="glass-panel absolute right-0 top-12 z-50 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl">
               <div className="flex items-center justify-between border-b border-ink/10 px-4 py-3">
                 <div>
                   <p className="font-display text-sm font-bold text-ink">Notifications</p>
@@ -133,7 +133,7 @@ export default function Topbar({ isAdminSection = false, onOpenSidebar, onToggle
           <button
             type="button"
             onClick={() => { setProfileOpen((open) => !open); setNotificationsOpen(false); }}
-            className="flex h-10 items-center gap-2 rounded-full px-1.5 pr-2 transition-colors hover:bg-emerald-50"
+            className="flex h-10 items-center gap-2 rounded-full px-1.5 pr-2 transition-colors hover:bg-white/70"
             aria-label="Open profile menu"
             aria-expanded={profileOpen}
           >
@@ -142,7 +142,7 @@ export default function Topbar({ isAdminSection = false, onOpenSidebar, onToggle
             <ChevronDown size={16} className="hidden text-ink/45 sm:block" aria-hidden="true" />
           </button>
           {profileOpen && (
-            <div className="absolute right-0 top-12 z-50 w-72 overflow-hidden rounded-xl border border-ink/10 bg-white shadow-soft">
+            <div className="glass-panel absolute right-0 top-12 z-50 w-72 overflow-hidden rounded-xl">
               <div className="border-b border-ink/10 px-4 py-4">
                 <div className="flex items-center gap-3">
                   <span className="grid h-11 w-11 place-items-center rounded-full bg-emerald-50 text-sm font-extrabold text-emerald-700">{initials(user?.name)}</span>

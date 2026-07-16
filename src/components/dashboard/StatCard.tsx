@@ -18,7 +18,7 @@ type StatCardProps = {
 
 function SkeletonStatCard() {
   return (
-    <MotionPanel className="animate-pulse rounded-xl border border-ink/10 bg-white p-3.5 shadow-sm">
+    <MotionPanel className="bento-card animate-pulse rounded-xl p-3.5">
       <div className="mb-3 h-9 w-9 rounded-lg bg-ink/8" />
       <div className="mb-2 h-2.5 w-14 rounded-full bg-ink/8" />
       <div className="h-6 w-20 rounded-full bg-ink/8" />
@@ -45,12 +45,12 @@ export default function StatCard({
   return (
     <MotionPanel
       className={[
-        "rounded-xl border p-3.5 shadow-sm transition-shadow hover:shadow-md",
+        "rounded-xl p-3.5 transition-all",
         isPositive
-          ? "border-leaf/20 bg-gradient-to-br from-white to-mint/50"
+          ? "bento-card border-leaf/20 bg-gradient-to-br from-white/90 to-mint/55"
           : isNegative
-            ? "border-clay/20 bg-gradient-to-br from-white to-orange-50/60"
-            : "border-ink/10 bg-white",
+            ? "bento-card border-clay/20 bg-gradient-to-br from-white/90 to-orange-50/65"
+            : "bento-card",
       ].join(" ")}
     >
       <span

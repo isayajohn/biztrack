@@ -6,8 +6,10 @@
 
 :root {
   color: #10231e;
-  background: #f7faf9;
+  background: #eef5f2;
   font-family: 'Open Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
 }
 
 html {
@@ -17,6 +19,17 @@ html {
 body {
   min-width: 320px;
   margin: 0;
+  min-height: 100vh;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(231, 250, 245, 0.58) 42%, rgba(245, 158, 11, 0.08)),
+    linear-gradient(rgba(16, 35, 30, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 35, 30, 0.035) 1px, transparent 1px),
+    #eef5f2;
+  background-size: auto, 36px 36px, 36px 36px, auto;
+}
+
+body::selection {
+  background: rgba(24, 189, 151, 0.22);
 }
 
 button,
@@ -24,6 +37,89 @@ a,
 input,
 select {
   -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a {
+  transition-property: color, background-color, border-color, box-shadow, transform, opacity;
+  transition-duration: 180ms;
+  transition-timing-function: ease;
+}
+
+input,
+select,
+textarea {
+  color-scheme: light;
+}
+
+@layer components {
+  .spatial-shell {
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(231, 250, 245, 0.56) 45%, rgba(245, 158, 11, 0.07)),
+      linear-gradient(rgba(16, 35, 30, 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(16, 35, 30, 0.035) 1px, transparent 1px),
+      #eef5f2;
+    background-size: auto, 36px 36px, 36px 36px, auto;
+  }
+
+  .glass-panel {
+    border: 1px solid rgba(16, 35, 30, 0.1);
+    background: rgba(255, 255, 255, 0.74);
+    box-shadow: 0 22px 70px rgba(13, 60, 52, 0.12);
+    backdrop-filter: blur(18px) saturate(145%);
+    -webkit-backdrop-filter: blur(18px) saturate(145%);
+  }
+
+  .bento-card {
+    border: 1px solid rgba(16, 35, 30, 0.09);
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.64)),
+      linear-gradient(180deg, rgba(24, 189, 151, 0.07), rgba(255, 255, 255, 0));
+    box-shadow: 0 16px 48px rgba(13, 60, 52, 0.09);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+  }
+
+  .bento-card:hover {
+    box-shadow: 0 22px 62px rgba(13, 60, 52, 0.13);
+    transform: translateY(-1px);
+  }
+
+  .minimal-input {
+    border: 1px solid rgba(16, 35, 30, 0.1);
+    background: rgba(255, 255, 255, 0.68);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  }
+}
+
+.MuiPaper-root {
+  border-color: rgba(16, 35, 30, 0.1);
+}
+
+.MuiTableContainer-root,
+.MuiCard-root,
+.MuiDialog-paper,
+.MuiPopover-paper,
+.MuiMenu-paper {
+  background: rgba(255, 255, 255, 0.78) !important;
+  border: 1px solid rgba(16, 35, 30, 0.1);
+  box-shadow: 0 20px 58px rgba(13, 60, 52, 0.11) !important;
+  backdrop-filter: blur(16px) saturate(145%);
+  -webkit-backdrop-filter: blur(16px) saturate(145%);
+}
+
+.MuiButton-root {
+  border-radius: 10px !important;
+  box-shadow: none;
+}
+
+.MuiOutlinedInput-root {
+  border-radius: 10px !important;
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.MuiTableRow-hover:hover {
+  background-color: rgba(24, 189, 151, 0.06) !important;
 }
 
 .hero-pattern {

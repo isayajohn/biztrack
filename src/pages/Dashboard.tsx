@@ -86,7 +86,7 @@ function DashboardTooltip({
 }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-ink/10 bg-white px-3 py-2 shadow-soft">
+    <div className="glass-panel rounded-lg px-3 py-2">
       <p className="mb-1 text-[11px] font-bold text-ink/45">{label}</p>
       {payload.map((entry) => (
         <p key={entry.name} className="text-xs font-bold" style={{ color: entry.color }}>
@@ -142,7 +142,7 @@ function KpiCard({
   const isPositive = (trend ?? 0) >= 0;
 
   return (
-    <section className="min-h-[8.75rem] rounded-xl border border-ink/10 bg-white p-5 shadow-sm">
+    <section className="bento-card min-h-[8.75rem] rounded-xl p-5">
       {loading ? (
         <div className="animate-pulse space-y-4">
           <div className="h-10 w-10 rounded-lg bg-ink/8" />
@@ -280,9 +280,9 @@ export default function Dashboard() {
           <p className="mt-2 text-sm font-semibold text-ink/50">Here&apos;s what&apos;s happening with your business today.</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <QuickAddDialog formType="sale" triggerLabel="Add Sale" triggerIconSize={16} triggerClassName="inline-flex h-11 items-center gap-2 rounded-lg bg-emerald-600 px-5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-emerald-700" />
-          <QuickAddDialog formType="expense" triggerLabel="Add Expense" triggerIconSize={16} triggerClassName="inline-flex h-11 items-center gap-2 rounded-lg border border-ink/10 bg-white px-5 text-sm font-bold text-ink shadow-sm transition-colors hover:bg-emerald-50" />
-          <QuickAddDialog formType="product" triggerLabel="Add Product" triggerIconSize={16} triggerClassName="inline-flex h-11 items-center gap-2 rounded-lg border border-ink/10 bg-white px-5 text-sm font-bold text-ink shadow-sm transition-colors hover:bg-emerald-50" />
+          <QuickAddDialog formType="sale" triggerLabel="Add Sale" triggerIconSize={16} triggerClassName="inline-flex h-11 items-center gap-2 rounded-lg bg-emerald-600 px-5 text-sm font-bold text-white shadow-[0_14px_32px_rgba(11,146,121,0.2)] transition-all hover:-translate-y-0.5 hover:bg-emerald-700" />
+          <QuickAddDialog formType="expense" triggerLabel="Add Expense" triggerIconSize={16} triggerClassName="minimal-input inline-flex h-11 items-center gap-2 rounded-lg px-5 text-sm font-bold text-ink transition-all hover:-translate-y-0.5 hover:bg-white/80" />
+          <QuickAddDialog formType="product" triggerLabel="Add Product" triggerIconSize={16} triggerClassName="minimal-input inline-flex h-11 items-center gap-2 rounded-lg px-5 text-sm font-bold text-ink transition-all hover:-translate-y-0.5 hover:bg-white/80" />
         </div>
       </div>
 
@@ -295,7 +295,7 @@ export default function Dashboard() {
         <KpiCard title="Low Stock Items" value={lowStockCount} icon={AlertTriangle} iconClass="bg-amber-50 text-amber-600" linkLabel="View items" linkTo="/products" loading={isLoading} />
       </div>
 
-      <section className="mt-5 rounded-xl border border-emerald-200 bg-gradient-to-r from-emerald-50/90 to-white p-5">
+      <section className="glass-panel mt-5 rounded-xl p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex gap-4">
             <span className="mt-0.5 text-emerald-700"><Sparkles size={18} /></span>
@@ -316,7 +316,7 @@ export default function Dashboard() {
           {summaryNeedsUpgrade ? (
             <Link to="/subscription" className="inline-flex h-11 shrink-0 items-center justify-center rounded-lg bg-emerald-600 px-5 text-sm font-bold text-white">Pay package</Link>
           ) : (
-            <button type="button" onClick={handleGenerateSummary} disabled={isGeneratingSummary} className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-lg border border-ink/10 bg-white px-5 text-sm font-bold text-ink shadow-sm transition-colors hover:bg-emerald-50 disabled:opacity-60">
+            <button type="button" onClick={handleGenerateSummary} disabled={isGeneratingSummary} className="minimal-input inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-lg px-5 text-sm font-bold text-ink transition-colors hover:bg-white/80 disabled:opacity-60">
               <Bot size={16} />
               Generate Summary
             </button>
@@ -325,7 +325,7 @@ export default function Dashboard() {
       </section>
 
       <div className="mt-5 grid gap-5 xl:grid-cols-2">
-        <section className="rounded-xl border border-ink/10 bg-white p-5 shadow-sm">
+        <section className="bento-card rounded-xl p-5">
           <div className="flex items-center justify-between">
             <PanelTitle title="Sales vs Expenses" icon={TrendingUp} />
             <button className="rounded-lg border border-ink/10 px-3 py-1.5 text-xs font-bold text-ink/60">Last 7 days</button>
@@ -348,7 +348,7 @@ export default function Dashboard() {
           </div>
         </section>
 
-        <section className="rounded-xl border border-ink/10 bg-white p-5 shadow-sm">
+        <section className="bento-card rounded-xl p-5">
           <div className="flex items-center justify-between">
             <PanelTitle title="Expense Breakdown" icon={WalletCards} />
             <button className="rounded-lg border border-ink/10 px-3 py-1.5 text-xs font-bold text-ink/60">This month</button>
@@ -379,7 +379,7 @@ export default function Dashboard() {
       </div>
 
       <div className="mt-5 grid gap-5 xl:grid-cols-2">
-        <section className="rounded-xl border border-ink/10 bg-white p-5 shadow-sm">
+        <section className="bento-card rounded-xl p-5">
           <div className="flex items-center justify-between">
             <PanelTitle title="Recent Sales" icon={CircleDollarSign} />
             <CardButton to="/sales">View all</CardButton>
@@ -397,7 +397,7 @@ export default function Dashboard() {
           </div>
         </section>
 
-        <section className="rounded-xl border border-ink/10 bg-white p-5 shadow-sm">
+        <section className="bento-card rounded-xl p-5">
           <div className="flex items-center justify-between">
             <PanelTitle title="Recent Expenses" icon={WalletCards} />
             <CardButton to="/expenses">View all</CardButton>
@@ -416,7 +416,7 @@ export default function Dashboard() {
         </section>
       </div>
 
-      <section className="mt-5 flex items-center justify-between gap-4 rounded-xl border border-emerald-200 bg-gradient-to-r from-emerald-50/90 to-white p-5">
+      <section className="glass-panel mt-5 flex items-center justify-between gap-4 rounded-xl p-5">
         <div className="flex gap-4">
           <Lightbulb size={20} className="mt-0.5 text-amber-500" />
           <div>

@@ -124,8 +124,8 @@ export default function Sidebar({
             "relative flex h-10 items-center rounded-lg text-sm font-semibold transition-colors duration-200",
             isCollapsed ? "w-10 justify-center px-0" : "gap-3 px-3",
             active
-              ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100"
-              : "text-ink/68 hover:bg-emerald-50/70 hover:text-ink",
+              ? "bg-white/80 text-emerald-700 ring-1 ring-emerald-200 shadow-sm"
+              : "text-ink/68 hover:bg-white/58 hover:text-ink",
           );
         }}
       >
@@ -154,8 +154,8 @@ export default function Sidebar({
 
   const content = (
     <TooltipProvider>
-      <div className={cn("flex h-full flex-col bg-white", isCollapsed ? "w-20" : "w-60")}>
-        <div className={cn("flex h-16 shrink-0 items-center border-b border-ink/10", isCollapsed ? "justify-center px-3" : "px-5")}>
+      <div className={cn("flex h-full flex-col bg-white/58 backdrop-blur-xl", isCollapsed ? "w-20" : "w-60")}>
+        <div className={cn("flex h-16 shrink-0 items-center border-b border-ink/10 bg-white/40", isCollapsed ? "justify-center px-3" : "px-5")}>
           <BrandLogo className={cn("h-auto max-w-full", isCollapsed ? "w-9" : "w-36")} />
         </div>
 
@@ -211,7 +211,7 @@ export default function Sidebar({
   return (
     <aside
       className={cn(
-        "fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-ink/10 bg-white transition-[width] duration-300 lg:flex",
+        "fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-white/70 bg-white/58 shadow-[12px_0_44px_rgba(13,60,52,0.08)] backdrop-blur-xl transition-[width] duration-300 lg:flex",
         isCollapsed ? "w-20" : "w-60",
       )}
     >

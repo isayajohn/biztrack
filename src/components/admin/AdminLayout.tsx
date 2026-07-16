@@ -8,7 +8,7 @@ export default function AdminLayout() {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen bg-[#f7faf9] text-ink">
+    <div className="spatial-shell min-h-screen text-ink">
       <AdminSidebar />
       <div className="min-h-screen lg:pl-64">
         <AdminTopbar />

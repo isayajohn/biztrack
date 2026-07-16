@@ -5,8 +5,8 @@ import { AnimatedIcon } from "../animate-ui/MotionPrimitives";
 
 export default function AdminSidebar() {
   return (
-    <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-ink/10 bg-white lg:flex lg:flex-col">
-      <div className="flex h-16 shrink-0 items-center gap-3 border-b border-ink/10 px-5">
+    <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-white/70 bg-white/58 shadow-[12px_0_44px_rgba(13,60,52,0.08)] backdrop-blur-xl lg:flex lg:flex-col">
+      <div className="flex h-16 shrink-0 items-center gap-3 border-b border-ink/10 bg-white/40 px-5">
         <img src="/biztrack-logo.png" alt="BizTrack" className="h-9 w-9 rounded-lg object-contain" />
         <div className="flex min-w-0 items-center gap-2">
           <p className="font-display text-lg font-bold text-ink">
@@ -17,7 +17,7 @@ export default function AdminSidebar() {
       </div>
 
       <div className="overflow-y-auto px-3 py-4">
-        <div className="mb-3 flex items-center gap-2 rounded-lg border border-emerald-100 bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700">
+        <div className="mb-3 flex items-center gap-2 rounded-lg border border-emerald-100 bg-white/70 px-3 py-2 text-xs font-bold text-emerald-700 shadow-sm">
           <AnimatedIcon icon={ShieldCheck} size={15} className="text-leaf" />
           Platform Management
         </div>
@@ -41,8 +41,8 @@ export default function AdminSidebar() {
                           [
                             "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-bold transition-colors",
                             isActive
-                              ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100"
-                              : "text-ink/65 hover:bg-emerald-50/70 hover:text-ink",
+                              ? "bg-white/80 text-emerald-700 ring-1 ring-emerald-200 shadow-sm"
+                              : "text-ink/65 hover:bg-white/58 hover:text-ink",
                           ].join(" ")
                         }
                       >

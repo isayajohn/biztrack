@@ -18,7 +18,7 @@ export default function AdminTopbar() {
   };
 
   return (
-    <header className="sticky top-0 z-20 border-b border-ink/10 bg-white px-4 shadow-sm lg:px-6">
+    <header className="sticky top-0 z-20 border-b border-white/70 bg-white/62 px-4 shadow-[0_12px_36px_rgba(13,60,52,0.07)] backdrop-blur-xl lg:px-6">
       <div className="flex h-14 items-center justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">

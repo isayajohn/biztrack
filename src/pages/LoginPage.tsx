@@ -27,11 +27,11 @@ function validate(email: string, password: string): FormErrors {
 
 function inputCls(hasError?: boolean) {
   return [
-    "w-full rounded-lg border px-5 py-3.5 text-sm font-semibold text-ink outline-none",
-    "bg-[#f5f9f8] transition-all placeholder:text-slateMuted/55 focus:ring-2",
+    "minimal-input w-full rounded-lg px-5 py-3.5 text-sm font-semibold text-ink outline-none",
+    "transition-all placeholder:text-slateMuted/55 focus:ring-2",
     hasError
       ? "border-red-400 focus:border-red-400 focus:ring-red-200/50"
-      : "border-transparent focus:border-leaf focus:ring-leaf/15",
+      : "focus:border-leaf focus:ring-leaf/15",
   ].join(" ");
 }
 
@@ -98,15 +98,15 @@ export default function LoginPage() {
   );
 
   return (
-    <main className="min-h-screen bg-white text-ink lg:grid lg:grid-cols-2">
+    <main className="spatial-shell min-h-screen text-ink lg:grid lg:grid-cols-2">
       <section className="flex min-h-screen items-center justify-center px-5 py-8 sm:px-8 lg:px-12">
-        <div className="w-full max-w-md">
-          <div className="mb-20 sm:mb-24">
+        <div className="bento-card w-full max-w-md rounded-xl p-5 sm:p-7">
+          <div className="mb-12 sm:mb-14">
             <BrandLogo className="h-auto w-44 max-w-full" />
           </div>
 
           <div>
-            <p className="mb-3 inline-flex items-center gap-2 rounded-full bg-mint px-3 py-1 text-xs font-black text-leaf">
+            <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-leaf/15 bg-white/70 px-3 py-1 text-xs font-black text-leaf shadow-sm">
               <Sparkles size={14} aria-hidden="true" />
               Welcome back
             </p>
@@ -214,7 +214,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="mt-1 flex w-full items-center justify-center gap-2 rounded-lg bg-leaf py-4 text-sm font-black text-white shadow-sm transition-all hover:bg-[#0b5f59] disabled:cursor-not-allowed disabled:opacity-65"
+              className="mt-1 flex w-full items-center justify-center gap-2 rounded-lg bg-leaf py-4 text-sm font-black text-white shadow-[0_14px_32px_rgba(11,146,121,0.22)] transition-all hover:-translate-y-0.5 hover:bg-[#0b5f59] disabled:cursor-not-allowed disabled:opacity-65"
             >
               {isLoading ? (
                 <>

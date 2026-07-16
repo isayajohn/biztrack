@@ -74,7 +74,7 @@ export function PrimaryButton(props: ButtonBaseProps) {
     <ButtonBase
       {...props}
       className={cx(
-        "bg-leaf text-white shadow-sm hover:-translate-y-0.5 hover:bg-[#0b9279] hover:shadow-card",
+        "bg-leaf text-white shadow-[0_14px_32px_rgba(11,146,121,0.2)] hover:-translate-y-0.5 hover:bg-[#0b9279]",
         props.className,
       )}
     />
@@ -86,7 +86,7 @@ export function SecondaryButton(props: ButtonBaseProps) {
     <ButtonBase
       {...props}
       className={cx(
-        "border border-slate-200 bg-white text-ink shadow-sm hover:-translate-y-0.5 hover:border-slate-300 hover:bg-cloud",
+        "minimal-input text-ink hover:-translate-y-0.5 hover:bg-white/80",
         props.className,
       )}
     />
@@ -126,7 +126,7 @@ type FeatureCardProps = {
 
 export function FeatureCard({ icon: Icon, title, description, imageUrl }: FeatureCardProps) {
   return (
-    <MotionPanel className="group flex h-full flex-col rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-200 hover:border-leaf/30 hover:shadow-card">
+    <MotionPanel className="bento-card group flex h-full flex-col rounded-xl p-6 transition-all duration-200 hover:border-leaf/30">
       {imageUrl ? (
         <img src={imageUrl} alt="" className="mb-4 h-32 w-full rounded-lg object-cover ring-1 ring-slate-200" />
       ) : (
@@ -166,7 +166,7 @@ export function PricingCard({
   return (
     <MotionPanel
       className={cx(
-        "relative flex h-full flex-col rounded-xl border bg-white p-7 shadow-sm transition-all duration-200 hover:shadow-card",
+        "bento-card relative flex h-full flex-col rounded-xl p-7 transition-all duration-200",
         highlighted ? "border-leaf ring-1 ring-leaf/15" : "border-slate-200",
       )}
     >
@@ -213,7 +213,7 @@ type StatCardProps = {
 
 export function StatCard({ icon: Icon, label, value, change }: StatCardProps) {
   return (
-    <MotionPanel className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+    <MotionPanel className="bento-card rounded-xl p-4">
       <span className="mb-3 grid h-10 w-10 place-items-center rounded-lg bg-mint text-leaf ring-1 ring-leaf/15">
         <AnimatedIcon icon={Icon} size={18} />
       </span>
