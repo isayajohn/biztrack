@@ -102,9 +102,6 @@ class ListItemCard extends StatelessWidget {
         return await showDialog<bool>(
           context: context,
           builder: (ctx) => AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
             title: const Text('Delete'),
             content: const Text('Are you sure you want to delete this item?'),
             actions: [

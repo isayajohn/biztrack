@@ -156,9 +156,9 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 const Divider(height: 1, indent: 56),
                 ListTile(
-                  leading: Icon(
+                  leading: const Icon(
                     Icons.bar_chart_rounded,
-                    color: Colors.blue.shade700,
+                    color: kPrimaryGreen,
                   ),
                   title: const Text('View Reports'),
                   trailing: const Icon(
@@ -206,7 +206,6 @@ class SettingsScreen extends StatelessWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text('Log Out'),
         content: const Text('Are you sure you want to log out?'),
         actions: [

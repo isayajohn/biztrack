@@ -34,9 +34,6 @@ class _LowStockScreenState extends State<LowStockScreen> {
       context: context,
       builder: (dialogCtx) => StatefulBuilder(
         builder: (dialogCtx, setDialogState) => AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -180,13 +177,7 @@ class _LowStockScreenState extends State<LowStockScreen> {
                   ),
                   flexibleSpace: FlexibleSpaceBar(
                     background: Container(
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [Color(0xFFDC2626), Color(0xFFEA580C)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                      ),
+                      color: kClay,
                       child: SafeArea(
                         child: Padding(
                           padding: const EdgeInsets.fromLTRB(20, 48, 20, 16),
@@ -328,9 +319,9 @@ class _LowStockScreenState extends State<LowStockScreen> {
                         return Card(
                           margin: const EdgeInsets.only(bottom: 10),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
+                            borderRadius: BorderRadius.circular(16),
                             side: BorderSide(
-                              color: Colors.red.shade200.withValues(alpha: 0.5),
+                              color: kClay.withValues(alpha: 0.3),
                             ),
                           ),
                           child: Padding(
@@ -341,12 +332,12 @@ class _LowStockScreenState extends State<LowStockScreen> {
                                   width: 44,
                                   height: 44,
                                   decoration: BoxDecoration(
-                                    color: Colors.red.shade50,
-                                    borderRadius: BorderRadius.circular(12),
+                                    color: kClay.withValues(alpha: kBadgeAlpha),
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
-                                  child: Icon(
+                                  child: const Icon(
                                     Icons.warning_amber_rounded,
-                                    color: Colors.red.shade600,
+                                    color: kClay,
                                     size: 24,
                                   ),
                                 ),
@@ -381,14 +372,16 @@ class _LowStockScreenState extends State<LowStockScreen> {
                                         children: [
                                           _stockChip(
                                             label: 'Stock: $stock',
-                                            color: Colors.red.shade600,
-                                            bg: Colors.red.shade50,
+                                            color: kClay,
+                                            bg: kClay.withValues(
+                                              alpha: kBadgeAlpha,
+                                            ),
                                           ),
                                           const SizedBox(width: 8),
                                           _stockChip(
                                             label: 'Reorder: $reorderPoint',
-                                            color: Colors.orange.shade700,
-                                            bg: Colors.orange.shade50,
+                                            color: kMuted,
+                                            bg: Colors.grey.shade100,
                                           ),
                                         ],
                                       ),

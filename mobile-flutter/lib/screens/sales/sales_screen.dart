@@ -36,7 +36,6 @@ class _SalesScreenState extends State<SalesScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text('Delete sale?'),
         content: Text(
           'Remove the sale of "${sale.productName}"? This cannot be undone.',
@@ -166,13 +165,7 @@ class _SalesScreenState extends State<SalesScreen> {
                   flexibleSpace: FlexibleSpaceBar(
                     collapseMode: CollapseMode.pin,
                     background: Container(
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [Color(0xFF1a5c38), kPrimaryGreen],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                      ),
+                      color: kPrimaryGreen,
                       padding: const EdgeInsets.fromLTRB(20, 60, 20, 16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -355,9 +348,6 @@ class _SaleCard extends StatelessWidget {
       ),
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 5),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        elevation: 0,
-        color: Colors.white,
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(16),
@@ -370,7 +360,7 @@ class _SaleCard extends StatelessWidget {
                   height: 44,
                   decoration: BoxDecoration(
                     color: kLightGreen,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(
                     Icons.receipt_long_rounded,

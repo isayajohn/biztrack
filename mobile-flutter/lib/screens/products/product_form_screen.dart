@@ -316,7 +316,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE5E7EB)),
+                border: Border.all(color: kCardBorder),
               ),
               child: SwitchListTile(
                 contentPadding: EdgeInsets.zero,

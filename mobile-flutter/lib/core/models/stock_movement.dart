@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 
 class StockMovement {
   final String id;
@@ -43,17 +44,17 @@ class StockMovement {
       case 'STOCK_IN':
       case 'PURCHASE':
       case 'RETURN':
-        return const Color(0xFF10B981);
+        return kPrimaryGreen;
       case 'SALE':
-        return const Color(0xFF3B82F6);
+        return kSecondaryGreen;
       case 'STOCK_OUT':
       case 'DAMAGED':
       case 'EXPIRED':
-        return const Color(0xFFEF4444);
+        return Colors.red.shade600;
       case 'ADJUSTMENT':
-        return const Color(0xFF8B5CF6);
+        return kMuted;
       default:
-        return const Color(0xFF6B7280);
+        return kMuted;
     }
   }
 

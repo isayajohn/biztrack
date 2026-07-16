@@ -1,24 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 
-class AuthDecorCircle extends StatelessWidget {
-  final double size;
-  final double opacity;
-  const AuthDecorCircle({super.key, required this.size, required this.opacity});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.white.withValues(alpha: opacity),
-      ),
-    );
-  }
-}
-
 class AuthInputField extends StatelessWidget {
   final TextEditingController controller;
   final String label;
@@ -65,23 +47,23 @@ class AuthInputField extends StatelessWidget {
         fillColor: Colors.white,
         labelStyle: const TextStyle(color: kMuted, fontSize: 14),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: kCardBorder),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: kCardBorder),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: kPrimaryGreen, width: 2),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Colors.red.shade400),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Colors.red.shade400, width: 2),
         ),
         contentPadding: const EdgeInsets.symmetric(
@@ -120,15 +102,15 @@ class AuthDropdownField<T> extends StatelessWidget {
         fillColor: Colors.white,
         labelStyle: const TextStyle(color: kMuted, fontSize: 14),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: kCardBorder),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: kCardBorder),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: kPrimaryGreen, width: 2),
         ),
         contentPadding: const EdgeInsets.symmetric(
@@ -138,19 +120,19 @@ class AuthDropdownField<T> extends StatelessWidget {
       ),
       style: const TextStyle(fontSize: 15, color: kDark),
       dropdownColor: Colors.white,
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(12),
       items: items,
       onChanged: onChanged,
     );
   }
 }
 
-class AuthGradientButton extends StatelessWidget {
+class AuthPrimaryButton extends StatelessWidget {
   final bool loading;
   final String label;
   final VoidCallback onTap;
 
-  const AuthGradientButton({
+  const AuthPrimaryButton({
     super.key,
     required this.loading,
     required this.label,
@@ -159,50 +141,37 @@ class AuthGradientButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: loading ? null : onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        height: 54,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: loading
-                ? [kMuted, kMuted]
-                : [const Color(0xFF1B5E35), kPrimaryGreen],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
+    return SizedBox(
+      height: 54,
+      child: ElevatedButton(
+        onPressed: loading ? null : onTap,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: kPrimaryGreen,
+          disabledBackgroundColor: kMuted,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
-          borderRadius: BorderRadius.circular(14),
-          boxShadow: loading
-              ? []
-              : [
-                  BoxShadow(
-                    color: kPrimaryGreen.withValues(alpha: 0.4),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
         ),
-        child: Center(
-          child: loading
-              ? const SizedBox(
-                  width: 22,
-                  height: 22,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.5,
-                    color: Colors.white,
-                  ),
-                )
-              : Text(
-                  label,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.3,
-                  ),
+        child: loading
+            ? const SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  color: Colors.white,
                 ),
-        ),
+              )
+            : Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.3,
+                ),
+              ),
       ),
     );
   }

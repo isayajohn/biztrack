@@ -580,15 +580,9 @@ class _PosScreenState extends State<PosScreen> {
           if (_cart.isNotEmpty)
             Container(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: kDark.withValues(alpha: 0.08),
-                    blurRadius: 16,
-                    offset: const Offset(0, -4),
-                  ),
-                ],
+                border: Border(top: BorderSide(color: kCardBorder)),
               ),
               child: SafeArea(
                 top: false,

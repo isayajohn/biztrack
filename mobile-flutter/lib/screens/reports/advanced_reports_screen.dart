@@ -75,7 +75,7 @@ class _State extends State<AdvancedReportsScreen> {
                         child: _metric(
                           'Cash out',
                           '$currency ${nf.format(cs?['totalOutflow'] ?? 0)}',
-                          Colors.red,
+                          Colors.red.shade600,
                         ),
                       ),
                     ],
@@ -84,7 +84,9 @@ class _State extends State<AdvancedReportsScreen> {
                   _metric(
                     'Net cash flow',
                     '$currency ${nf.format(cs?['netCashFlow'] ?? 0)}',
-                    (cs?['netCashFlow'] ?? 0) >= 0 ? kPrimaryGreen : Colors.red,
+                    (cs?['netCashFlow'] ?? 0) >= 0
+                        ? kPrimaryGreen
+                        : Colors.red.shade600,
                   ),
                   const SizedBox(height: 22),
                   const Text(
@@ -140,8 +142,8 @@ Widget _metric(String label, String value, Color color) => Container(
   padding: const EdgeInsets.all(16),
   decoration: BoxDecoration(
     color: Colors.white,
-    borderRadius: BorderRadius.circular(14),
-    border: Border.all(color: kDark.withValues(alpha: .08)),
+    borderRadius: BorderRadius.circular(16),
+    border: Border.all(color: kCardBorder),
   ),
   child: Column(
     crossAxisAlignment: CrossAxisAlignment.start,

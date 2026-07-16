@@ -142,12 +142,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [kPrimaryGreen, kPrimaryGreen.withGreen(160)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(20),
+            color: kPrimaryGreen,
+            borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -186,14 +182,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     icon: Icons.arrow_upward_rounded,
                     label: 'Sales',
                     value: _fmt(stats.totalSales, currency),
-                    color: Colors.greenAccent.shade200,
+                    color: Colors.white.withValues(alpha: 0.85),
                   ),
                   const SizedBox(width: 16),
                   _miniStat(
                     icon: Icons.arrow_downward_rounded,
                     label: 'Expenses',
                     value: _fmt(stats.totalExpenses, currency),
-                    color: Colors.orange.shade200,
+                    color: Colors.white.withValues(alpha: 0.85),
                   ),
                 ],
               ),
@@ -221,14 +217,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
               title: 'Total Expenses',
               value: stats.expensesCount.toString(),
               icon: Icons.account_balance_wallet_rounded,
-              iconColor: Colors.orange.shade600,
               onTap: () => context.go('/expenses'),
             ),
             StatCard(
               title: 'Products',
               value: stats.totalProducts.toString(),
               icon: Icons.inventory_2_rounded,
-              iconColor: Colors.blue.shade600,
               onTap: () => context.go('/inventory'),
             ),
             StatCard(
@@ -268,7 +262,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: _quickAction(
                 icon: Icons.remove_circle_rounded,
                 label: 'New Expense',
-                color: Colors.orange.shade700,
+                color: kPrimaryGreen,
                 onTap: () => context.push('/expenses/add'),
               ),
             ),
@@ -277,7 +271,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: _quickAction(
                 icon: Icons.add_box_rounded,
                 label: 'New Product',
-                color: Colors.blue.shade700,
+                color: kPrimaryGreen,
                 onTap: () => context.push('/products/add'),
               ),
             ),

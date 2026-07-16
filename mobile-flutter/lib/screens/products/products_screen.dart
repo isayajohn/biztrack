@@ -53,7 +53,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text('Delete product?'),
         content: Text('Delete "${p.name}"? This cannot be undone.'),
         actions: [
@@ -92,7 +91,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
   @override
   Widget build(BuildContext context) {
     final currency = context.watch<AuthProvider>().user?.currency ?? 'TZS';
-    const accentColor = Color(0xFF6366F1); // indigo
+    const accentColor = kPrimaryGreen;
 
     return Scaffold(
       backgroundColor: kBg,
@@ -122,13 +121,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   flexibleSpace: FlexibleSpaceBar(
                     collapseMode: CollapseMode.pin,
                     background: Container(
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [Color(0xFF3730a3), accentColor],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                      ),
+                      color: accentColor,
                       padding: const EdgeInsets.fromLTRB(20, 60, 20, 16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -233,7 +226,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                       icon: Icons.inventory_2_outlined,
                       message: 'No products found',
                       hint: 'Tap the + button to add your first product',
-                      color: Color(0xFF6366F1),
+                      color: kPrimaryGreen,
                     ),
                   )
                 else
@@ -335,9 +328,6 @@ class _ProductCard extends StatelessWidget {
       ),
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 5),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        elevation: 0,
-        color: Colors.white,
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(16),
@@ -350,9 +340,9 @@ class _ProductCard extends StatelessWidget {
                   height: 48,
                   decoration: BoxDecoration(
                     color: isActive
-                        ? accentColor.withValues(alpha: 0.1)
+                        ? accentColor.withValues(alpha: kBadgeAlpha)
                         : Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(
                     Icons.inventory_2_rounded,

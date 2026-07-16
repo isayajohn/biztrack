@@ -66,13 +66,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
               ),
               flexibleSpace: FlexibleSpaceBar(
                 background: Container(
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Color(0xFF7C3AED), Color(0xFF9333EA)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                  ),
+                  color: kPrimaryGreen,
                   child: SafeArea(
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(20, 48, 20, 16),
@@ -218,7 +212,7 @@ class _SupplierCard extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: const Color(0xFF7C3AED).withValues(alpha: 0.1),
+                color: kPrimaryGreen.withValues(alpha: kBadgeAlpha),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Center(
@@ -227,7 +221,7 @@ class _SupplierCard extends StatelessWidget {
                       ? supplier.name[0].toUpperCase()
                       : 'S',
                   style: const TextStyle(
-                    color: Color(0xFF7C3AED),
+                    color: kPrimaryGreen,
                     fontWeight: FontWeight.w800,
                     fontSize: 20,
                   ),
@@ -303,13 +297,13 @@ class _SupplierCard extends StatelessWidget {
                         vertical: 3,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.orange.shade50,
+                        color: kClay.withValues(alpha: kBadgeAlpha),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         'Balance: ${fmt.format(supplier.balance)}',
-                        style: TextStyle(
-                          color: Colors.orange.shade700,
+                        style: const TextStyle(
+                          color: kClay,
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
                         ),

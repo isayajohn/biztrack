@@ -192,14 +192,8 @@ class _ReportsScreenState extends State<ReportsScreen>
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: isProfit
-                    ? [kPrimaryGreen, const Color(0xFF1B5E20)]
-                    : [Colors.red.shade700, Colors.red.shade900],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(20),
+              color: profitColor,
+              borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -292,7 +286,7 @@ class _ReportsScreenState extends State<ReportsScreen>
                     report.totalSales,
                     report.totalSales + report.totalExpenses,
                   ),
-                  Colors.blue.shade600,
+                  kMuted,
                 ),
               ),
               const SizedBox(width: 10),
@@ -300,7 +294,7 @@ class _ReportsScreenState extends State<ReportsScreen>
                 child: _ratioCard(
                   'Cost Ratio',
                   _pct(report.totalExpenses, report.totalSales),
-                  Colors.orange.shade700,
+                  kMuted,
                 ),
               ),
             ],
@@ -463,22 +457,17 @@ class _ReportsScreenState extends State<ReportsScreen>
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: bold ? Border.all(color: color.withValues(alpha: 0.3)) : null,
-        boxShadow: [
-          BoxShadow(
-            color: kDark.withValues(alpha: 0.04),
-            blurRadius: 4,
-            offset: const Offset(0, 1),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: bold ? color.withValues(alpha: 0.3) : kCardBorder,
+        ),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
+              color: color.withValues(alpha: kBadgeAlpha),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: color, size: 18),

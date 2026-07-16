@@ -21,13 +21,7 @@ class MoreScreen extends StatelessWidget {
             automaticallyImplyLeading: false,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [kSecondaryGreen, kPrimaryGreen],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                ),
+                color: kPrimaryGreen,
                 child: SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
@@ -94,7 +88,7 @@ class MoreScreen extends StatelessWidget {
                 _tile(
                   context,
                   icon: Icons.bar_chart_rounded,
-                  color: Colors.indigo.shade600,
+                  color: kPrimaryGreen,
                   label: 'Reports & P&L',
                   subtitle: 'Profit, loss & top products',
                   route: '/reports',
@@ -111,7 +105,7 @@ class MoreScreen extends StatelessWidget {
                   _tile(
                     context,
                     icon: Icons.people_outline,
-                    color: kSecondaryGreen,
+                    color: kPrimaryGreen,
                     label: 'Customers & Credit',
                     subtitle: 'Customers, balances and repayments',
                     route: '/customers',
@@ -120,7 +114,7 @@ class MoreScreen extends StatelessWidget {
                   _tile(
                     context,
                     icon: Icons.local_offer_outlined,
-                    color: kSun,
+                    color: kPrimaryGreen,
                     label: 'Promotions',
                     subtitle: 'Discount codes and campaigns',
                     route: '/promotions',
@@ -130,7 +124,7 @@ class MoreScreen extends StatelessWidget {
                   _tile(
                     context,
                     icon: Icons.corporate_fare_outlined,
-                    color: kClay,
+                    color: kPrimaryGreen,
                     label: 'Branches & Staff',
                     subtitle: 'Locations, roles and permissions',
                     route: '/organization',
@@ -141,7 +135,7 @@ class MoreScreen extends StatelessWidget {
                 _tile(
                   context,
                   icon: Icons.notifications_outlined,
-                  color: Colors.amber.shade700,
+                  color: kPrimaryGreen,
                   label: 'Notifications',
                   subtitle: 'Alerts & stock warnings',
                   route: '/notifications',
@@ -181,26 +175,15 @@ class MoreScreen extends StatelessWidget {
     required String subtitle,
     required String route,
   }) {
-    return Container(
+    return Card(
       margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: kDark.withValues(alpha: 0.05),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: ListTile(
         onTap: () => context.push(route),
         leading: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(12),
+            color: color.withValues(alpha: kBadgeAlpha),
+            borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, color: color, size: 22),
         ),
@@ -217,7 +200,7 @@ class MoreScreen extends StatelessWidget {
           style: const TextStyle(color: kMuted, fontSize: 12),
         ),
         trailing: const Icon(Icons.chevron_right_rounded, color: kMuted),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
     );
   }

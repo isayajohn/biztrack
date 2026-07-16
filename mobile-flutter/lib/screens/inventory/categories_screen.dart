@@ -259,14 +259,14 @@ class _CategoryCard extends StatelessWidget {
           width: 44,
           height: 44,
           decoration: BoxDecoration(
-            color: Colors.blue.shade50,
-            borderRadius: BorderRadius.circular(12),
+            color: kPrimaryGreen.withValues(alpha: kBadgeAlpha),
+            borderRadius: BorderRadius.circular(10),
           ),
           child: Center(
             child: Text(
               category.name.isNotEmpty ? category.name[0].toUpperCase() : 'C',
-              style: TextStyle(
-                color: Colors.blue.shade700,
+              style: const TextStyle(
+                color: kPrimaryGreen,
                 fontWeight: FontWeight.w800,
                 fontSize: 18,
               ),

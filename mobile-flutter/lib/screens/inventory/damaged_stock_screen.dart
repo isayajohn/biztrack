@@ -60,13 +60,7 @@ class _DamagedStockScreenState extends State<DamagedStockScreen> {
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.brown.shade800, Colors.brown.shade600],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                ),
+                color: kClay,
                 child: SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(20, 48, 20, 16),
@@ -220,12 +214,12 @@ class _DamagedCard extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: Colors.brown.shade50,
+                    color: kClay.withValues(alpha: kBadgeAlpha),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.broken_image_rounded,
-                    color: Colors.brown.shade600,
+                    color: kClay,
                     size: 20,
                   ),
                 ),

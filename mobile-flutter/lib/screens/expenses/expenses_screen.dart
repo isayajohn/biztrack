@@ -29,7 +29,6 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text('Delete expense?'),
         content: Text(
           'Remove "${expense.description}"? This cannot be undone.',
@@ -71,7 +70,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   Widget build(BuildContext context) {
     final currency = context.watch<AuthProvider>().user?.currency ?? 'TZS';
     final fmt = NumberFormat('#,##0.00');
-    const accentColor = Color(0xFFD97706); // amber-600
+    const accentColor = kPrimaryGreen;
 
     return Scaffold(
       backgroundColor: kBg,
@@ -101,13 +100,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                   flexibleSpace: FlexibleSpaceBar(
                     collapseMode: CollapseMode.pin,
                     background: Container(
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [Color(0xFF92400e), accentColor],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                      ),
+                      color: accentColor,
                       padding: const EdgeInsets.fromLTRB(20, 60, 20, 16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -203,7 +196,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                       icon: Icons.account_balance_wallet_outlined,
                       message: 'No expenses recorded',
                       hint: 'Tap the + button to log your first expense',
-                      color: Color(0xFFD97706),
+                      color: kPrimaryGreen,
                     ),
                   )
                 else
@@ -312,9 +305,6 @@ class _ExpenseCard extends StatelessWidget {
       ),
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 5),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        elevation: 0,
-        color: Colors.white,
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(16),
@@ -326,8 +316,8 @@ class _ExpenseCard extends StatelessWidget {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: accentColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
+                    color: accentColor.withValues(alpha: kBadgeAlpha),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(
                     Icons.account_balance_wallet_rounded,

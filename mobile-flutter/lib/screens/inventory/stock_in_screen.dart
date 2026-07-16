@@ -103,7 +103,7 @@ class _StockInScreenState extends State<StockInScreen> {
               margin: const EdgeInsets.only(bottom: 20),
               decoration: BoxDecoration(
                 color: kLightGreen,
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(16),
               ),
               child: Row(
                 children: [
@@ -111,7 +111,7 @@ class _StockInScreenState extends State<StockInScreen> {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: kPrimaryGreen.withValues(alpha: 0.15),
+                      color: kPrimaryGreen.withValues(alpha: kBadgeAlpha),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(

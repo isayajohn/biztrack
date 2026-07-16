@@ -70,13 +70,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Color _typeColor(String type) {
     switch (type) {
       case 'LOW_STOCK':
-        return Colors.orange.shade600;
+        return kClay;
       case 'STOCK_IN':
       case 'PURCHASE':
-        return const Color(0xFF10B981);
+        return kPrimaryGreen;
       case 'STOCK_OUT':
       case 'SALE':
-        return const Color(0xFF3B82F6);
+        return kSecondaryGreen;
       case 'EXPIRY':
       case 'EXPIRED':
         return Colors.red.shade600;
@@ -298,8 +298,8 @@ class _NotificationTile extends StatelessWidget {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(12),
+                color: color.withValues(alpha: kBadgeAlpha),
+                borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(icon, color: color, size: 22),
             ),
@@ -385,7 +385,7 @@ class _FilterPill extends StatelessWidget {
           color: selected ? kPrimaryGreen : Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: selected ? kPrimaryGreen : const Color(0xFFE5E7EB),
+            color: selected ? kPrimaryGreen : kCardBorder,
           ),
         ),
         child: Text(

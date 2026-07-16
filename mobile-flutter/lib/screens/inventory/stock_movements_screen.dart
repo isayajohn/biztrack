@@ -105,9 +105,7 @@ class _StockMovementsScreenState extends State<StockMovementsScreen> {
                       color: selected ? kPrimaryGreen : Colors.white,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: selected
-                            ? kPrimaryGreen
-                            : const Color(0xFFE5E7EB),
+                        color: selected ? kPrimaryGreen : kCardBorder,
                       ),
                     ),
                     child: Text(
@@ -237,9 +235,7 @@ class _MovementCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = StockMovement.typeColor(movement.movementType);
     final isPositive = movement.quantity > 0;
-    final qtyColor = isPositive
-        ? const Color(0xFF10B981)
-        : const Color(0xFFEF4444);
+    final qtyColor = isPositive ? kPrimaryGreen : Colors.red.shade600;
     final qtyPrefix = isPositive ? '+' : '';
 
     return Card(

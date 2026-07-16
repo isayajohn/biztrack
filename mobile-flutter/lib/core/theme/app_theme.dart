@@ -10,6 +10,12 @@ const kMuted = Color(0xFF60756E);
 const kSun = Color(0xFFF59E0B);
 const kClay = Color(0xFFB45309);
 
+// Shared minimalist tokens: one accent (kPrimaryGreen), one radius scale
+// (12 for controls, 16 for surfaces), flat cards with a hairline border
+// instead of shadows, and a single icon-badge tint.
+const kCardBorder = Color(0xFFE5E7EB);
+const kBadgeAlpha = 0.10;
+
 // API host selection:
 //   Physical Android/iOS device → uses the Mac mDNS hostname on the same local network
 //   Android emulator            → flutter run --dart-define=BIZTRACK_API_BASE_URL=http://10.0.2.2:8002/api
@@ -67,11 +73,11 @@ ThemeData buildAppTheme() {
       fillColor: Colors.white,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+        borderSide: const BorderSide(color: kCardBorder),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+        borderSide: const BorderSide(color: kCardBorder),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -86,9 +92,15 @@ ThemeData buildAppTheme() {
     ),
     cardTheme: CardThemeData(
       color: Colors.white,
-      elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(color: kCardBorder),
+      ),
       margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 0),
+    ),
+    dialogTheme: DialogThemeData(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
     ),
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
       backgroundColor: kPrimaryGreen,
