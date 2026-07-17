@@ -134,9 +134,28 @@ function getProductCostMap(products: Product[]): Map<string, number> {
   return new Map(products.map((product) => [product.id, product.buyingPrice]));
 }
 
+type SaleLine = { productId: string; productName: string; quantity: number; revenue: number };
+
+// A POS sale has no single productId — break it into one line per cart item so
+// per-product reports (gross profit, best/most-profitable) attribute correctly.
+function getSaleLines(sale: Sale): SaleLine[] {
+  if (sale.items && sale.items.length > 0) {
+    return sale.items.map((item) => ({
+      productId: item.productId,
+      productName: item.productName,
+      quantity: item.quantity,
+      revenue: item.total,
+    }));
+  }
+  if (!sale.productId) return [];
+  return [{ productId: sale.productId, productName: sale.productName, quantity: sale.quantity, revenue: sale.totalAmount }];
+}
+
 function getSaleGrossProfit(sale: Sale, productCostMap: Map<string, number>): number {
-  const unitCost = productCostMap.get(sale.productId) ?? 0;
-  return sale.totalAmount - unitCost * sale.quantity;
+  return getSaleLines(sale).reduce((sum, line) => {
+    const unitCost = productCostMap.get(line.productId) ?? 0;
+    return sum + (line.revenue - unitCost * line.quantity);
+  }, 0);
 }
 
 function createDateBucket(date: string): SalesExpenseChartRow {
@@ -179,20 +198,23 @@ export function buildReportData(
 
   const productMap = new Map<string, ProductPerformanceRow>();
   for (const sale of filteredSales) {
-    const current =
-      productMap.get(sale.productId) ??
-      ({
-        productId: sale.productId,
-        productName: sale.productName,
-        quantitySold: 0,
-        revenue: 0,
-        grossProfit: 0,
-      } satisfies ProductPerformanceRow);
+    for (const line of getSaleLines(sale)) {
+      const unitCost = productCostMap.get(line.productId) ?? 0;
+      const current =
+        productMap.get(line.productId) ??
+        ({
+          productId: line.productId,
+          productName: line.productName,
+          quantitySold: 0,
+          revenue: 0,
+          grossProfit: 0,
+        } satisfies ProductPerformanceRow);
 
-    current.quantitySold += sale.quantity;
-    current.revenue += sale.totalAmount;
-    current.grossProfit += getSaleGrossProfit(sale, productCostMap);
-    productMap.set(sale.productId, current);
+      current.quantitySold += line.quantity;
+      current.revenue += line.revenue;
+      current.grossProfit += line.revenue - unitCost * line.quantity;
+      productMap.set(line.productId, current);
+    }
   }
 
   const productPerformance = Array.from(productMap.values());

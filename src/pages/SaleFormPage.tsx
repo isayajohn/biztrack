@@ -18,6 +18,7 @@ import type { Customer } from "../services/customerApi";
 import { getBusinessProfile } from "../services/authApi";
 import { getPromotions } from "../services/promotionApi";
 import type { Promotion } from "../services/promotionApi";
+import { computeSaleTotals } from "../utils/saleTotals";
 
 // ─── Validation ───────────────────────────────────────────────────────────────
 
@@ -142,7 +143,7 @@ export default function SaleFormPage({ embedded = false, onClose, onSaved }: Emb
           setFields({
             customerId: sale.customerId ?? "",
             promotionId: sale.promotionId ?? "",
-            productId: sale.productId,
+            productId: sale.productId ?? "",
             quantity: String(sale.quantity),
             unitPrice: String(sale.unitPrice),
             discount: String(sale.discount ?? 0),
@@ -198,12 +199,14 @@ export default function SaleFormPage({ embedded = false, onClose, onSaved }: Emb
       : null;
   const discountNum = Number(fields.discount || 0);
   const selectedPromotion = promotions.find((promotion) => promotion.id === fields.promotionId);
-  const promotionBase = Math.max(0, (computedTotal ?? 0) - discountNum);
-  const rawPromotionDiscount = selectedPromotion ? (selectedPromotion.type === "PERCENTAGE" ? promotionBase * selectedPromotion.value / 100 : selectedPromotion.value) : 0;
-  const promotionDiscount = Math.min(promotionBase, selectedPromotion?.maximumDiscount ? Math.min(rawPromotionDiscount, selectedPromotion.maximumDiscount) : rawPromotionDiscount);
   const taxRateNum = Number(fields.taxRate || 0);
-  const taxAmount = computedTotal === null ? 0 : Math.max(0, computedTotal - discountNum - promotionDiscount) * taxRateNum / 100;
-  const netTotal = computedTotal === null ? null : Math.max(0, computedTotal - discountNum - promotionDiscount + taxAmount);
+  const { promotionDiscount, taxAmount, netTotal: computedNetTotal } = computeSaleTotals(
+    computedTotal ?? 0,
+    discountNum,
+    selectedPromotion,
+    taxRateNum,
+  );
+  const netTotal = computedTotal === null ? null : computedNetTotal;
   const paidNum = fields.paidAmount === "" && fields.paymentMethod !== "Credit"
     ? netTotal ?? 0
     : Number(fields.paidAmount || 0);

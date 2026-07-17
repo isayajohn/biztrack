@@ -13,6 +13,7 @@ import {
   Settings,
   ShieldCheck,
   ShoppingCart,
+  Store,
   Tag,
   Tags,
   Percent,
@@ -35,6 +36,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard, section: "Overview" },
   { label: "Notifications", to: "/notifications", icon: Bell, section: "Overview" },
 
+  { label: "POS", to: "/pos", icon: Store, section: "Sales", permission: "sales.create" },
   { label: "Sales", to: "/sales", icon: CircleDollarSign, section: "Sales", permission: "sales.view" },
   { label: "Customers", to: "/customers", icon: Users, section: "Sales", permission: "customers.view" },
   { label: "Promotions", to: "/promotions", icon: Percent, section: "Sales", permission: "promotions.manage" },

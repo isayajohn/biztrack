@@ -1,9 +1,9 @@
 import { apiClient } from "./apiClient";
-import type { PaymentMethod, Sale } from "../types/sale";
+import type { PaymentMethod, Sale, SaleItem } from "../types/sale";
 
 type ApiPaymentMethod = "CASH" | "MOBILE_MONEY" | "BANK" | "CREDIT";
 
-type ApiSale = Omit<Sale, "productName" | "paymentMethod"> & {
+type ApiSale = Omit<Sale, "productName" | "paymentMethod" | "items"> & {
   productName?: string | null;
   paymentMethod: PaymentMethod | ApiPaymentMethod;
   product?: {
@@ -11,6 +11,7 @@ type ApiSale = Omit<Sale, "productName" | "paymentMethod"> & {
     name: string;
     sku?: string | null;
   } | null;
+  items?: SaleItem[] | null;
 };
 
 type SalesResponse = ApiSale[] | { sales?: ApiSale[] };
@@ -55,6 +56,7 @@ function normalizeSale(sale: ApiSale): Sale {
     paymentMethod: fromApiPaymentMethod(sale.paymentMethod),
     saleDate: sale.saleDate,
     notes: sale.notes,
+    items: sale.items ?? undefined,
     createdAt: sale.createdAt,
     updatedAt: sale.updatedAt,
   };
@@ -90,6 +92,32 @@ export async function createSale(
   },
 ): Promise<Sale> {
   const sale = unwrap<ApiSale>(await apiClient.post("/sales", serializeSale(data)));
+  return normalizeSale(sale);
+}
+
+export type PosCartItem = {
+  productId: string;
+  quantity: number;
+  unitPrice: number;
+};
+
+export async function createPosSale(data: {
+  items: PosCartItem[];
+  customerId?: string;
+  promotionId?: string;
+  discount?: number;
+  taxRate?: number;
+  paidAmount?: number;
+  paymentDueDate?: string;
+  paymentMethod: PaymentMethod;
+  saleDate: string;
+}): Promise<Sale> {
+  const sale = unwrap<ApiSale>(
+    await apiClient.post("/sales/pos", {
+      ...data,
+      paymentMethod: toApiPaymentMethod(data.paymentMethod),
+    }),
+  );
   return normalizeSale(sale);
 }
 

@@ -21,6 +21,7 @@ import Dashboard from "./pages/Dashboard";
 import SalesPage from "./pages/SalesPage";
 import SaleFormPage from "./pages/SaleFormPage";
 import SaleReceiptPage from "./pages/SaleReceiptPage";
+import PosPage from "./pages/PosPage";
 import ExpensesPage from "./pages/ExpensesPage";
 import ExpenseFormPage from "./pages/ExpenseFormPage";
 import ProductsPage from "./pages/ProductsPage";
@@ -94,6 +95,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               <Route element={<AppLayout />}>
                 <Route path="/onboarding" element={<OnboardingPage />} />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/pos" element={<PosPage />} />
                 <Route path="/sales" element={<SalesPage />} />
                 <Route path="/sales/new" element={<SaleFormPage />} />
                 <Route path="/sales/:id/edit" element={<SaleFormPage />} />

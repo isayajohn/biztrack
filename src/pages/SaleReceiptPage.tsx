@@ -45,7 +45,20 @@ export default function SaleReceiptPage() {
 
         <table className="mt-6 w-full text-left text-sm">
           <thead className="bg-[#f7faf9] text-xs uppercase text-ink/45"><tr><th className="px-3 py-2.5">Item</th><th className="px-3 py-2.5 text-right">Qty</th><th className="px-3 py-2.5 text-right">Price</th><th className="px-3 py-2.5 text-right">Amount</th></tr></thead>
-          <tbody><tr className="border-b border-ink/10"><td className="px-3 py-4 font-bold">{sale.productName}</td><td className="px-3 py-4 text-right">{sale.quantity}</td><td className="px-3 py-4 text-right">{formatCurrency(sale.unitPrice, user?.currency)}</td><td className="px-3 py-4 text-right font-bold">{formatCurrency(sale.totalAmount, user?.currency)}</td></tr></tbody>
+          <tbody>
+            {sale.items && sale.items.length > 0 ? (
+              sale.items.map((item) => (
+                <tr key={item.id} className="border-b border-ink/10">
+                  <td className="px-3 py-4 font-bold">{item.productName}</td>
+                  <td className="px-3 py-4 text-right">{item.quantity}</td>
+                  <td className="px-3 py-4 text-right">{formatCurrency(item.unitPrice, user?.currency)}</td>
+                  <td className="px-3 py-4 text-right font-bold">{formatCurrency(item.total, user?.currency)}</td>
+                </tr>
+              ))
+            ) : (
+              <tr className="border-b border-ink/10"><td className="px-3 py-4 font-bold">{sale.productName}</td><td className="px-3 py-4 text-right">{sale.quantity}</td><td className="px-3 py-4 text-right">{formatCurrency(sale.unitPrice, user?.currency)}</td><td className="px-3 py-4 text-right font-bold">{formatCurrency(sale.totalAmount, user?.currency)}</td></tr>
+            )}
+          </tbody>
         </table>
 
         <section className="ml-auto mt-6 max-w-sm space-y-2 text-sm">
