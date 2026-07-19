@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import { ArrowLeft, Eye, EyeOff, Loader2, Lock } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import BrandLogo from "../components/BrandLogo";
+import { useNoIndex } from "../hooks/useSeo";
 import { resetPassword } from "../services/authApi";
 import { getApiErrorMessage } from "../services/apiClient";
 
@@ -21,6 +22,7 @@ function inputCls(hasError?: boolean) {
 }
 
 export default function ResetPasswordPage() {
+  useNoIndex();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");

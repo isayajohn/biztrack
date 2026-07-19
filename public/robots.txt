@@ -1,0 +1,26 @@
+User-agent: *
+Allow: /
+
+# Authenticated app screens: no value to crawlers (auth-gated) and add
+# noindex via meta anyway — disallow outright to save crawl budget.
+Disallow: /dashboard
+Disallow: /pos
+Disallow: /sales
+Disallow: /expenses
+Disallow: /products
+Disallow: /reports
+Disallow: /subscription
+Disallow: /settings
+Disallow: /onboarding
+Disallow: /inventory
+Disallow: /promotions
+Disallow: /branches
+Disallow: /staff
+Disallow: /customers
+Disallow: /notifications
+Disallow: /admin
+
+# Auth utility pages stay crawlable (their <meta name="robots"> already
+# says noindex) so link equity still flows through them.
+
+Sitemap: https://biztrack.app/sitemap.xml

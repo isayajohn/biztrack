@@ -1,10 +1,12 @@
 import { Outlet, useLocation } from "react-router-dom";
+import { useNoIndex } from "../../hooks/useSeo";
 import { MotionPage } from "../animate-ui/MotionPrimitives";
 import AdminMobileBottomNav from "./AdminMobileBottomNav";
 import AdminSidebar from "./AdminSidebar";
 import AdminTopbar from "./AdminTopbar";
 
 export default function AdminLayout() {
+  useNoIndex(false);
   const location = useLocation();
 
   return (

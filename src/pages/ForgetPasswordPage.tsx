@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { ArrowLeft, Loader2, Mail } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import BrandLogo from "../components/BrandLogo";
+import { useNoIndex } from "../hooks/useSeo";
 import { forgotPassword } from "../services/authApi";
 import { getApiErrorMessage } from "../services/apiClient";
 
@@ -30,6 +31,7 @@ function inputCls(hasError?: boolean) {
 }
 
 export default function ForgetPasswordPage() {
+  useNoIndex();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});

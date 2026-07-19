@@ -8,6 +8,7 @@ import {
   WalletCards,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useSeo } from "../hooks/useSeo";
 
 const summary = [
   { label: "Sales", value: "$248", icon: CircleDollarSign, tone: "bg-mint text-leaf" },
@@ -22,6 +23,13 @@ const activity = [
 ];
 
 function DemoDashboard() {
+  useSeo({
+    title: "BizTrack Demo | See sales, expenses, and profit tracking in action",
+    description:
+      "Try a live preview of the BizTrack dashboard — sales, expenses, stock, and profit tracking for small business owners.",
+    path: "/demo",
+  });
+
   return (
     <main className="min-h-screen bg-[#f7faf9] text-ink">
       <div className="mx-auto max-w-md px-4 pb-8 pt-4">

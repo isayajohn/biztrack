@@ -3,12 +3,14 @@ import { Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import { ADMIN_NAV_ITEMS } from "../../constants/adminNav";
 import { ADMIN_BUTTON_NAV_ITEM, NAV_ITEMS } from "../../constants/nav";
+import { useNoIndex } from "../../hooks/useSeo";
 import { MotionPage } from "../animate-ui/MotionPrimitives";
 import { Sheet, SheetContent } from "../ui/sheet";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 
 export default function AppLayout() {
+  useNoIndex(false);
   const { user } = useAuth();
   const location = useLocation();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);

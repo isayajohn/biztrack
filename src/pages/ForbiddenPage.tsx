@@ -1,7 +1,9 @@
 import { ArrowRight, ShieldAlert } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useNoIndex } from "../hooks/useSeo";
 
 export default function ForbiddenPage() {
+  useNoIndex(false);
   return (
     <main className="grid min-h-screen place-items-center bg-[#f5f7f4] px-4 py-10 text-ink">
       <section className="w-full max-w-md rounded-xl border border-ink/10 bg-white p-5 text-center shadow-soft sm:p-7">

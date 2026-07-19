@@ -3,10 +3,12 @@ import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import BrandLogo from "../components/BrandLogo";
+import { useNoIndex } from "../hooks/useSeo";
 import * as authApi from "../services/authApi";
 import { getApiErrorMessage } from "../services/apiClient";
 
 export default function VerifyEmailPage() {
+  useNoIndex();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { refreshUser } = useAuth();

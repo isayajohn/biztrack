@@ -6,6 +6,7 @@ import AuthLoadingScreen from "../components/AuthLoadingScreen";
 import AuthShowcasePanel from "../components/auth/AuthShowcasePanel";
 import BrandLogo from "../components/BrandLogo";
 import GoogleAuthButton from "../components/GoogleAuthButton";
+import { useNoIndex } from "../hooks/useSeo";
 import { getApiErrorMessage } from "../services/apiClient";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -36,6 +37,7 @@ function inputCls(hasError?: boolean) {
 }
 
 export default function LoginPage() {
+  useNoIndex();
   const { login, loginWithGoogle, isAuthenticated, isLoading: isCheckingAuth, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();

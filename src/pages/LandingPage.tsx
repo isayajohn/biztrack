@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import LandingNavbar from "../components/landing/LandingNavbar";
@@ -16,10 +16,18 @@ import MobileAppSection from "../components/landing/MobileAppSection";
 import LandingFooter from "../components/landing/LandingFooter";
 import { getLandingPageContent } from "../services/landingApi";
 import type { PublicLandingPageContent } from "../services/landingApi";
+import { useSeo } from "../hooks/useSeo";
+import { DEFAULT_DESCRIPTION, DEFAULT_TITLE, SITE_URL } from "../constants/seo";
 
 function optionalText(value?: string | null) {
   const trimmed = value?.trim();
   return trimmed ? trimmed : undefined;
+}
+
+function textFrom(value: unknown) {
+  if (typeof value === "string") return value.trim();
+  if (typeof value === "number") return String(value);
+  return "";
 }
 
 export default function LandingPage() {
@@ -42,19 +50,69 @@ export default function LandingPage() {
     };
   }, []);
 
-  useEffect(() => {
-    document.title = content?.seoTitle || "BizTrack | Sales, expenses, stock, and profit tracking";
+  const seoTitle = content?.seoTitle || DEFAULT_TITLE;
+  const seoDescription = content?.seoDescription || DEFAULT_DESCRIPTION;
 
-    let meta = document.querySelector<HTMLMetaElement>('meta[name="description"]');
-    if (!meta) {
-      meta = document.createElement("meta");
-      meta.name = "description";
-      document.head.appendChild(meta);
+  const structuredData = useMemo(() => {
+    const faqs = Array.isArray(content?.faqs)
+      ? content.faqs
+          .map((item) => ({
+            question: textFrom(item.question) || textFrom(item.title),
+            answer: textFrom(item.answer) || textFrom(item.text),
+          }))
+          .filter((item) => item.question && item.answer)
+      : [];
+
+    const organization = {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: "BizTrack",
+      url: SITE_URL,
+      logo: `${SITE_URL}/biztrack-logo.png`,
+    };
+
+    const softwareApplication = {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      name: "BizTrack",
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "Web, Android, iOS",
+      description: seoDescription,
+      url: SITE_URL,
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "USD",
+        category: "Free plan available",
+      },
+    };
+
+    const schemas: object[] = [organization, softwareApplication];
+
+    if (faqs.length) {
+      schemas.push({
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: faqs.map((faq) => ({
+          "@type": "Question",
+          name: faq.question,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: faq.answer,
+          },
+        })),
+      });
     }
-    meta.content =
-      content?.seoDescription ||
-      "BizTrack helps small business owners track sales, expenses, stock, and profit from one simple dashboard.";
-  }, [content?.seoDescription, content?.seoTitle]);
+
+    return schemas;
+  }, [content?.faqs, seoDescription]);
+
+  useSeo({
+    title: seoTitle,
+    description: seoDescription,
+    path: "/",
+    structuredData,
+  });
 
   useEffect(() => {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;

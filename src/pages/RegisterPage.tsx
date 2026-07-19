@@ -13,6 +13,7 @@ import AuthLoadingScreen from "../components/AuthLoadingScreen";
 import AuthShowcasePanel from "../components/auth/AuthShowcasePanel";
 import BrandLogo from "../components/BrandLogo";
 import GoogleAuthButton from "../components/GoogleAuthButton";
+import { useNoIndex } from "../hooks/useSeo";
 import { getApiErrorMessage, getRateLimitSeconds } from "../services/apiClient";
 import { getPublicPackages, type PublicPackage } from "../services/landingApi";
 import { formatCurrency } from "../utils/format";
@@ -94,6 +95,7 @@ function inputCls(hasError?: boolean) {
 }
 
 export default function RegisterPage() {
+  useNoIndex();
   const { register, loginWithGoogle, isAuthenticated, isLoading: isCheckingAuth, user } = useAuth();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const loadingSnackbarRef = useRef<SnackbarKey | null>(null);
