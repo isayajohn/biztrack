@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
 use App\Models\Supplier;
+use App\Services\DebtService;
 use App\Services\StockService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,6 +16,8 @@ use Illuminate\Support\Str;
 
 class PurchaseController extends Controller
 {
+    public function __construct(private DebtService $debtService) {}
+
     private function getBusiness(): ?Business
     {
         return Business::forUser(auth()->user());
@@ -323,6 +326,8 @@ class PurchaseController extends Controller
                 $supplier->increment('balance', $outstanding);
             }
         }
+
+        $this->debtService->createFromPurchase($purchase, $outstanding, auth()->id());
 
         $newStatus = $allReceived ? 'RECEIVED' : ($anyReceived ? 'PARTIAL' : $purchase->status);
 

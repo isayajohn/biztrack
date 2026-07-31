@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth, type User } from "../auth/AuthContext";
 import { getApiErrorMessage } from "../services/apiClient";
 import { getBusinessProfile, updateBusinessProfile } from "../services/authApi";
+import { confirmDialog } from "../lib/notifications";
 import { createExpense, deleteExpense, getExpenses } from "../services/expenseService";
 import { createProduct, deleteProduct, getProducts } from "../services/productService";
 import { createSale, deleteSale, getSales } from "../services/saleService";
@@ -330,10 +331,13 @@ export default function SettingsPage() {
     }
   };
 
-  const handleClearAll = () => {
-    const confirmed = window.confirm(
-      "Clear all BizTrack data from the API for this account? This removes products, sales, and expenses.",
-    );
+  const handleClearAll = async () => {
+    const confirmed = await confirmDialog({
+      title: "Clear all BizTrack data?",
+      text: "This permanently removes all products, sales, and expenses for this account.",
+      confirmText: "Clear all data",
+      danger: true,
+    });
     if (!confirmed) return;
 
     Promise.all([getSales(), getExpenses(), getProducts()])

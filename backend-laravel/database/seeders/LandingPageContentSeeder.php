@@ -78,6 +78,7 @@ class LandingPageContentSeeder extends Seeder
                 ['title' => 'Product & Stock Management', 'description' => 'Add your products, set quantities, and get alerts when stock runs low before you miss a sale.', 'iconName' => 'Boxes', 'imageUrl' => ''],
                 ['title' => 'Daily Profit Dashboard', 'description' => 'See your net profit at a glance every day. No spreadsheets, no mental math — just clear numbers.', 'iconName' => 'BarChart3', 'imageUrl' => ''],
                 ['title' => 'Simple Business Reports', 'description' => 'Weekly and monthly summaries of your sales, expenses, and top-performing products in plain language.', 'iconName' => 'FileText', 'imageUrl' => ''],
+                ['title' => 'Debts & Credit Management', 'description' => "Track customer and supplier debts automatically, record payments, and send SMS, WhatsApp, and email reminders before and after they're due.", 'iconName' => 'HandCoins', 'imageUrl' => ''],
                 ['title' => 'Mobile-Friendly Design', 'description' => 'Built for phones first. Use BizTrack on your Android or iPhone with no downloads required.', 'iconName' => 'Smartphone', 'imageUrl' => ''],
             ],
 

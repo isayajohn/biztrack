@@ -4,7 +4,7 @@ import ReactDOM from "react-dom/client";
 import { ThemeProvider } from "@mui/material/styles";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./auth/AuthContext";
-import AppSnackbarProvider from "./components/AppSnackbarProvider";
+import AppAlertProvider from "./components/AppAlertProvider";
 import AdminRoute from "./components/AdminRoute";
 import AdminLayout from "./components/admin/AdminLayout";
 import AppLayout from "./components/app/AppLayout";
@@ -48,6 +48,14 @@ import StockInPage from "./pages/StockInPage";
 import DamagedStockPage from "./pages/DamagedStockPage";
 import InventoryReportsPage from "./pages/InventoryReportsPage";
 import NotificationsPage from "./pages/NotificationsPage";
+import DebtsOverviewPage from "./pages/DebtsOverviewPage";
+import CustomerDebtsPage from "./pages/CustomerDebtsPage";
+import SupplierDebtsPage from "./pages/SupplierDebtsPage";
+import DebtFormPage from "./pages/DebtFormPage";
+import DebtDetailPage from "./pages/DebtDetailPage";
+import DebtPaymentsPage from "./pages/DebtPaymentsPage";
+import DebtRemindersPage from "./pages/DebtRemindersPage";
+import DebtReportsPage from "./pages/DebtReportsPage";
 import AdminAuditLogsPage from "./pages/admin/AdminAuditLogsPage";
 import AdminBusinessDetailPage from "./pages/admin/AdminBusinessDetailPage";
 import AdminBusinessesPage from "./pages/admin/AdminBusinessesPage";
@@ -77,7 +85,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <GoogleOAuthProvider clientId={googleClientId}>
       <ThemeProvider theme={muiTheme}>
         <BrowserRouter>
-          <AppSnackbarProvider>
+          <AppAlertProvider>
             <AuthProvider>
               <Routes>
             {/* Public routes */}
@@ -128,6 +136,15 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 <Route path="/inventory/damaged-stock" element={<DamagedStockPage />} />
                 <Route path="/inventory/reports" element={<InventoryReportsPage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
+                {/* Debts & Credit module */}
+                <Route path="/debts" element={<DebtsOverviewPage />} />
+                <Route path="/debts/customers" element={<CustomerDebtsPage />} />
+                <Route path="/debts/suppliers" element={<SupplierDebtsPage />} />
+                <Route path="/debts/new" element={<DebtFormPage />} />
+                <Route path="/debts/payments" element={<DebtPaymentsPage />} />
+                <Route path="/debts/reminders" element={<DebtRemindersPage />} />
+                <Route path="/debts/reports" element={<DebtReportsPage />} />
+                <Route path="/debts/:id" element={<DebtDetailPage />} />
               </Route>
             </Route>
 
@@ -159,7 +176,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             </Route>
               </Routes>
             </AuthProvider>
-          </AppSnackbarProvider>
+          </AppAlertProvider>
         </BrowserRouter>
       </ThemeProvider>
     </GoogleOAuthProvider>

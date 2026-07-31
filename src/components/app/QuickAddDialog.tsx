@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Boxes, CircleDollarSign, Plus, WalletCards, X } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { useSnackbar } from "notistack";
 import ExpenseFormPage from "../../pages/ExpenseFormPage";
 import ProductFormPage from "../../pages/ProductFormPage";
 import SaleFormPage from "../../pages/SaleFormPage";
@@ -12,26 +11,22 @@ const formMeta: Record<
   AddFormType,
   {
     title: string;
-    savedMessage: string;
     icon: LucideIcon;
     tone: string;
   }
 > = {
   sale: {
     title: "Record Sale",
-    savedMessage: "Sale recorded.",
     icon: CircleDollarSign,
     tone: "bg-mint text-leaf",
   },
   expense: {
     title: "Add Expense",
-    savedMessage: "Expense added.",
     icon: WalletCards,
     tone: "bg-orange-50 text-clay",
   },
   product: {
     title: "Add Product",
-    savedMessage: "Product added.",
     icon: Boxes,
     tone: "bg-sky-50 text-sky-700",
   },
@@ -52,7 +47,6 @@ export default function QuickAddDialog({
   triggerIconSize = 15,
   onSaved,
 }: QuickAddDialogProps) {
-  const { enqueueSnackbar } = useSnackbar();
   const [isOpen, setIsOpen] = useState(false);
   const meta = formMeta[formType];
   const Icon = meta.icon;
@@ -61,7 +55,6 @@ export default function QuickAddDialog({
 
   const handleSaved = () => {
     close();
-    enqueueSnackbar(meta.savedMessage, { variant: "success" });
     void onSaved?.();
   };
 

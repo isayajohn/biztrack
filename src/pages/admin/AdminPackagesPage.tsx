@@ -3,6 +3,7 @@ import {
   AlertCircle,
   CheckCircle2,
   Eye,
+  EyeOff,
   Loader2,
   PackagePlus,
   Pencil,
@@ -15,6 +16,7 @@ import {
   deleteAdminPackage,
   getAdminPackages,
   updateAdminPackageStatus,
+  updateAdminPackageVisibility,
 } from "../../services/adminApi";
 import type { AdminPackage, PackageStatus } from "../../services/adminApi";
 import { getApiErrorMessage } from "../../services/apiClient";
@@ -52,6 +54,20 @@ function StatusBadge({ status }: { status: PackageStatus }) {
   return (
     <span className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-extrabold ${classes}`}>
       {status}
+    </span>
+  );
+}
+
+function VisibilityBadge({ isVisible }: { isVisible: boolean }) {
+  return (
+    <span
+      className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-extrabold ${
+        isVisible
+          ? "border-sky-200 bg-sky-50 text-sky-700"
+          : "border-ink/10 bg-[#eef8f4] text-ink/55"
+      }`}
+    >
+      {isVisible ? "VISIBLE" : "HIDDEN"}
     </span>
   );
 }
@@ -143,6 +159,27 @@ export default function AdminPackagesPage() {
     });
   }
 
+  function showPackage(plan: AdminPackage) {
+    runAction(
+      () => updateAdminPackageVisibility(plan.id, true).then(() => undefined),
+      `${plan.name} is now visible to users.`,
+    );
+  }
+
+  function confirmHide(plan: AdminPackage) {
+    setConfirmAction({
+      title: "Hide package from users?",
+      body: `${plan.name} will be removed from pricing, registration, and subscription choices. Existing subscriptions will not be changed.`,
+      confirmLabel: "Hide package",
+      tone: "warning",
+      onConfirm: () =>
+        runAction(
+          () => updateAdminPackageVisibility(plan.id, false).then(() => undefined),
+          `${plan.name} is now hidden from users.`,
+        ),
+    });
+  }
+
   function confirmDelete(plan: AdminPackage) {
     setConfirmAction({
       title: "Delete package?",
@@ -206,6 +243,7 @@ export default function AdminPackagesPage() {
                       <th className="px-4 py-3">Max expenses / month</th>
                       <th className="px-4 py-3">Features</th>
                       <th className="px-4 py-3">Status</th>
+                      <th className="px-4 py-3">User view</th>
                       <th className="px-4 py-3 text-right">Actions</th>
                     </tr>
                   </thead>
@@ -234,12 +272,17 @@ export default function AdminPackagesPage() {
                           <StatusBadge status={plan.status} />
                         </td>
                         <td className="px-4 py-4">
+                          <VisibilityBadge isVisible={plan.isVisible} />
+                        </td>
+                        <td className="px-4 py-4">
                           <PackageActions
                             plan={plan}
                             isMutating={isMutating}
                             onView={() => setViewPackage(plan)}
                             onActivate={() => activatePackage(plan)}
                             onDeactivate={() => confirmDeactivate(plan)}
+                            onShow={() => showPackage(plan)}
+                            onHide={() => confirmHide(plan)}
                             onDelete={() => confirmDelete(plan)}
                           />
                         </td>
@@ -257,7 +300,10 @@ export default function AdminPackagesPage() {
                         <h3 className="truncate font-display text-base font-bold text-ink">{plan.name}</h3>
                         <p className="mt-1 truncate text-xs font-bold text-ink/40">{plan.slug}</p>
                       </div>
-                      <StatusBadge status={plan.status} />
+                      <div className="flex flex-wrap justify-end gap-1.5">
+                        <StatusBadge status={plan.status} />
+                        <VisibilityBadge isVisible={plan.isVisible} />
+                      </div>
                     </div>
 
                     <dl className="mt-4 grid grid-cols-2 gap-2 text-xs">
@@ -285,6 +331,8 @@ export default function AdminPackagesPage() {
                         onView={() => setViewPackage(plan)}
                         onActivate={() => activatePackage(plan)}
                         onDeactivate={() => confirmDeactivate(plan)}
+                        onShow={() => showPackage(plan)}
+                        onHide={() => confirmHide(plan)}
                         onDelete={() => confirmDelete(plan)}
                         compact
                       />
@@ -351,6 +399,8 @@ function PackageActions({
   onView,
   onActivate,
   onDeactivate,
+  onShow,
+  onHide,
   onDelete,
   compact = false,
 }: {
@@ -359,6 +409,8 @@ function PackageActions({
   onView: () => void;
   onActivate: () => void;
   onDeactivate: () => void;
+  onShow: () => void;
+  onHide: () => void;
   onDelete: () => void;
   compact?: boolean;
 }) {
@@ -375,6 +427,28 @@ function PackageActions({
         <Pencil size={14} aria-hidden="true" />
         Edit
       </Link>
+      {plan.isVisible ? (
+        <button
+          type="button"
+          onClick={onHide}
+          disabled={isMutating}
+          className={`${base} border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100`}
+        >
+          <EyeOff size={14} aria-hidden="true" />
+          Hide from users
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={onShow}
+          disabled={isMutating || plan.status !== "ACTIVE"}
+          title={plan.status !== "ACTIVE" ? "Activate the package before showing it" : undefined}
+          className={`${base} border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100`}
+        >
+          <Eye size={14} aria-hidden="true" />
+          Show to users
+        </button>
+      )}
       {plan.status === "ACTIVE" ? (
         <button
           type="button"
@@ -418,6 +492,7 @@ function ViewPackageModal({ plan, onClose }: { plan: AdminPackage; onClose: () =
             <div className="flex flex-wrap items-center gap-2">
               <h2 className="font-display text-lg font-bold text-ink">{plan.name}</h2>
               <StatusBadge status={plan.status} />
+              <VisibilityBadge isVisible={plan.isVisible} />
             </div>
             <p className="mt-1 text-sm font-semibold text-ink/45">{plan.description || "No description"}</p>
           </div>
@@ -441,6 +516,7 @@ function ViewPackageModal({ plan, onClose }: { plan: AdminPackage; onClose: () =
           <Detail label="Sales / month" value={plan.maxSalesPerMonth} />
           <Detail label="Expenses / month" value={plan.maxExpensesPerMonth} />
           <Detail label="Sort order" value={plan.sortOrder} />
+          <Detail label="Visible to users" value={plan.isVisible ? "Yes" : "No"} />
           <Detail label="Subscriptions" value={plan.subscriptionCount ?? 0} />
         </dl>
         <div className="border-t border-ink/10 p-4">

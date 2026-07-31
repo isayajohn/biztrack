@@ -22,11 +22,12 @@ const sectionOrder = [
   "Purchasing & Expenses",
   "Inventory",
   "Reports",
+  "Debts & Credit",
   "Management",
   "Account",
 ];
 
-const collapsibleSections = new Set(["Sales", "Purchasing & Expenses", "Inventory", "Reports", "Management"]);
+const collapsibleSections = new Set(["Sales", "Purchasing & Expenses", "Inventory", "Reports", "Debts & Credit", "Management"]);
 const iconSize = 18;
 
 function groupItems(items: NavItem[]) {

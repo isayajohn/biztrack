@@ -10,6 +10,7 @@ import {
 import type { DamagedStock } from "../services/inventoryApi";
 import { getProducts } from "../services/productService";
 import type { Product } from "../types/product";
+import { notifyError } from "../lib/notifications";
 
 function statusBadge(status: string) {
   const map: Record<string, string> = {
@@ -125,7 +126,7 @@ export default function DamagedStockPage() {
       await approveDamagedStock(id);
       await load();
     } catch (err) {
-      alert(getApiErrorMessage(err));
+      notifyError(getApiErrorMessage(err));
     } finally {
       setActing(null);
     }
@@ -137,7 +138,7 @@ export default function DamagedStockPage() {
       await rejectDamagedStock(id);
       await load();
     } catch (err) {
-      alert(getApiErrorMessage(err));
+      notifyError(getApiErrorMessage(err));
     } finally {
       setActing(null);
     }

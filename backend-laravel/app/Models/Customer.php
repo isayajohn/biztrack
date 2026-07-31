@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Customer extends Model
 {
-    use HasUuids;
+    use HasUuids, HasFactory;
 
     protected $fillable = [
         'business_id', 'name', 'phone', 'email', 'address',
@@ -33,5 +34,10 @@ class Customer extends Model
     public function payments()
     {
         return $this->hasMany(CustomerPayment::class);
+    }
+
+    public function debts()
+    {
+        return $this->hasMany(Debt::class);
     }
 }

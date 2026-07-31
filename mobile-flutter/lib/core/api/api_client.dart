@@ -195,11 +195,42 @@ class ApiClient {
     }
   }
 
-  Future<dynamic> delete(String path) async {
+  Future<dynamic> delete(String path, {Map<String, dynamic>? body}) async {
     try {
       final response = await http
-          .delete(await _uri(path), headers: await _headers())
+          .delete(
+            await _uri(path),
+            headers: await _headers(),
+            body: body != null ? jsonEncode(body) : null,
+          )
           .timeout(_requestTimeout);
+      return _parseResponse(response);
+    } on TimeoutException {
+      throw _connectionException('request timed out');
+    } on SocketException catch (e) {
+      throw _connectionException(e.message);
+    } on HttpException catch (e) {
+      throw _connectionException(e.message);
+    }
+  }
+
+  Future<dynamic> postMultipart(
+    String path,
+    Map<String, String> fields, {
+    String? filePath,
+    String fileField = 'file',
+  }) async {
+    try {
+      final request = http.MultipartRequest('POST', await _uri(path));
+      final headers = await _headers();
+      headers.remove(HttpHeaders.contentTypeHeader);
+      request.headers.addAll(headers);
+      request.fields.addAll(fields);
+      if (filePath != null) {
+        request.files.add(await http.MultipartFile.fromPath(fileField, filePath));
+      }
+      final streamed = await request.send().timeout(_requestTimeout);
+      final response = await http.Response.fromStream(streamed);
       return _parseResponse(response);
     } on TimeoutException {
       throw _connectionException('request timed out');

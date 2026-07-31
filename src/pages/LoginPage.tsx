@@ -8,6 +8,7 @@ import BrandLogo from "../components/BrandLogo";
 import GoogleAuthButton from "../components/GoogleAuthButton";
 import { useNoIndex } from "../hooks/useSeo";
 import { getApiErrorMessage } from "../services/apiClient";
+import { notifyError, notifySuccess } from "../lib/notifications";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -73,9 +74,12 @@ export default function LoginPage() {
       setIsLoading(true);
       try {
         const loggedInUser = await login(email, password);
+        notifySuccess(`Welcome back, ${loggedInUser.name}.`);
         navigate(routeAfterLogin(loggedInUser), { replace: true });
       } catch (err) {
-        setErrors({ general: getApiErrorMessage(err) });
+        const message = getApiErrorMessage(err);
+        setErrors({ general: message });
+        notifyError(message);
       } finally {
         setIsLoading(false);
       }
@@ -89,9 +93,12 @@ export default function LoginPage() {
       setIsGoogleLoading(true);
       try {
         const loggedInUser = await loginWithGoogle(credential);
+        notifySuccess(`Welcome back, ${loggedInUser.name}.`);
         navigate(routeAfterLogin(loggedInUser), { replace: true });
       } catch (error) {
-        setErrors({ general: getApiErrorMessage(error) });
+        const message = getApiErrorMessage(error);
+        setErrors({ general: message });
+        notifyError(message);
       } finally {
         setIsGoogleLoading(false);
       }
@@ -102,7 +109,7 @@ export default function LoginPage() {
   return (
     <main className="spatial-shell min-h-screen text-ink lg:grid lg:grid-cols-2">
       <section className="flex min-h-screen items-center justify-center px-5 py-8 sm:px-8 lg:px-12">
-        <div className="bento-card w-full max-w-md rounded-xl p-5 sm:p-7">
+        <div className="w-full max-w-md">
           <div className="mb-12 sm:mb-14">
             <BrandLogo className="h-auto w-44 max-w-full" />
           </div>

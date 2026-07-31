@@ -25,6 +25,25 @@ export function exportTablePdf<T>(options: {
   document.save(options.fileName);
 }
 
+function csvEscape(value: string | number): string {
+  const text = String(value);
+  return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+}
+
+export function exportTableCsv<T>(options: { fileName: string; columns: ExportColumn<T>[]; rows: T[] }) {
+  const lines = [
+    options.columns.map((column) => csvEscape(column.header)).join(","),
+    ...options.rows.map((row) => options.columns.map((column) => csvEscape(column.value(row))).join(",")),
+  ];
+  const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = options.fileName;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
 export async function exportTableExcel<T>(options: {
   sheetName: string;
   fileName: string;

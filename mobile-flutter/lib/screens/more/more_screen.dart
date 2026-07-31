@@ -110,6 +110,15 @@ class MoreScreen extends StatelessWidget {
                     subtitle: 'Customers, balances and repayments',
                     route: '/customers',
                   ),
+                if (user?.can('debts.view') == true)
+                  _tile(
+                    context,
+                    icon: Icons.handshake_outlined,
+                    color: kPrimaryGreen,
+                    label: 'Debts & Credit',
+                    subtitle: 'Receivables, payables, and reminders',
+                    route: '/debts',
+                  ),
                 if (user?.can('promotions.manage') == true)
                   _tile(
                     context,

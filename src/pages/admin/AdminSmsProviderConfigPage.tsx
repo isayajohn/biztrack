@@ -7,6 +7,7 @@ import {
 } from "../../services/adminApi";
 import type { ConfigProvider, SmsConfig } from "../../services/adminApi";
 import { getApiErrorMessage } from "../../services/apiClient";
+import { confirmDialog } from "../../lib/notifications";
 import {
   fieldClass,
   Notice,
@@ -72,7 +73,11 @@ export default function AdminSmsProviderConfigPage() {
 
   async function saveConfig(event: React.FormEvent) {
     event.preventDefault();
-    const confirmed = window.confirm("Save SMS configuration? Secret fields will only change if you entered new values.");
+    const confirmed = await confirmDialog({
+      title: "Save SMS configuration?",
+      text: "Secret fields will only change if you entered new values.",
+      confirmText: "Save configuration",
+    });
     if (!confirmed) return;
 
     setIsSaving(true);

@@ -30,6 +30,28 @@ class SubscriptionController extends Controller
             ->orderByDesc('starts_at')
             ->first();
 
+        if (!$subscription) {
+            $freePackage = Package::where('status', 'ACTIVE')
+                ->where(function ($query) {
+                    $query->where('slug', 'free')->orWhere('price_monthly', 0);
+                })
+                ->orderByRaw("CASE WHEN slug = 'free' THEN 0 ELSE 1 END")
+                ->orderBy('sort_order')
+                ->first();
+
+            if ($freePackage) {
+                $subscription = BusinessSubscription::create([
+                    'id' => Str::uuid(),
+                    'business_id' => $business->id,
+                    'package_id' => $freePackage->id,
+                    'status' => 'ACTIVE',
+                    'billing_cycle' => 'LIFETIME',
+                    'starts_at' => now(),
+                    'notes' => 'Automatically assigned as the default free package.',
+                ])->load('package');
+            }
+        }
+
         $payments = \App\Models\PaymentTransaction::where('business_id', $business->id)
             ->with('package')
             ->orderByDesc('created_at')
@@ -76,7 +98,10 @@ class SubscriptionController extends Controller
             return response()->json(['success' => false, 'error' => 'Business not found'], 404);
         }
 
-        $package = Package::where('id', $data['packageId'])->where('status', 'ACTIVE')->first();
+        $package = Package::where('id', $data['packageId'])
+            ->where('status', 'ACTIVE')
+            ->where('is_visible', true)
+            ->first();
         if (!$package) {
             return response()->json(['success' => false, 'error' => 'Package not found'], 404);
         }
@@ -229,11 +254,15 @@ class SubscriptionController extends Controller
         return [
             'id' => $sub->id,
             'businessId' => $sub->business_id,
+            'packageId' => $sub->package_id,
             'status' => $sub->status,
             'billingCycle' => $sub->billing_cycle,
             'startsAt' => $sub->starts_at,
             'endsAt' => $sub->ends_at,
             'trialEndsAt' => $sub->trial_ends_at,
+            'notes' => $sub->notes,
+            'createdAt' => $sub->created_at,
+            'updatedAt' => $sub->updated_at,
             'package' => $sub->package ? [
                 'id' => $sub->package->id,
                 'name' => $sub->package->name,

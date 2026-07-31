@@ -92,6 +92,7 @@ export default function SubscriptionPage() {
   );
   const selectedPackage = sortedPackages.find((plan) => plan.id === selectedPackageId) ?? sortedPackages[0];
   const subscription = overview?.subscription ?? null;
+  const isCurrentPackage = Boolean(selectedPackage && subscription?.packageId === selectedPackage.id);
   const trialDaysLeft = daysUntil(subscription?.trialEndsAt);
   const pendingPayments = overview?.payments.filter((payment) => payment.status === "PENDING") ?? [];
 
@@ -285,7 +286,7 @@ export default function SubscriptionPage() {
 
                 <button
                   type="button"
-                  disabled={!selectedPackage || isCheckingOut}
+                  disabled={!selectedPackage || isCheckingOut || isCurrentPackage}
                   onClick={handleCheckout}
                   className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-leaf px-5 py-3 text-sm font-black text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-65 sm:w-auto"
                 >
@@ -294,7 +295,7 @@ export default function SubscriptionPage() {
                   ) : (
                     <CreditCard size={16} aria-hidden="true" />
                   )}
-                  Continue to AzamPay
+                  {isCurrentPackage ? "Current package" : "Continue to AzamPay"}
                 </button>
               </div>
             </section>

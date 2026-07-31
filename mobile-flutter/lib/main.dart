@@ -9,6 +9,7 @@ import 'core/models/product.dart';
 import 'core/models/sale.dart';
 import 'core/theme/app_theme.dart';
 import 'providers/auth_provider.dart';
+import 'providers/debt_provider.dart';
 import 'providers/expense_provider.dart';
 import 'providers/inventory_provider.dart';
 import 'providers/product_provider.dart';
@@ -17,6 +18,10 @@ import 'screens/auth/forgot_password_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
 import 'screens/dashboard/dashboard_screen.dart';
+import 'screens/debts/debt_detail_screen.dart';
+import 'screens/debts/debt_form_screen.dart';
+import 'screens/debts/debts_list_screen.dart';
+import 'screens/debts/debts_overview_screen.dart';
 import 'screens/expenses/expense_form_screen.dart';
 import 'screens/expenses/expenses_screen.dart';
 import 'screens/home/home_shell.dart';
@@ -245,6 +250,18 @@ class _BizTrackAppState extends State<BizTrackApp> {
           builder: (_, __) => const NotificationsScreen(),
         ),
         GoRoute(path: '/settings', builder: (_, __) => const SettingsScreen()),
+
+        // --- Debts & Credit ---
+        GoRoute(path: '/debts', builder: (_, __) => const DebtsOverviewScreen()),
+        GoRoute(
+          path: '/debts/list',
+          builder: (_, state) => DebtsListScreen(initialType: state.uri.queryParameters['type'] ?? 'CUSTOMER'),
+        ),
+        GoRoute(path: '/debts/new', builder: (_, __) => const DebtFormScreen()),
+        GoRoute(
+          path: '/debts/:id',
+          builder: (_, state) => DebtDetailScreen(debtId: state.pathParameters['id']!),
+        ),
       ],
     );
   }
@@ -261,6 +278,7 @@ class _BizTrackAppState extends State<BizTrackApp> {
         ChangeNotifierProvider(
           create: (_) => InventoryProvider(InventoryApi(_apiClient)),
         ),
+        ChangeNotifierProvider(create: (_) => DebtProvider(_apiClient)),
       ],
       child: MaterialApp.router(
         title: 'BizTrack',

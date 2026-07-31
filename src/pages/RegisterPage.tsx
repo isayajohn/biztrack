@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
   ChevronDown,
@@ -6,7 +6,6 @@ import {
   EyeOff,
   Loader2,
 } from "lucide-react";
-import { useSnackbar, type SnackbarKey, type VariantType } from "notistack";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth, type RegisterData } from "../auth/AuthContext";
 import AuthLoadingScreen from "../components/AuthLoadingScreen";
@@ -17,6 +16,12 @@ import { useNoIndex } from "../hooks/useSeo";
 import { getApiErrorMessage, getRateLimitSeconds } from "../services/apiClient";
 import { getPublicPackages, type PublicPackage } from "../services/landingApi";
 import { formatCurrency } from "../utils/format";
+import {
+  closeLoadingAlert,
+  notify,
+  showLoadingAlert,
+  type AppNotificationVariant,
+} from "../lib/notifications";
 
 const CURRENCIES = [
   { code: "TZS", name: "Tanzanian Shilling" },
@@ -97,8 +102,6 @@ function inputCls(hasError?: boolean) {
 export default function RegisterPage() {
   useNoIndex();
   const { register, loginWithGoogle, isAuthenticated, isLoading: isCheckingAuth, user } = useAuth();
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-  const loadingSnackbarRef = useRef<SnackbarKey | null>(null);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const packageSlug = searchParams.get("package")?.trim().toLowerCase() ?? "";
@@ -128,28 +131,23 @@ export default function RegisterPage() {
   );
 
   const closeLoadingNotification = useCallback(() => {
-    if (loadingSnackbarRef.current == null) return;
-    closeSnackbar(loadingSnackbarRef.current);
-    loadingSnackbarRef.current = null;
-  }, [closeSnackbar]);
+    closeLoadingAlert();
+  }, []);
 
   const showLoadingNotification = useCallback(
     (message: string) => {
       closeLoadingNotification();
-      loadingSnackbarRef.current = enqueueSnackbar(message, {
-        variant: "info",
-        persist: true,
-      });
+      showLoadingAlert(message);
     },
-    [closeLoadingNotification, enqueueSnackbar],
+    [closeLoadingNotification],
   );
 
   const showNotification = useCallback(
-    (message: string, variant: VariantType) => {
+    (message: string, variant: AppNotificationVariant) => {
       closeLoadingNotification();
-      enqueueSnackbar(message, { variant });
+      notify(message, variant);
     },
-    [closeLoadingNotification, enqueueSnackbar],
+    [closeLoadingNotification],
   );
 
   useEffect(() => {
@@ -158,7 +156,9 @@ export default function RegisterPage() {
 
     getPublicPackages()
       .then((plans) => {
-        if (isMounted) setPackages(plans);
+        if (isMounted) {
+          setPackages(plans.filter((plan) => plan.slug.toLowerCase() === "free" || plan.priceMonthly === 0));
+        }
       })
       .catch((error) => {
         if (!isMounted) return;

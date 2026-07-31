@@ -18,7 +18,7 @@ class Package extends Model
         'trial_days', 'max_businesses', 'max_users', 'max_products',
         'max_sales_per_month', 'max_expenses_per_month',
         'allow_reports', 'allow_pdf_export', 'allow_csv_export',
-        'allow_inventory_alerts', 'allow_ai_insights', 'status', 'sort_order',
+        'allow_inventory_alerts', 'allow_ai_insights', 'status', 'is_visible', 'sort_order',
     ];
 
     protected $casts = [
@@ -29,6 +29,7 @@ class Package extends Model
         'allow_csv_export' => 'boolean',
         'allow_inventory_alerts' => 'boolean',
         'allow_ai_insights' => 'boolean',
+        'is_visible' => 'boolean',
     ];
 
     public function subscriptions()

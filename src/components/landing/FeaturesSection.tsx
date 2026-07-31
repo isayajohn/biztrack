@@ -4,6 +4,7 @@ import {
   Boxes,
   BarChart3,
   FileText,
+  HandCoins,
   Smartphone,
   Sparkles,
 } from "lucide-react";
@@ -20,6 +21,7 @@ const iconMap = {
   BarChart3,
   Boxes,
   FileText,
+  HandCoins,
   ReceiptText,
   Smartphone,
   WalletCards,
@@ -55,6 +57,12 @@ const features = [
     title: "Simple Business Reports",
     description:
       "Weekly and monthly summaries of your sales, expenses, and top-performing products in plain language.",
+  },
+  {
+    icon: HandCoins,
+    title: "Debts & Credit Management",
+    description:
+      "Track customer and supplier debts automatically, record payments, and send SMS, WhatsApp, and email reminders before and after they're due.",
   },
   {
     icon: Smartphone,

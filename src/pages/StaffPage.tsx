@@ -3,6 +3,7 @@ import { CheckCircle2, Eye, Loader2, Pencil, Plus, Shield, Trash2, X } from "luc
 import { createStaff, getBranches, getStaff, removeStaff, updateStaff } from "../services/organizationApi";
 import type { Branch, StaffMember, StaffRole } from "../services/organizationApi";
 import { getApiErrorMessage } from "../services/apiClient";
+import { confirmDialog } from "../lib/notifications";
 
 const roles: Exclude<StaffRole, "OWNER">[] = ["MANAGER", "CASHIER", "INVENTORY", "ACCOUNTANT", "CUSTOM"];
 
@@ -318,7 +319,13 @@ export default function StaffPage() {
   };
 
   const deleteMember = async (member: StaffMember) => {
-    if (!confirm(`Remove ${member.user.name}?`)) return;
+    const confirmed = await confirmDialog({
+      title: `Remove ${member.user.name}?`,
+      text: "This staff member will lose access to the business.",
+      confirmText: "Remove staff member",
+      danger: true,
+    });
+    if (!confirmed) return;
     setError("");
     setSuccess("");
     try {

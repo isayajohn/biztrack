@@ -38,6 +38,7 @@ class AdminPackageController extends Controller
             'allowInventoryAlerts' => 'boolean',
             'allowAiInsights' => 'boolean',
             'status' => 'in:ACTIVE,INACTIVE',
+            'isVisible' => 'boolean',
             'sortOrder' => 'integer',
         ]);
 
@@ -61,6 +62,7 @@ class AdminPackageController extends Controller
             'allow_inventory_alerts' => $data['allowInventoryAlerts'] ?? false,
             'allow_ai_insights' => $data['allowAiInsights'] ?? false,
             'status' => $data['status'] ?? 'ACTIVE',
+            'is_visible' => $data['isVisible'] ?? true,
             'sort_order' => $data['sortOrder'] ?? 0,
         ]);
 
@@ -103,6 +105,7 @@ class AdminPackageController extends Controller
             'allowCsvExport' => 'sometimes|boolean',
             'allowInventoryAlerts' => 'sometimes|boolean',
             'allowAiInsights' => 'sometimes|boolean',
+            'isVisible' => 'sometimes|boolean',
             'sortOrder' => 'sometimes|integer',
         ]);
 
@@ -114,7 +117,7 @@ class AdminPackageController extends Controller
             'maxSalesPerMonth' => 'max_sales_per_month', 'maxExpensesPerMonth' => 'max_expenses_per_month',
             'allowReports' => 'allow_reports', 'allowPdfExport' => 'allow_pdf_export',
             'allowCsvExport' => 'allow_csv_export', 'allowInventoryAlerts' => 'allow_inventory_alerts',
-            'allowAiInsights' => 'allow_ai_insights', 'sortOrder' => 'sort_order',
+            'allowAiInsights' => 'allow_ai_insights', 'isVisible' => 'is_visible', 'sortOrder' => 'sort_order',
         ];
 
         foreach ($data as $k => $v) {
@@ -140,6 +143,24 @@ class AdminPackageController extends Controller
         if (!$package) return response()->json(['success' => false, 'error' => 'Not found'], 404);
 
         $package->update(['status' => $data['status']]);
+        return response()->json(['success' => true, 'data' => $this->formatPackage($package)]);
+    }
+
+    public function updatePackageVisibility(Request $request, string $id): JsonResponse
+    {
+        $data = $request->validate(['isVisible' => 'required|boolean']);
+        $package = Package::find($id);
+        if (!$package) return response()->json(['success' => false, 'error' => 'Not found'], 404);
+
+        $package->update(['is_visible' => $data['isVisible']]);
+
+        AuditService::log([
+            'actor_id' => auth()->id(),
+            'action' => $data['isVisible'] ? 'PACKAGE_SHOWN' : 'PACKAGE_HIDDEN',
+            'target_type' => 'Package',
+            'target_id' => $package->id,
+        ]);
+
         return response()->json(['success' => true, 'data' => $this->formatPackage($package)]);
     }
 
@@ -182,6 +203,7 @@ class AdminPackageController extends Controller
             'allowInventoryAlerts' => (bool) $p->allow_inventory_alerts,
             'allowAiInsights' => (bool) $p->allow_ai_insights,
             'status' => $p->status,
+            'isVisible' => (bool) $p->is_visible,
             'sortOrder' => $p->sort_order,
             'createdAt' => $p->created_at,
             'updatedAt' => $p->updated_at,

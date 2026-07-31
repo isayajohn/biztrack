@@ -7,6 +7,7 @@ import {
   markNotificationRead,
 } from "../services/inventoryApi";
 import type { InventoryNotification } from "../services/inventoryApi";
+import { notifyError, notifySuccess } from "../lib/notifications";
 
 function typeIcon(type: string) {
   const map: Record<string, { icon: React.ElementType; bg: string; fg: string }> = {
@@ -69,8 +70,9 @@ export default function NotificationsPage() {
     try {
       await markAllNotificationsRead();
       setAll(prev => prev.map(n => ({ ...n, isRead: true })));
+      notifySuccess("All notifications marked as read.");
     } catch (err) {
-      alert(getApiErrorMessage(err));
+      notifyError(getApiErrorMessage(err));
     } finally {
       setMarking(false);
     }

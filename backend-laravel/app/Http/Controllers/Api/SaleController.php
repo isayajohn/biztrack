@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Services\AuditService;
+use App\Services\DebtService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -17,6 +18,8 @@ use Illuminate\Support\Facades\DB;
 
 class SaleController extends Controller
 {
+    public function __construct(private DebtService $debtService) {}
+
     private function getBusiness(): ?Business
     {
         return Business::forUser(auth()->user());
@@ -154,6 +157,8 @@ class SaleController extends Controller
             'target_id' => $sale->id,
         ]);
 
+        $this->debtService->createFromSale($sale, auth()->id());
+
         return response()->json(['success' => true, 'data' => $this->formatSale($sale->load(['product', 'customer']))], 201);
     }
 
@@ -275,6 +280,8 @@ class SaleController extends Controller
             'target_id' => $sale->id,
         ]);
 
+        $this->debtService->createFromSale($sale, auth()->id());
+
         return response()->json(['success' => true, 'data' => $this->formatSale($sale->load(['customer', 'items.product']))], 201);
     }
 
@@ -388,7 +395,12 @@ class SaleController extends Controller
         $sale = Sale::where('id', $id)->where('business_id', $business->id)->first();
         if (!$sale) return response()->json(['success' => false, 'error' => 'Sale not found'], 404);
 
-        DB::transaction(function () use ($sale) {
+        $debt = \App\Models\Debt::where('sale_id', $sale->id)->first();
+        if ($debt && (float) $debt->total_paid > 0) {
+            return response()->json(['success' => false, 'error' => 'Cannot delete a sale whose debt already has payments recorded. Reverse the payments first.'], 422);
+        }
+
+        DB::transaction(function () use ($sale, $debt) {
             $balance = max(0, (float) $sale->total_amount - (float) $sale->discount - (float) $sale->promotion_discount + (float) $sale->tax_amount - (float) $sale->paid_amount);
             if ($sale->customer_id && $balance > 0) {
                 Customer::where('id', $sale->customer_id)->decrement('credit_balance', $balance);
@@ -399,6 +411,9 @@ class SaleController extends Controller
                 }
             } elseif ($sale->product_id) {
                 Product::where('id', $sale->product_id)->increment('stock_quantity', $sale->quantity);
+            }
+            if ($debt && !in_array($debt->status, ['CANCELLED', 'WRITTEN_OFF'], true)) {
+                $this->debtService->cancel($debt, 'Related sale was deleted', auth()->id());
             }
             $sale->delete();
         });

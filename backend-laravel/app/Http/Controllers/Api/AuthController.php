@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\AuthToken;
 use App\Models\Business;
+use App\Models\BusinessSubscription;
+use App\Models\Package;
 use App\Models\SecurityConfig;
 use App\Models\User;
 use App\Services\AuditService;
@@ -56,6 +58,26 @@ class AuthController extends Controller
                 'currency' => strtoupper($data['currency'] ?? 'TZS'),
                 'country' => $data['country'] ?? 'Tanzania',
             ]);
+
+            $freePackage = Package::where('status', 'ACTIVE')
+                ->where(function ($query) {
+                    $query->where('slug', 'free')->orWhere('price_monthly', 0);
+                })
+                ->orderByRaw("CASE WHEN slug = 'free' THEN 0 ELSE 1 END")
+                ->orderBy('sort_order')
+                ->first();
+
+            if ($freePackage) {
+                BusinessSubscription::create([
+                    'id' => Str::uuid(),
+                    'business_id' => $business->id,
+                    'package_id' => $freePackage->id,
+                    'status' => 'ACTIVE',
+                    'billing_cycle' => 'LIFETIME',
+                    'starts_at' => now(),
+                    'notes' => 'Automatically assigned during registration.',
+                ]);
+            }
         }
 
         if ($requireEmailVerification) {

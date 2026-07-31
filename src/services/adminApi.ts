@@ -147,6 +147,7 @@ export type AdminPackage = {
   allowInventoryAlerts: boolean;
   allowAiInsights: boolean;
   status: PackageStatus;
+  isVisible: boolean;
   sortOrder: number;
   subscriptionCount?: number;
   createdAt: string;
@@ -920,6 +921,7 @@ function normalizeAdminPackage(plan: Partial<AdminPackage> | null | undefined): 
     allowInventoryAlerts: Boolean(plan?.allowInventoryAlerts),
     allowAiInsights: Boolean(plan?.allowAiInsights),
     status: plan?.status ?? "INACTIVE",
+    isVisible: plan?.isVisible ?? true,
     sortOrder: numberOrZero(plan?.sortOrder),
     subscriptionCount: numberOrZero(plan?.subscriptionCount),
     createdAt: plan?.createdAt ?? "",
@@ -1153,6 +1155,12 @@ export async function updateAdminPackage(id: string, payload: Partial<PackagePay
 
 export async function updateAdminPackageStatus(id: string, status: PackageStatus) {
   return normalizeAdminPackage(unwrap<AdminPackage>(await apiClient.patch(`/admin/packages/${id}/status`, { status })));
+}
+
+export async function updateAdminPackageVisibility(id: string, isVisible: boolean) {
+  return normalizeAdminPackage(
+    unwrap<AdminPackage>(await apiClient.patch(`/admin/packages/${id}/visibility`, { isVisible })),
+  );
 }
 
 export async function deleteAdminPackage(id: string) {

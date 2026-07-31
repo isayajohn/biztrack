@@ -31,6 +31,12 @@ use App\Http\Controllers\Api\StockController;
 use App\Http\Controllers\Api\PurchaseController;
 use App\Http\Controllers\Api\DamagedStockController;
 use App\Http\Controllers\Api\InventoryNotificationController;
+use App\Http\Controllers\Api\DebtController;
+use App\Http\Controllers\Api\DebtPaymentController;
+use App\Http\Controllers\Api\DebtReminderController;
+use App\Http\Controllers\Api\DebtSettingController;
+use App\Http\Controllers\Api\DebtReminderTemplateController;
+use App\Http\Controllers\Api\WhatsAppConfigController;
 use Illuminate\Support\Facades\Route;
 
 // Health check
@@ -197,6 +203,42 @@ Route::middleware('jwt.auth')->group(function () {
         Route::delete('/{id}', [PurchaseController::class, 'deletePurchase'])->middleware('permission:purchases.manage');
     });
 
+    // Debts & Credit
+    Route::prefix('debts')->group(function () {
+        Route::get('/', [DebtController::class, 'index'])->middleware('permission:debts.view');
+        Route::post('/', [DebtController::class, 'store'])->middleware('permission:debts.create');
+        Route::get('/overview', [DebtController::class, 'overview'])->middleware('permission:debts.view');
+        Route::get('/aging-report', [DebtController::class, 'agingReport'])->middleware('permission:debts.reports.view');
+        Route::get('/{id}', [DebtController::class, 'show'])->middleware('permission:debts.view');
+        Route::put('/{id}', [DebtController::class, 'update'])->middleware('permission:debts.edit');
+        Route::delete('/{id}', [DebtController::class, 'destroy'])->middleware('permission:debts.delete_draft');
+        Route::post('/{id}/cancel', [DebtController::class, 'cancel'])->middleware('permission:debts.edit');
+        Route::post('/{id}/write-off', [DebtController::class, 'writeOff'])->middleware('permission:debts.write_off');
+        Route::post('/{id}/dispute', [DebtController::class, 'dispute'])->middleware('permission:debts.edit');
+        Route::get('/{id}/activity', [DebtController::class, 'activity'])->middleware('permission:debts.view');
+        Route::post('/{id}/attachments', [DebtController::class, 'uploadAttachment'])->middleware('permission:debts.edit');
+        Route::get('/{id}/attachments/{attachmentId}', [DebtController::class, 'downloadAttachment'])->middleware('permission:debts.view');
+
+        Route::post('/{id}/payments', [DebtPaymentController::class, 'store'])->middleware('permission:debts.record_payment');
+
+        Route::get('/{id}/reminders', [DebtReminderController::class, 'index'])->middleware('permission:debts.view');
+        Route::post('/{id}/reminders', [DebtReminderController::class, 'schedule'])->middleware('permission:debts.send_reminders');
+        Route::post('/{id}/reminders/{reminderId}/send-now', [DebtReminderController::class, 'sendNow'])->middleware('permission:debts.send_reminders');
+    });
+
+    Route::get('/debt-payments', [DebtPaymentController::class, 'index'])->middleware('permission:debts.view');
+    Route::delete('/debt-payments/{paymentId}', [DebtPaymentController::class, 'reverse'])->middleware('permission:debts.reverse_payment');
+
+    Route::prefix('debt-settings')->middleware('permission:settings.manage')->group(function () {
+        Route::get('/', [DebtSettingController::class, 'show']);
+        Route::put('/', [DebtSettingController::class, 'update']);
+    });
+
+    Route::prefix('debt-reminder-templates')->middleware('permission:settings.manage')->group(function () {
+        Route::get('/', [DebtReminderTemplateController::class, 'index']);
+        Route::put('/{channel}/{trigger}', [DebtReminderTemplateController::class, 'update']);
+    });
+
     // Damaged stock
     Route::prefix('damaged-stock')->group(function () {
         Route::get('/', [DamagedStockController::class, 'list']);
@@ -239,6 +281,7 @@ Route::middleware('jwt.auth')->group(function () {
             Route::get('/{id}', [AdminPackageController::class, 'getPackageById']);
             Route::put('/{id}', [AdminPackageController::class, 'updatePackage']);
             Route::patch('/{id}/status', [AdminPackageController::class, 'updatePackageStatus']);
+            Route::patch('/{id}/visibility', [AdminPackageController::class, 'updatePackageVisibility']);
             Route::delete('/{id}', [AdminPackageController::class, 'deletePackage']);
         });
 
@@ -275,6 +318,13 @@ Route::middleware('jwt.auth')->group(function () {
             Route::get('/', [SmsConfigController::class, 'getSmsConfig']);
             Route::put('/', [SmsConfigController::class, 'updateSmsConfig']);
             Route::post('/test', [SmsConfigController::class, 'testSmsConfig']);
+        });
+
+        // WhatsApp config
+        Route::prefix('config/whatsapp')->group(function () {
+            Route::get('/', [WhatsAppConfigController::class, 'getWhatsAppConfig']);
+            Route::put('/', [WhatsAppConfigController::class, 'updateWhatsAppConfig']);
+            Route::post('/test', [WhatsAppConfigController::class, 'testWhatsAppConfig']);
         });
 
         // Email templates

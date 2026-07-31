@@ -12,6 +12,7 @@ class PublicPackageController extends Controller
     public function listPackages(Request $request): JsonResponse
     {
         $packages = Package::where('status', 'ACTIVE')
+            ->where('is_visible', true)
             ->orderBy('sort_order')
             ->orderBy('price_monthly')
             ->get()

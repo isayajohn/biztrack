@@ -36,6 +36,7 @@ type FormState = {
   allowInventoryAlerts: boolean;
   allowAiInsights: boolean;
   status: PackageStatus;
+  isVisible: boolean;
   sortOrder: string;
 };
 
@@ -60,6 +61,7 @@ const emptyForm: FormState = {
   allowInventoryAlerts: false,
   allowAiInsights: false,
   status: "ACTIVE",
+  isVisible: true,
   sortOrder: "0",
 };
 
@@ -113,6 +115,7 @@ function formFromPackage(plan: AdminPackage): FormState {
     allowInventoryAlerts: plan.allowInventoryAlerts,
     allowAiInsights: plan.allowAiInsights,
     status: plan.status,
+    isVisible: plan.isVisible,
     sortOrder: String(plan.sortOrder),
   };
 }
@@ -165,6 +168,7 @@ function toPayload(form: FormState): PackagePayload {
     allowInventoryAlerts: form.allowInventoryAlerts,
     allowAiInsights: form.allowAiInsights,
     status: form.status,
+    isVisible: form.isVisible,
     sortOrder: numberValue(form.sortOrder),
   };
 }
@@ -359,6 +363,20 @@ export default function AdminPackageFormPage() {
                   <option value="ACTIVE">ACTIVE</option>
                   <option value="INACTIVE">INACTIVE</option>
                 </select>
+              </label>
+              <label className="flex items-center gap-3 rounded-lg border border-ink/10 bg-[#f7faf9] p-3 sm:col-span-2">
+                <input
+                  type="checkbox"
+                  checked={form.isVisible}
+                  onChange={(event) => updateField("isVisible", event.target.checked)}
+                  className="h-4 w-4 shrink-0 accent-leaf"
+                />
+                <span>
+                  <span className="block text-sm font-extrabold text-ink">Visible to users</span>
+                  <span className="mt-0.5 block text-xs font-semibold leading-5 text-ink/45">
+                    Show this package on pricing, registration, and the subscription page.
+                  </span>
+                </span>
               </label>
             </div>
           </section>

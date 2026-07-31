@@ -52,6 +52,36 @@ textarea {
   color-scheme: light;
 }
 
+.swal2-popup.biztrack-sweet-alert {
+  border: 1px solid rgba(16, 35, 30, 0.1);
+  border-radius: 16px;
+  font-family: 'Open Sans', ui-sans-serif, system-ui, sans-serif;
+  box-shadow: 0 24px 70px rgba(13, 60, 52, 0.18);
+}
+
+.swal2-popup.biztrack-sweet-alert .swal2-title {
+  color: #10231e;
+  font-family: 'Sora', ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.swal2-popup.biztrack-sweet-alert .swal2-html-container {
+  color: rgba(16, 35, 30, 0.65);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.swal2-popup.biztrack-sweet-alert .swal2-confirm,
+.swal2-popup.biztrack-sweet-alert .swal2-cancel {
+  border-radius: 10px;
+  font-weight: 800;
+}
+
+.swal2-timer-progress-bar {
+  background: #0b9279;
+}
+
 @layer components {
   .spatial-shell {
     background:

@@ -13,6 +13,7 @@ import {
 } from "../services/customerApi";
 import type { Customer } from "../services/customerApi";
 import { formatCurrency } from "../utils/format";
+import { confirmDialog } from "../lib/notifications";
 
 type CustomerForm = {
   name: string;
@@ -119,7 +120,13 @@ export default function CustomersPage() {
   };
 
   const removeCustomer = async (customer: Customer) => {
-    if (!window.confirm(`Delete ${customer.name}?`)) return;
+    const confirmed = await confirmDialog({
+      title: `Delete ${customer.name}?`,
+      text: "This customer will be permanently removed.",
+      confirmText: "Delete customer",
+      danger: true,
+    });
+    if (!confirmed) return;
     setError("");
     try {
       await deleteCustomer(customer.id);

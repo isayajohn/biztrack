@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import * as authApi from "../services/authApi";
 import { AUTH_TOKEN_KEY } from "../services/apiClient";
+import { notifySuccess } from "../lib/notifications";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -45,7 +46,7 @@ type AuthContextType = {
   register: (data: RegisterData) => Promise<RegisterResult>;
   updateUser: (data: Partial<User>) => void;
   refreshUser: () => Promise<void>;
-  logout: () => void;
+  logout: (options?: { notify?: boolean }) => void;
 };
 
 // ─── Storage keys ─────────────────────────────────────────────────────────────
@@ -144,11 +145,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback((options?: { notify?: boolean }) => {
+    const hadSession = Boolean(localStorage.getItem(TOKEN_KEY));
     clearAuth();
     setUser(null);
     setToken(null);
     setIsLoading(false);
+    if (hadSession && options?.notify !== false) {
+      notifySuccess("You have been logged out successfully.");
+    }
   }, []);
 
   const updateUser = useCallback((data: Partial<User>) => {
@@ -180,7 +185,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       })
       .catch(() => {
         if (!isMounted) return;
-        logout();
+        logout({ notify: false });
       })
       .finally(() => {
         if (!isMounted) return;
@@ -193,7 +198,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [logout]);
 
   useEffect(() => {
-    const handleUnauthorized = () => logout();
+    const handleUnauthorized = () => logout({ notify: false });
     window.addEventListener("biztrack:unauthorized", handleUnauthorized);
     return () => window.removeEventListener("biztrack:unauthorized", handleUnauthorized);
   }, [logout]);

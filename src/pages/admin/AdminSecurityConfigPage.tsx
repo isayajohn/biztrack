@@ -3,6 +3,7 @@ import { AlertCircle, CheckCircle2, Loader2, Save, ShieldCheck } from "lucide-re
 import { getSecurityConfig, updateSecurityConfig } from "../../services/adminApi";
 import type { SecurityConfig } from "../../services/adminApi";
 import { getApiErrorMessage } from "../../services/apiClient";
+import { confirmDialog } from "../../lib/notifications";
 
 type SecurityForm = Omit<SecurityConfig, "id" | "createdAt" | "updatedAt">;
 
@@ -53,7 +54,11 @@ export default function AdminSecurityConfigPage() {
 
   async function save(event: React.FormEvent) {
     event.preventDefault();
-    const confirmed = window.confirm("Save security configuration? These settings affect account access for all users.");
+    const confirmed = await confirmDialog({
+      title: "Save security configuration?",
+      text: "These settings affect account access for all users.",
+      confirmText: "Save security settings",
+    });
     if (!confirmed) return;
 
     setIsSaving(true);
