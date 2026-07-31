@@ -53,8 +53,9 @@ flutter pub get
 flutter run
 ```
 
-The default physical-device URL is
-`http://Isayas-MacBook-Pro.local:8002/api`. For an Android emulator, run with
+The default API URL is
+`https://snow-aardvark-815146.hostingersite.com/api`. For local development on
+an Android emulator, run with
 `--dart-define=BIZTRACK_API_BASE_URL=http://10.0.2.2:8002/api`. For an iOS
 simulator, use `http://127.0.0.1:8002/api`.
 

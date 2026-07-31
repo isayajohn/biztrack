@@ -17,16 +17,16 @@ const kCardBorder = Color(0xFFE5E7EB);
 const kBadgeAlpha = 0.10;
 
 // API host selection:
-//   Physical Android/iOS device → uses the Mac mDNS hostname on the same local network
+//   Production/default           → deployed BizTrack API
 //   Android emulator            → flutter run --dart-define=BIZTRACK_API_BASE_URL=http://10.0.2.2:8002/api
 //   iOS simulator               → flutter run --dart-define=BIZTRACK_API_BASE_URL=http://127.0.0.1:8002/api
-const _kMdnsHost =
-    'Isayas-MacBook-Pro.local'; // Mac mDNS hostname for same-network devices
+const _kProductionApiBaseUrl =
+    'https://snow-aardvark-815146.hostingersite.com/api';
 
 String get kApiBaseUrl {
   const override = String.fromEnvironment('BIZTRACK_API_BASE_URL');
   if (override.isNotEmpty) return override;
-  return 'http://$_kMdnsHost:8002/api';
+  return _kProductionApiBaseUrl;
 }
 
 ThemeData buildAppTheme() {

@@ -1,16 +1,22 @@
-# mobile_flutter
+# BizTrack Mobile
 
-A new Flutter project.
+The app uses the deployed BizTrack API by default:
 
-## Getting Started
+```text
+https://snow-aardvark-815146.hostingersite.com/api
+```
 
-This project is a starting point for a Flutter application.
+For local development, override it at build or run time:
 
-A few resources to get you started if this is your first Flutter project:
+```bash
+flutter run --dart-define=BIZTRACK_API_BASE_URL=http://10.0.2.2:8002/api
+```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Use `127.0.0.1` instead of `10.0.2.2` for the iOS simulator.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Run
+
+```bash
+flutter pub get
+flutter run
+```

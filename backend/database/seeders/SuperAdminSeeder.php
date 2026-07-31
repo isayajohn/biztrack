@@ -12,27 +12,40 @@ class SuperAdminSeeder extends Seeder
 {
     public function run(): void
     {
-        $email = 'admin@biztrack.com';
-        $password = 'Admin@1234';
+        $email = env('SUPER_ADMIN_EMAIL', 'admin@biztrack.com');
+        $password = env('SUPER_ADMIN_PASSWORD');
 
         $existing = User::where('email', $email)->first();
-        if (!$existing) {
-            User::create([
-                'id' => Str::uuid(),
-                'name' => 'Super Admin',
-                'email' => $email,
+        if (! $existing) {
+            if (! $password && app()->environment('production')) {
+                $this->command->warn('Super admin was not created because SUPER_ADMIN_PASSWORD is not set.');
+            } else {
+                $password ??= 'Admin@1234';
+
+                User::create([
+                    'id' => Str::uuid(),
+                    'name' => 'Super Admin',
+                    'email' => $email,
+                    'password_hash' => Hash::make($password),
+                    'role' => 'SUPER_ADMIN',
+                    'status' => 'ACTIVE',
+                    'email_verified_at' => now(),
+                ]);
+                $this->command->info("Super admin created: $email");
+            }
+        } elseif ($password) {
+            $existing->update([
                 'password_hash' => Hash::make($password),
-                'role' => 'SUPER_ADMIN',
                 'status' => 'ACTIVE',
-                'email_verified_at' => now(),
+                'email_verified_at' => $existing->email_verified_at ?? now(),
             ]);
-            $this->command->info("Super admin created: $email / $password");
+            $this->command->info("Super admin credentials updated: $email");
         } else {
             $this->command->info("Super admin already exists: $email");
         }
 
         // Seed default security config
-        if (!SecurityConfig::first()) {
+        if (! SecurityConfig::first()) {
             SecurityConfig::create([
                 'id' => Str::uuid(),
                 'require_email_verification' => false,

@@ -8,6 +8,13 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->call(SuperAdminSeeder::class);
+        $this->call([
+            SuperAdminSeeder::class,
+            LandingPageContentSeeder::class,
+        ]);
+
+        if (filter_var(env('SEED_DEMO_DATA', false), FILTER_VALIDATE_BOOL)) {
+            $this->call(DemoDataSeeder::class);
+        }
     }
 }
