@@ -51,6 +51,11 @@
 		<true/>
 		<key>NSExceptionDomains</key>
 		<dict>
+			<key>Isayas-MacBook-Pro.local</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
 			<key>localhost</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
@@ -68,6 +73,8 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>BizTrack connects to the local development API running on your computer.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>BizTrack uses the camera to scan product barcodes and QR codes.</string>
 </dict>
