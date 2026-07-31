@@ -7,7 +7,7 @@ export type SaleTotals = {
 };
 
 // Mirrors the backend's createPosSale/createSale total calculation
-// (backend-laravel/app/Http/Controllers/Api/SaleController.php) so the
+// (backend/app/Http/Controllers/Api/SaleController.php) so the
 // preview shown while checking out always matches what gets charged.
 export function computeSaleTotals(
   subtotal: number,

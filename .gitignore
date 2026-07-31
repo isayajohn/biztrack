@@ -1,18 +1,18 @@
 # Dependencies
-node_modules/
+frontend/node_modules/
 backend/node_modules/
 
 # Build outputs
-dist/
+frontend/dist/
 backend/dist/
 *.tsbuildinfo
 
 # Environment files
-.env
-.env.*
+frontend/.env
+frontend/.env.*
 backend/.env
 backend/.env.*
-!.env.example
+!frontend/.env.example
 !backend/.env.example
 
 # Local database and runtime data
