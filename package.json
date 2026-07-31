@@ -30,7 +30,7 @@
     "react-router-dom": "^6.28.0",
     "recharts": "^3.8.1",
     "sweetalert2": "^11.26.25",
-    "vite": "^6.0.0"
+    "vite": "^8.2.0"
   },
   "devDependencies": {
     "@types/react": "^19.2.14",
