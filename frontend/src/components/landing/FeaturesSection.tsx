@@ -90,7 +90,7 @@ const FEATURES: Feature[] = [
   {
     icon: Users,
     title: "Customers & Suppliers",
-    description: "One profile per relationship — purchase history, balances, and contact information.",
+    description: "One profile per relationship — purchase history, balances, and contact info.",
     detail: {
       tagline: "Every business relationship, in context.",
       overview: "Keep the people and companies behind each sale, purchase, and debt connected, so your team always sees history before taking the next action.",
@@ -106,7 +106,7 @@ const FEATURES: Feature[] = [
   {
     icon: FileText,
     title: "Finance Reports",
-    description: "Profit, cash flow, debt, and expense breakdowns generated automatically.",
+    description: "P&L, cash flow, and expense breakdowns generated automatically, always current.",
     detail: {
       tagline: "Reports ready before you ask.",
       overview: "Turn daily operations into decision-ready reports without rebuilding formulas. Filter dates, compare categories, and export the result when needed.",
@@ -122,47 +122,47 @@ const FEATURES: Feature[] = [
   {
     icon: Repeat2,
     title: "Automations",
-    description: "Reminders and repeatable workflows that run without constant follow-up.",
+    description: "Recurring invoices, reminders, and workflows that run without you touching them.",
     detail: {
       tagline: "Let routine work keep moving.",
-      overview: "BizTrack automates important follow-ups around debts, low stock, and recurring business checks so your team can focus on customers and operations.",
+      overview: "BizTrack automates the follow-ups and repeat billing that used to eat your day — recurring invoices, debt reminders, and low-stock checks all run themselves on schedule.",
       bullets: [
+        { title: "Recurring invoices", body: "Bill a customer weekly, monthly, or quarterly — BizTrack generates and records the sale automatically." },
         { title: "Debt follow-ups", body: "Schedule reminders before and after customer or supplier debt becomes due." },
         { title: "Low-stock monitoring", body: "Surface products that cross their reorder threshold automatically." },
         { title: "Notification centre", body: "Keep operational alerts and important changes visible to the right users." },
-        { title: "Reliable audit history", body: "Track what changed, when it changed, and who performed the action." },
       ],
       bestFor: "Teams that want fewer missed follow-ups and more consistent daily operations.",
     },
   },
   {
     icon: Globe2,
-    title: "Multi-Branch & Multi-Currency",
-    description: "Manage branches, currencies, staff access, and consolidated operations.",
+    title: "Multi-Country & Multi-Currency",
+    description: "Pick your country and currency during onboarding. BizTrack adapts.",
     detail: {
-      tagline: "Grow without losing control.",
-      overview: "Configure the currency that fits your market, organise operations by branch, and give staff access based on their responsibilities.",
+      tagline: "Built for how African businesses actually operate.",
+      overview: "Set your country and currency once during onboarding, and BizTrack adapts — amounts, reports, and branch operations all follow the setup that fits your market.",
       bullets: [
-        { title: "Local currency setup", body: "Choose the currency your business uses during account setup." },
+        { title: "Local currency setup", body: "Choose the currency your business uses; every amount across the app follows it." },
+        { title: "Country-aware setup", body: "Onboarding adapts to the country you select from day one." },
         { title: "Branch workspaces", body: "Organise staff and business activity around operational locations." },
         { title: "Role-based access", body: "Control which tools and records each team member can use." },
-        { title: "Consolidated oversight", body: "Keep management visibility while operations happen across locations." },
       ],
       bestFor: "Growing businesses with multiple locations, team members, or regional operations.",
     },
   },
   {
     icon: Smartphone,
-    title: "Mobile & Web App",
-    description: "Work from phone, tablet, or desktop with no business data left behind.",
+    title: "Installable PWA",
+    description: "Add to your home screen on iOS and Android. No app store required.",
     detail: {
       tagline: "Your business goes where you go.",
-      overview: "Use BizTrack through the web or mobile app with workflows designed for quick entry at the counter and deeper analysis at a desk.",
+      overview: "Install BizTrack straight from the browser — no app store, no download page. It sits on your home screen and opens full-screen like a native app.",
       bullets: [
-        { title: "Mobile-first workflows", body: "Record sales, expenses, payments, and stock updates from a phone." },
-        { title: "Desktop-ready reporting", body: "Use wider dashboards and tables when you need deeper operational review." },
-        { title: "One secure account", body: "Move between devices without creating separate business records." },
-        { title: "Fast onboarding", body: "Start with a clear setup flow instead of a long software implementation." },
+        { title: "One-tap install", body: "Add BizTrack to your home screen from Chrome on Android or Safari on iOS." },
+        { title: "No app store required", body: "Skip app store review and updates — the installed app always opens the latest version." },
+        { title: "Full-screen, native feel", body: "Runs without browser chrome, just like an installed app." },
+        { title: "Desktop-ready too", body: "Use wider dashboards and tables from a laptop or desktop when you need deeper review." },
       ],
       bestFor: "Owners and teams that work at the counter, in the field, and from the office.",
     },

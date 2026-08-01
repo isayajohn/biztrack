@@ -27,7 +27,7 @@ class EmailLinkTest extends TestCase
                         && $email === 'owner@example.com'
                         && str_starts_with($variables['resetUrl'], 'https://biztrack.example/reset-password?token=')
                         && ! str_contains($variables['resetUrl'], '127.0.0.1');
-                });
+                })->andReturn(true);
         });
 
         $this->postJson('/api/auth/forgot-password', [
@@ -48,7 +48,7 @@ class EmailLinkTest extends TestCase
                         && $email === 'new-owner@example.com'
                         && str_starts_with($variables['verifyUrl'], 'https://biztrack.example/verify-email?token=')
                         && ! str_contains($variables['verifyUrl'], '127.0.0.1');
-                });
+                })->andReturn(true);
         });
 
         $this->postJson('/api/auth/register', [

@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\AdminSubscriptionController;
 use App\Http\Controllers\Api\AiController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BusinessController;
+use App\Http\Controllers\Api\BusinessInvitationController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\BranchController;
 use App\Http\Controllers\Api\PromotionController;
@@ -20,6 +21,7 @@ use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\PublicPackageController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\SaleController;
+use App\Http\Controllers\Api\RecurringInvoiceController;
 use App\Http\Controllers\Api\SecurityConfigController;
 use App\Http\Controllers\Api\SmsConfigController;
 use App\Http\Controllers\Api\SmsTemplateController;
@@ -61,6 +63,7 @@ Route::prefix('landing-page')->group(function () {
 // Auth routes
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/invitations/validate', [BusinessInvitationController::class, 'validateCode'])->middleware('throttle:12,1');
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/google', [AuthController::class, 'googleAuth']);
     Route::post('/request-login-otp', [AuthController::class, 'requestLoginOtp']);
@@ -68,6 +71,8 @@ Route::prefix('auth')->group(function () {
     Route::post('/login/otp', [AuthController::class, 'verifyOtpLogin']);
     Route::post('/send-verification-email', [AuthController::class, 'sendVerificationEmail']);
     Route::post('/verify-email', [AuthController::class, 'verifyEmail']);
+    Route::post('/verify-phone', [AuthController::class, 'verifyPhone'])->middleware('throttle:10,1');
+    Route::post('/resend-phone-verification', [AuthController::class, 'resendPhoneVerification'])->middleware('throttle:4,1');
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
     Route::post('/change-password', [AuthController::class, 'changePassword'])->middleware('jwt.auth');
@@ -124,6 +129,12 @@ Route::middleware('jwt.auth')->group(function () {
         Route::delete('/{id}', [StaffController::class, 'destroy']);
     });
 
+    Route::middleware('permission:staff.manage')->prefix('invitations')->group(function () {
+        Route::get('/', [BusinessInvitationController::class, 'index']);
+        Route::post('/', [BusinessInvitationController::class, 'store']);
+        Route::delete('/{id}', [BusinessInvitationController::class, 'destroy']);
+    });
+
     // Sales
     Route::prefix('sales')->group(function () {
         Route::get('/', [SaleController::class, 'listSales'])->middleware('permission:sales.view');
@@ -132,6 +143,17 @@ Route::middleware('jwt.auth')->group(function () {
         Route::get('/{id}', [SaleController::class, 'getSale'])->middleware('permission:sales.view');
         Route::put('/{id}', [SaleController::class, 'updateSale'])->middleware('permission:sales.edit');
         Route::delete('/{id}', [SaleController::class, 'deleteSale'])->middleware('permission:sales.delete');
+    });
+
+    // Recurring invoices (kept out of the /sales/{id} group so a literal path here never gets swallowed by that wildcard)
+    Route::prefix('recurring-invoices')->group(function () {
+        Route::get('/', [RecurringInvoiceController::class, 'index'])->middleware('permission:sales.view');
+        Route::post('/', [RecurringInvoiceController::class, 'store'])->middleware('permission:sales.create');
+        Route::get('/{id}', [RecurringInvoiceController::class, 'show'])->middleware('permission:sales.view');
+        Route::put('/{id}', [RecurringInvoiceController::class, 'update'])->middleware('permission:sales.edit');
+        Route::put('/{id}/status', [RecurringInvoiceController::class, 'updateStatus'])->middleware('permission:sales.edit');
+        Route::post('/{id}/run-now', [RecurringInvoiceController::class, 'runNow'])->middleware('permission:sales.create');
+        Route::delete('/{id}', [RecurringInvoiceController::class, 'destroy'])->middleware('permission:sales.delete');
     });
 
     // Expenses

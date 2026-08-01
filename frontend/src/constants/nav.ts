@@ -24,6 +24,7 @@ import {
   Tag,
   Tags,
   Percent,
+  Repeat2,
   UserCog,
   Truck,
   Users,
@@ -45,6 +46,7 @@ export const NAV_ITEMS: NavItem[] = [
 
   { label: "POS", to: "/pos", icon: Store, section: "Sales", permission: "sales.create" },
   { label: "Sales", to: "/sales", icon: CircleDollarSign, section: "Sales", permission: "sales.view" },
+  { label: "Recurring Invoices", to: "/sales/recurring", icon: Repeat2, section: "Sales", permission: "sales.view" },
   { label: "Customers", to: "/customers", icon: Users, section: "Sales", permission: "customers.view" },
   { label: "Promotions", to: "/promotions", icon: Percent, section: "Sales", permission: "promotions.manage" },
 

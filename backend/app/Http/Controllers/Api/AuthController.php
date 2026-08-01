@@ -4,23 +4,29 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\AuthToken;
+use App\Models\Branch;
 use App\Models\Business;
+use App\Models\BusinessInvitation;
+use App\Models\BusinessMembership;
 use App\Models\BusinessSubscription;
 use App\Models\Package;
 use App\Models\SecurityConfig;
 use App\Models\User;
 use App\Services\AuditService;
 use App\Services\EmailService;
+use App\Services\SmsService;
 use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-    public function __construct(private EmailService $emailService) {}
+    public function __construct(private EmailService $emailService, private SmsService $smsService) {}
 
     public function register(Request $request): JsonResponse
     {
@@ -28,60 +34,121 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8',
-            'phone' => 'nullable|string',
+            'phone' => ['required_if:verificationMethod,PHONE', 'nullable', 'string', 'max:50', 'regex:/^\+?[0-9\s().-]{8,20}$/'],
             'businessName' => 'nullable|string|max:255',
             'currency' => 'nullable|string',
             'country' => 'nullable|string',
             'packageId' => 'nullable|string',
+            'invitationCode' => 'nullable|string|min:6|max:40',
+            'verificationMethod' => 'nullable|in:EMAIL,PHONE',
         ]);
 
-        $secConfig = SecurityConfig::first();
-        $requireEmailVerification = $secConfig?->require_email_verification ?? false;
+        $verificationMethod = strtoupper($data['verificationMethod'] ?? 'EMAIL');
+        $normalizedPhone = isset($data['phone'])
+            ? preg_replace('/[^0-9+]/', '', trim($data['phone']))
+            : null;
+        if ($normalizedPhone && User::where('phone', $normalizedPhone)->exists()) {
+            throw ValidationException::withMessages(['phone' => 'This phone number is already registered.']);
+        }
+        [$user, $business] = DB::transaction(function () use ($data, $verificationMethod, $normalizedPhone) {
+            $email = strtolower($data['email']);
+            $invitation = null;
 
-        $user = User::create([
-            'id' => Str::uuid(),
-            'name' => $data['name'],
-            'email' => strtolower($data['email']),
-            'phone' => $data['phone'] ?? null,
-            'password_hash' => Hash::make($data['password']),
-            'role' => 'USER',
-            'status' => 'ACTIVE',
-        ]);
+            if (!empty($data['invitationCode'])) {
+                $invitation = BusinessInvitation::where('code_hash', BusinessInvitation::hashCode($data['invitationCode']))
+                    ->lockForUpdate()
+                    ->first();
 
-        // Create business if businessName provided
-        $business = null;
-        if (! empty($data['businessName'])) {
-            $business = Business::create([
+                if (!$invitation || !$invitation->isAvailable()) {
+                    throw ValidationException::withMessages(['invitationCode' => 'This invitation code is invalid or has expired.']);
+                }
+                if ($invitation->email && strtolower($invitation->email) !== $email) {
+                    throw ValidationException::withMessages(['invitationCode' => 'This invitation was issued for a different email address.']);
+                }
+            }
+
+            $user = User::create([
                 'id' => Str::uuid(),
-                'user_id' => $user->id,
-                'name' => $data['businessName'],
-                'currency' => strtoupper($data['currency'] ?? 'TZS'),
-                'country' => $data['country'] ?? 'Tanzania',
+                'name' => $data['name'],
+                'email' => $email,
+                'phone' => $normalizedPhone,
+                'password_hash' => Hash::make($data['password']),
+                'role' => 'USER',
+                'status' => 'ACTIVE',
+                'registration_verification_method' => $verificationMethod,
             ]);
 
-            $freePackage = Package::where('status', 'ACTIVE')
-                ->where(function ($query) {
-                    $query->where('slug', 'free')->orWhere('price_monthly', 0);
-                })
-                ->orderByRaw("CASE WHEN slug = 'free' THEN 0 ELSE 1 END")
-                ->orderBy('sort_order')
-                ->first();
-
-            if ($freePackage) {
-                BusinessSubscription::create([
-                    'id' => Str::uuid(),
+            if ($invitation) {
+                $business = $invitation->business()->firstOrFail();
+                BusinessMembership::create([
                     'business_id' => $business->id,
-                    'package_id' => $freePackage->id,
+                    'user_id' => $user->id,
+                    'branch_id' => $invitation->branch_id,
+                    'role' => $invitation->role,
+                    'permissions' => $invitation->permissions ?? [],
                     'status' => 'ACTIVE',
-                    'billing_cycle' => 'LIFETIME',
-                    'starts_at' => now(),
-                    'notes' => 'Automatically assigned during registration.',
                 ]);
-            }
-        }
+                $invitation->update([
+                    'status' => 'ACCEPTED',
+                    'accepted_by' => $user->id,
+                    'accepted_at' => now(),
+                ]);
+            } else {
+                $business = null;
+                if (!empty($data['businessName'])) {
+                    $business = Business::create([
+                        'id' => Str::uuid(),
+                        'user_id' => $user->id,
+                        'name' => $data['businessName'],
+                        'currency' => strtoupper($data['currency'] ?? 'TZS'),
+                        'country' => $data['country'] ?? 'Tanzania',
+                    ]);
 
-        if ($requireEmailVerification) {
-            $this->sendEmailVerificationToken($user);
+                    $branch = Branch::create([
+                        'business_id' => $business->id,
+                        'name' => 'Main Branch',
+                        'code' => 'MAIN',
+                        'is_default' => true,
+                        'is_active' => true,
+                    ]);
+                    BusinessMembership::create([
+                        'business_id' => $business->id,
+                        'user_id' => $user->id,
+                        'branch_id' => $branch->id,
+                        'role' => 'OWNER',
+                        'permissions' => ['*'],
+                        'status' => 'ACTIVE',
+                    ]);
+
+                    $freePackage = Package::where('status', 'ACTIVE')
+                        ->where(fn ($query) => $query->where('slug', 'free')->orWhere('price_monthly', 0))
+                        ->orderByRaw("CASE WHEN slug = 'free' THEN 0 ELSE 1 END")
+                        ->orderBy('sort_order')
+                        ->first();
+
+                    if ($freePackage) {
+                        BusinessSubscription::create([
+                            'id' => Str::uuid(),
+                            'business_id' => $business->id,
+                            'package_id' => $freePackage->id,
+                            'status' => 'ACTIVE',
+                            'billing_cycle' => 'LIFETIME',
+                            'starts_at' => now(),
+                            'notes' => 'Automatically assigned during registration.',
+                        ]);
+                    }
+                }
+            }
+
+            return [$user, $business];
+        });
+
+        $verificationEmailSent = false;
+        $verificationOtpSent = false;
+        if ($verificationMethod === 'EMAIL') {
+            $verificationEmailSent = $this->sendEmailVerificationToken($user);
+        } else {
+            $verificationOtpSent = $this->sendPhoneVerificationOtp($user);
         }
 
         AuditService::log([
@@ -91,15 +158,17 @@ class AuthController extends Controller
             'target_id' => $user->id,
         ]);
 
-        $token = JWTAuth::fromUser($user);
-
         return response()->json([
             'success' => true,
             'data' => [
                 'user' => $this->formatUser($user, $business),
-                'token' => $token,
-                'requiresEmailVerification' => $requireEmailVerification,
-                'verificationEmailSent' => $requireEmailVerification,
+                'token' => null,
+                'requiresVerification' => true,
+                'requiresEmailVerification' => $verificationMethod === 'EMAIL',
+                'verificationMethod' => $verificationMethod,
+                'verificationEmailSent' => $verificationEmailSent,
+                'verificationOtpSent' => $verificationOtpSent,
+                'phoneNumberMasked' => $verificationMethod === 'PHONE' ? $this->maskPhone((string) $user->phone) : null,
             ],
         ], 201);
     }
@@ -138,7 +207,15 @@ class AuthController extends Controller
             return response()->json(['success' => false, 'error' => 'Account suspended'], 403);
         }
 
-        if ($secConfig?->require_email_verification && ! $user->email_verified_at) {
+        if ($user->registration_verification_method === 'PHONE' && !$user->phone_verified_at) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Phone number not verified',
+                'code' => 'PHONE_NOT_VERIFIED',
+            ], 403);
+        }
+
+        if (($user->registration_verification_method === 'EMAIL' || (!$user->registration_verification_method && $secConfig?->require_email_verification)) && ! $user->email_verified_at) {
             return response()->json([
                 'success' => false,
                 'error' => 'Email not verified',
@@ -293,6 +370,56 @@ class AuthController extends Controller
         ]);
     }
 
+    public function verifyPhone(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'email' => 'required|email',
+            'otp' => 'required|digits:6',
+        ]);
+        $user = User::where('email', strtolower($data['email']))->first();
+
+        if (!$user || $user->registration_verification_method !== 'PHONE' || $user->phone_verified_at) {
+            return response()->json(['success' => false, 'error' => 'Invalid verification request'], 422);
+        }
+        if (!$user->otp_code_hash || !$user->otp_expires_at || now()->gt($user->otp_expires_at) || !Hash::check($data['otp'], $user->otp_code_hash)) {
+            return response()->json(['success' => false, 'error' => 'Invalid or expired verification code'], 422);
+        }
+
+        $user->update([
+            'phone_verified_at' => now(),
+            'otp_code_hash' => null,
+            'otp_expires_at' => null,
+        ]);
+        AuditService::log([
+            'actor_id' => $user->id,
+            'action' => 'PHONE_VERIFIED',
+            'target_type' => 'User',
+            'target_id' => $user->id,
+        ]);
+
+        $business = Business::forUser($user);
+        $token = JWTAuth::fromUser($user);
+        return response()->json(['success' => true, 'data' => [
+            'user' => $this->formatUser($user, $business),
+            'token' => $token,
+        ]]);
+    }
+
+    public function resendPhoneVerification(Request $request): JsonResponse
+    {
+        $data = $request->validate(['email' => 'required|email']);
+        $user = User::where('email', strtolower($data['email']))->first();
+        $sent = false;
+        if ($user && $user->registration_verification_method === 'PHONE' && !$user->phone_verified_at && $user->phone) {
+            $sent = $this->sendPhoneVerificationOtp($user);
+        }
+
+        return response()->json(['success' => true, 'data' => [
+            'message' => $sent ? 'A new verification code was sent.' : 'The verification code could not be sent. Check the SMS configuration and try again.',
+            'sent' => $sent,
+        ]]);
+    }
+
     public function forgotPassword(Request $request): JsonResponse
     {
         $data = $request->validate(['email' => 'required|email']);
@@ -400,6 +527,12 @@ class AuthController extends Controller
             return response()->json(['success' => true, 'data' => ['message' => 'OTP sent if account exists.']]);
         }
 
+        if (($user->registration_verification_method === 'EMAIL' && !$user->email_verified_at)
+            || ($user->registration_verification_method === 'PHONE' && !$user->phone_verified_at)
+            || $user->status !== 'ACTIVE') {
+            return response()->json(['success' => true, 'data' => ['message' => 'OTP sent if account exists.']]);
+        }
+
         $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
         $otpHash = Hash::make($otp);
 
@@ -433,6 +566,14 @@ class AuthController extends Controller
             return response()->json(['success' => false, 'error' => 'Invalid or expired OTP'], 401);
         }
 
+        if ($user->status !== 'ACTIVE') {
+            return response()->json(['success' => false, 'error' => 'Account suspended'], 403);
+        }
+        if (($user->registration_verification_method === 'EMAIL' && !$user->email_verified_at)
+            || ($user->registration_verification_method === 'PHONE' && !$user->phone_verified_at)) {
+            return response()->json(['success' => false, 'error' => 'Account verification required'], 403);
+        }
+
         $user->update([
             'otp_code_hash' => null,
             'otp_expires_at' => null,
@@ -462,7 +603,7 @@ class AuthController extends Controller
         ]);
     }
 
-    private function sendEmailVerificationToken(User $user): void
+    private function sendEmailVerificationToken(User $user): bool
     {
         $rawToken = Str::random(64);
         $tokenHash = hash('sha256', $rawToken);
@@ -484,11 +625,37 @@ class AuthController extends Controller
         ]);
 
         $verifyUrl = rtrim((string) config('app.frontend_url'), '/').'/verify-email?token='.$rawToken;
-        $this->emailService->sendFromTemplate('EMAIL_VERIFICATION', $user->email, $user->name, [
+        return $this->emailService->sendFromTemplate('EMAIL_VERIFICATION', $user->email, $user->name, [
             'name' => $user->name,
             'verifyUrl' => $verifyUrl,
             'token' => $rawToken,
         ]);
+    }
+
+    private function sendPhoneVerificationOtp(User $user): bool
+    {
+        if (!$user->phone) return false;
+        $minutes = SecurityConfig::first()?->otp_expiry_minutes ?? 10;
+        $otp = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        $user->update([
+            'otp_code_hash' => Hash::make($otp),
+            'otp_expires_at' => now()->addMinutes($minutes),
+        ]);
+
+        return $this->smsService->sendFromTemplate('OTP_CODE', $user->phone, [
+            'name' => $user->name,
+            'code' => $otp,
+            'otp' => $otp,
+            'expiresIn' => $minutes.' minutes',
+            'business_name' => 'BizTrack',
+        ]);
+    }
+
+    private function maskPhone(string $phone): string
+    {
+        $length = strlen($phone);
+        if ($length <= 4) return str_repeat('*', $length);
+        return substr($phone, 0, 3).str_repeat('*', max(3, $length - 6)).substr($phone, -3);
     }
 
     private function formatUser(User $user, ?Business $business = null): array
@@ -506,6 +673,8 @@ class AuthController extends Controller
             'permissions' => $membership?->permissions ?? ($business?->user_id === $user->id ? ['*'] : []),
             'branch' => $membership?->branch ? ['id' => $membership->branch->id, 'name' => $membership->branch->name] : null,
             'emailVerifiedAt' => $user->email_verified_at,
+            'phoneVerifiedAt' => $user->phone_verified_at,
+            'verificationMethod' => $user->registration_verification_method,
             'lastLoginAt' => $user->last_login_at,
             'createdAt' => $user->created_at,
             'business' => $business ? [

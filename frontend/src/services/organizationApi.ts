@@ -11,3 +11,7 @@ export async function getStaff(){return unwrap<{staff:StaffMember[];permissions:
 export async function createStaff(data:{name:string;email:string;phone?:string;password?:string;role:Exclude<StaffRole,"OWNER">;branchId?:string;permissions?:string[]}){return unwrap<StaffMember>(await apiClient.post("/staff",data))}
 export async function updateStaff(id:string,data:Partial<{role:Exclude<StaffRole,"OWNER">;branchId:string|null;permissions:string[];status:"ACTIVE"|"INACTIVE"}>){return unwrap<StaffMember>(await apiClient.put(`/staff/${id}`,data))}
 export async function removeStaff(id:string){await apiClient.delete(`/staff/${id}`)}
+export type BusinessInvitation={id:string;email?:string;codePrefix?:string;code?:string;role:Exclude<StaffRole,"OWNER">;permissions:string[];status:"ACTIVE"|"REVOKED"|"ACCEPTED"|"EXPIRED";branch:{id:string;name:string}|null;expiresAt:string;acceptedAt?:string;acceptedBy?:{id:string;name:string;email:string};createdAt:string};
+export async function getInvitations(){return unwrap<{invitations:BusinessInvitation[]}>(await apiClient.get("/invitations")).invitations??[]}
+export async function createInvitation(data:{email?:string;role:Exclude<StaffRole,"OWNER">;branchId?:string;permissions?:string[];expiresInDays?:number}){return unwrap<BusinessInvitation>(await apiClient.post("/invitations",data))}
+export async function revokeInvitation(id:string){await apiClient.delete(`/invitations/${id}`)}

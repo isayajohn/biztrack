@@ -28,13 +28,20 @@ export type RegisterData = {
   currency: string;
   country?: string;
   packageId?: string;
+  phone?: string;
+  invitationCode?: string;
+  verificationMethod: "EMAIL" | "PHONE";
 };
 
 export type RegisterResult = {
   user: User;
+  requiresVerification: boolean;
   requiresEmailVerification: boolean;
   verificationEmailSent: boolean;
   verificationEmailError?: boolean;
+  verificationMethod: "EMAIL" | "PHONE";
+  verificationOtpSent: boolean;
+  phoneNumberMasked?: string | null;
 };
 
 type AuthContextType = {
@@ -130,18 +137,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const register = useCallback(async (data: RegisterData) => {
     const result = await authApi.register(data);
-    if (result.requiresEmailVerification) {
+    if (result.requiresVerification) {
       clearAuth();
       setUser(null);
       setToken(null);
-    } else {
+    } else if (result.token) {
       saveAuth(result.user, result.token);
     }
     return {
       user: result.user,
+      requiresVerification: result.requiresVerification,
       requiresEmailVerification: result.requiresEmailVerification,
       verificationEmailSent: result.verificationEmailSent,
       verificationEmailError: result.verificationEmailError,
+      verificationMethod: result.verificationMethod,
+      verificationOtpSent: result.verificationOtpSent,
+      phoneNumberMasked: result.phoneNumberMasked,
     };
   }, []);
 

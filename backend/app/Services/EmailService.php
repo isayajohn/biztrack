@@ -12,7 +12,7 @@ class EmailService
 {
     public function __construct(private EncryptionService $encryptionService) {}
 
-    public function sendFromTemplate(string $templateKey, string $toEmail, string $toName, array $variables = []): void
+    public function sendFromTemplate(string $templateKey, string $toEmail, string $toName, array $variables = []): bool
     {
         $template = MessageTemplate::where('key', $templateKey)
             ->where('type', 'EMAIL')
@@ -23,7 +23,7 @@ class EmailService
         $subject = $this->interpolate($template?->subject ?: $fallback['subject'], $variables);
         $body = $this->interpolate($template?->body ?: $fallback['body'], $variables);
 
-        $this->send($toEmail, $toName, $subject, $body);
+        return $this->send($toEmail, $toName, $subject, $body);
     }
 
     public function send(string $toEmail, string $toName, string $subject, string $body, bool $throw = false): bool

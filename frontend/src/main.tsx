@@ -16,12 +16,15 @@ import ForbiddenPage from "./pages/ForbiddenPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
+import VerifyPhonePage from "./pages/VerifyPhonePage";
 import ForgetPasswordPage from "./pages/ForgetPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import Dashboard from "./pages/Dashboard";
 import SalesPage from "./pages/SalesPage";
 import SaleFormPage from "./pages/SaleFormPage";
 import SaleReceiptPage from "./pages/SaleReceiptPage";
+import RecurringInvoicesPage from "./pages/RecurringInvoicesPage";
+import RecurringInvoiceFormPage from "./pages/RecurringInvoiceFormPage";
 import PosPage from "./pages/PosPage";
 import ExpensesPage from "./pages/ExpensesPage";
 import ExpenseFormPage from "./pages/ExpenseFormPage";
@@ -98,6 +101,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
 <Route path="/verify-email" element={<VerifyEmailPage />} />
+            <Route path="/verify-phone" element={<VerifyPhonePage />} />
             <Route path="/forgot-password" element={<ForgetPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
 
@@ -111,6 +115,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 <Route path="/sales/new" element={<SaleFormPage />} />
                 <Route path="/sales/:id/edit" element={<SaleFormPage />} />
                 <Route path="/sales/:id/receipt" element={<SaleReceiptPage />} />
+                <Route path="/sales/recurring" element={<RecurringInvoicesPage />} />
+                <Route path="/sales/recurring/new" element={<RecurringInvoiceFormPage />} />
+                <Route path="/sales/recurring/:id/edit" element={<RecurringInvoiceFormPage />} />
                 <Route path="/expenses" element={<ExpensesPage />} />
                 <Route path="/expenses/new" element={<ExpenseFormPage />} />
                 <Route path="/expenses/:id/edit" element={<ExpenseFormPage />} />

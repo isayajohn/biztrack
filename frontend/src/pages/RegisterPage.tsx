@@ -5,12 +5,16 @@ import {
   Eye,
   EyeOff,
   Loader2,
+  MailCheck,
+  MessageSquareText,
+  TicketCheck,
 } from "lucide-react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth, type RegisterData } from "../auth/AuthContext";
 import AuthLoadingScreen from "../components/AuthLoadingScreen";
 import { useNoIndex } from "../hooks/useSeo";
 import { getApiErrorMessage, getRateLimitSeconds } from "../services/apiClient";
+import { validateInvitation, type InvitationPreview } from "../services/authApi";
 import { getPublicPackages, type PublicPackage } from "../services/landingApi";
 import { formatCurrency } from "../utils/format";
 import {
@@ -39,6 +43,8 @@ type FormErrors = Partial<
     | "password"
     | "confirmPassword"
     | "businessName"
+    | "phone"
+    | "invitationCode"
     | "currency"
     | "terms"
     | "general",
@@ -53,6 +59,8 @@ type Fields = {
   confirmPassword: string;
   businessName: string;
   currency: string;
+  phone: string;
+  invitationCode: string;
 };
 
 function packagePrice(plan: PublicPackage) {
@@ -68,7 +76,12 @@ function packageSummary(plan: PublicPackage) {
   return pieces.join(" / ");
 }
 
-function validate(f: Fields, acceptedTerms: boolean): FormErrors {
+function validate(
+  f: Fields,
+  acceptedTerms: boolean,
+  registrationMode: "CREATE" | "JOIN",
+  verificationMethod: "EMAIL" | "PHONE",
+): FormErrors {
   const e: FormErrors = {};
   if (!f.name.trim()) e.name = "Name is required.";
   else if (f.name.trim().length < 2) e.name = "Name must be at least 2 characters.";
@@ -78,10 +91,14 @@ function validate(f: Fields, acceptedTerms: boolean): FormErrors {
   else if (f.password.length < 8) e.password = "Password must be at least 8 characters.";
   if (!f.confirmPassword) e.confirmPassword = "Please confirm your password.";
   else if (f.confirmPassword !== f.password) e.confirmPassword = "Passwords do not match.";
-  if (!f.businessName.trim()) e.businessName = "Business name is required.";
-  else if (f.businessName.trim().length < 2)
-    e.businessName = "Business name must be at least 2 characters.";
-  if (!f.currency) e.currency = "Please select a currency.";
+  if (verificationMethod === "PHONE" && !f.phone.trim()) e.phone = "Phone number is required for OTP verification.";
+  if (registrationMode === "CREATE") {
+    if (!f.businessName.trim()) e.businessName = "Business name is required.";
+    else if (f.businessName.trim().length < 2) e.businessName = "Business name must be at least 2 characters.";
+    if (!f.currency) e.currency = "Please select a currency.";
+  } else if (!f.invitationCode.trim()) {
+    e.invitationCode = "Enter the invitation code shared by your business administrator.";
+  }
   if (!acceptedTerms) e.terms = "Accept the terms to continue.";
   return e;
 }
@@ -110,7 +127,13 @@ export default function RegisterPage() {
     confirmPassword: "",
     businessName: "",
     currency: "TZS",
+    phone: "",
+    invitationCode: "",
   });
+  const [registrationMode, setRegistrationMode] = useState<"CREATE" | "JOIN">("CREATE");
+  const [verificationMethod, setVerificationMethod] = useState<"EMAIL" | "PHONE">("EMAIL");
+  const [invitationPreview, setInvitationPreview] = useState<InvitationPreview | null>(null);
+  const [isCheckingInvitation, setIsCheckingInvitation] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -220,7 +243,7 @@ export default function RegisterPage() {
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      const errs = validate(fields, acceptedTerms);
+      const errs = validate(fields, acceptedTerms, registrationMode, verificationMethod);
       if (Object.keys(errs).length > 0) {
         setErrors(errs);
         return;
@@ -233,11 +256,26 @@ export default function RegisterPage() {
           name: fields.name.trim(),
           email: fields.email.trim(),
           password: fields.password,
-          businessName: fields.businessName.trim(),
+          businessName: registrationMode === "CREATE" ? fields.businessName.trim() : "",
           currency: fields.currency,
-          packageId: selectedPackageId || undefined,
+          packageId: registrationMode === "CREATE" ? selectedPackageId || undefined : undefined,
+          phone: fields.phone.trim() || undefined,
+          invitationCode: registrationMode === "JOIN" ? fields.invitationCode.trim() : undefined,
+          verificationMethod,
         };
         const result = await register(data);
+        if (result.verificationMethod === "PHONE") {
+          const message = result.verificationOtpSent
+            ? `We sent a 6-digit verification code to ${result.phoneNumberMasked || "your phone"}.`
+            : "Your account was created, but the SMS could not be sent. Use resend after your SMS provider is configured.";
+          showNotification(message, result.verificationOtpSent ? "success" : "error");
+          sessionStorage.setItem("biztrack_phone_verification", JSON.stringify({ email: fields.email.trim(), phone: result.phoneNumberMasked, message }));
+          navigate("/verify-phone", {
+            replace: true,
+            state: { email: fields.email.trim(), phone: result.phoneNumberMasked, message },
+          });
+          return;
+        }
         if (result.requiresEmailVerification) {
           const message = result.verificationEmailSent
             ? "Account created. Check your email to verify your account before signing in."
@@ -274,12 +312,33 @@ export default function RegisterPage() {
       closeLoadingNotification,
       fields,
       navigate,
+      registrationMode,
       register,
       selectedPackageId,
       showLoadingNotification,
       showNotification,
+      verificationMethod,
     ],
   );
+
+  const checkInvitation = useCallback(async () => {
+    const code = fields.invitationCode.trim();
+    if (!code) {
+      setErrors((current) => ({ ...current, invitationCode: "Enter an invitation code first." }));
+      return;
+    }
+    setIsCheckingInvitation(true);
+    setInvitationPreview(null);
+    try {
+      const preview = await validateInvitation(code);
+      setInvitationPreview(preview);
+      setErrors((current) => ({ ...current, invitationCode: undefined }));
+    } catch (error) {
+      setErrors((current) => ({ ...current, invitationCode: getApiErrorMessage(error) }));
+    } finally {
+      setIsCheckingInvitation(false);
+    }
+  }, [fields.invitationCode]);
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#07102b] text-white">
@@ -309,6 +368,23 @@ export default function RegisterPage() {
           <p className="mt-3 text-sm font-medium leading-6 text-white/45">
             Set up your business workspace and see every important number in one place.
           </p>
+
+          <div className="mt-7 grid grid-cols-2 rounded-xl border border-white/10 bg-black/20 p-1">
+            <button
+              type="button"
+              onClick={() => { setRegistrationMode("CREATE"); setInvitationPreview(null); setErrors((current) => ({ ...current, invitationCode: undefined })); }}
+              className={`rounded-lg px-3 py-2.5 text-xs font-bold transition ${registrationMode === "CREATE" ? "bg-[#12e4d7] text-[#051210]" : "text-white/45 hover:text-white"}`}
+            >
+              Create a business
+            </button>
+            <button
+              type="button"
+              onClick={() => { setRegistrationMode("JOIN"); setErrors((current) => ({ ...current, businessName: undefined, currency: undefined })); }}
+              className={`rounded-lg px-3 py-2.5 text-xs font-bold transition ${registrationMode === "JOIN" ? "bg-[#12e4d7] text-[#051210]" : "text-white/45 hover:text-white"}`}
+            >
+              Join with invitation code
+            </button>
+          </div>
 
           {errors.general && (
             <div className="mt-6 rounded-xl border border-red-400/25 bg-red-400/10 px-4 py-3 text-sm font-semibold text-red-200">
@@ -340,6 +416,42 @@ export default function RegisterPage() {
                 className={inputCls(Boolean(errors.email))}
               />
             </Field>
+
+            <div>
+              <p className="mb-2 text-sm font-bold text-white/75">Verify your account using</p>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => { setVerificationMethod("EMAIL"); setErrors((current) => ({ ...current, phone: undefined })); }}
+                  className={`flex items-center gap-3 rounded-xl border p-3 text-left transition ${verificationMethod === "EMAIL" ? "border-[#12e4d7]/50 bg-[#12e4d7]/10 text-white" : "border-white/10 bg-white/[0.03] text-white/45"}`}
+                >
+                  <MailCheck size={18} className="shrink-0 text-[#12e4d7]" />
+                  <span><span className="block text-xs font-bold">Email link</span><span className="mt-0.5 block text-[10px] opacity-60">Open an activation link</span></span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setVerificationMethod("PHONE")}
+                  className={`flex items-center gap-3 rounded-xl border p-3 text-left transition ${verificationMethod === "PHONE" ? "border-[#12e4d7]/50 bg-[#12e4d7]/10 text-white" : "border-white/10 bg-white/[0.03] text-white/45"}`}
+                >
+                  <MessageSquareText size={18} className="shrink-0 text-[#12e4d7]" />
+                  <span><span className="block text-xs font-bold">Phone OTP</span><span className="mt-0.5 block text-[10px] opacity-60">Receive a 6-digit code</span></span>
+                </button>
+              </div>
+            </div>
+
+            {verificationMethod === "PHONE" && (
+              <Field id="phone" label="Phone number" error={errors.phone}>
+                <input
+                  id="phone"
+                  type="tel"
+                  autoComplete="tel"
+                  placeholder="+255 7XX XXX XXX"
+                  value={fields.phone}
+                  onChange={set("phone")}
+                  className={inputCls(Boolean(errors.phone))}
+                />
+              </Field>
+            )}
 
             <Field id="password" label="Password" error={errors.password}>
               <div className="relative">
@@ -385,6 +497,7 @@ export default function RegisterPage() {
               </div>
             </Field>
 
+            {registrationMode === "CREATE" ? <>
             <div className="grid gap-4 sm:grid-cols-2">
               <Field id="businessName" label="Business" error={errors.businessName}>
                 <input
@@ -462,6 +575,38 @@ export default function RegisterPage() {
                 </p>
               )}
             </div>
+            </> : (
+              <Field id="invitationCode" label="Invitation code" error={errors.invitationCode}>
+                <div className="flex gap-2">
+                  <input
+                    id="invitationCode"
+                    type="text"
+                    autoComplete="off"
+                    placeholder="BIZ-XXXX-XXXX"
+                    value={fields.invitationCode}
+                    onChange={(event) => {
+                      set("invitationCode")(event);
+                      setInvitationPreview(null);
+                    }}
+                    className={inputCls(Boolean(errors.invitationCode)) + " uppercase"}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => void checkInvitation()}
+                    disabled={isCheckingInvitation}
+                    className="shrink-0 rounded-xl border border-[#12e4d7]/30 bg-[#12e4d7]/10 px-4 text-xs font-bold text-[#55e7c3] hover:bg-[#12e4d7]/15 disabled:opacity-50"
+                  >
+                    {isCheckingInvitation ? <Loader2 size={16} className="animate-spin" /> : "Check"}
+                  </button>
+                </div>
+                {invitationPreview && (
+                  <div className="mt-3 flex items-start gap-3 rounded-xl border border-emerald-400/20 bg-emerald-400/[0.07] p-3 text-emerald-100">
+                    <TicketCheck size={18} className="mt-0.5 shrink-0 text-emerald-300" />
+                    <div><p className="text-sm font-bold">Join {invitationPreview.businessName}</p><p className="mt-1 text-xs text-emerald-100/60">Role: {invitationPreview.role}{invitationPreview.branch?.name ? ` · ${invitationPreview.branch.name}` : " · All branches"}</p></div>
+                  </div>
+                )}
+              </Field>
+            )}
 
             <div>
               <label className="flex items-start gap-2 text-sm font-semibold text-white/45">

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { CheckCircle2, Eye, Loader2, Pencil, Plus, Shield, Trash2, X } from "lucide-react";
-import { createStaff, getBranches, getStaff, removeStaff, updateStaff } from "../services/organizationApi";
-import type { Branch, StaffMember, StaffRole } from "../services/organizationApi";
+import { CheckCircle2, Copy, Eye, Link2, Loader2, Pencil, Plus, Shield, Trash2, X } from "lucide-react";
+import { createInvitation, createStaff, getBranches, getInvitations, getStaff, removeStaff, revokeInvitation, updateStaff } from "../services/organizationApi";
+import type { Branch, BusinessInvitation, StaffMember, StaffRole } from "../services/organizationApi";
 import { getApiErrorMessage } from "../services/apiClient";
 import { confirmDialog } from "../lib/notifications";
 
@@ -207,6 +207,7 @@ export default function StaffPage() {
   const [staff, setStaff] = useState<StaffMember[]>([]);
   const [branches, setBranches] = useState<Branch[]>([]);
   const [permissions, setPermissions] = useState<string[]>([]);
+  const [invitations, setInvitations] = useState<BusinessInvitation[]>([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -217,14 +218,20 @@ export default function StaffPage() {
   const [form, setForm] = useState<StaffFormState>(emptyForm);
   const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteError, setInviteError] = useState("");
+  const [isInviting, setIsInviting] = useState(false);
+  const [createdCode, setCreatedCode] = useState("");
+  const [inviteForm, setInviteForm] = useState({ email: "", role: "CASHIER" as Exclude<StaffRole, "OWNER">, branchId: "", permissions: [] as string[], expiresInDays: 7 });
 
   const load = async () => {
     setIsLoading(true);
     try {
-      const [staffResult, branchesResult] = await Promise.all([getStaff(), getBranches()]);
+      const [staffResult, branchesResult, invitationResult] = await Promise.all([getStaff(), getBranches(), getInvitations()]);
       setStaff(staffResult.staff);
       setPermissions(staffResult.permissions);
       setBranches(branchesResult);
+      setInvitations(invitationResult);
       setError("");
     } catch (err) {
       setError(getApiErrorMessage(err));
@@ -337,6 +344,40 @@ export default function StaffPage() {
     }
   };
 
+  const createInvite = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setIsInviting(true);
+    setInviteError("");
+    try {
+      const invitation = await createInvitation({
+        email: inviteForm.email.trim() || undefined,
+        role: inviteForm.role,
+        branchId: inviteForm.branchId || undefined,
+        permissions: inviteForm.role === "CUSTOM" ? inviteForm.permissions : undefined,
+        expiresInDays: inviteForm.expiresInDays,
+      });
+      setCreatedCode(invitation.code || "");
+      setSuccess("Invitation code created. Copy it now—it is shown only once.");
+      await load();
+    } catch (err) {
+      setInviteError(getApiErrorMessage(err));
+    } finally {
+      setIsInviting(false);
+    }
+  };
+
+  const revokeInvite = async (invitation: BusinessInvitation) => {
+    const confirmed = await confirmDialog({ title: "Revoke invitation?", text: "This code will no longer be accepted during registration.", confirmText: "Revoke code", danger: true });
+    if (!confirmed) return;
+    try {
+      await revokeInvitation(invitation.id);
+      setSuccess("Invitation revoked.");
+      await load();
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+    }
+  };
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -344,14 +385,32 @@ export default function StaffPage() {
           <h1 className="font-display text-xl font-bold text-ink">Staff & Permissions</h1>
           <p className="mt-1 text-sm font-semibold text-ink/45">Add, view, edit, assign permissions, activate, and remove staff users.</p>
         </div>
-        <button onClick={openCreate} className="inline-flex items-center justify-center gap-2 rounded-lg bg-leaf px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-leaf/90">
-          <Plus size={16} />
-          Add staff
-        </button>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <button onClick={() => { setInviteOpen(true); setCreatedCode(""); setInviteError(""); }} className="inline-flex items-center justify-center gap-2 rounded-lg border border-leaf/20 bg-white px-4 py-2.5 text-sm font-bold text-leaf hover:bg-mint"><Link2 size={16} />Create invitation</button>
+          <button onClick={openCreate} className="inline-flex items-center justify-center gap-2 rounded-lg bg-leaf px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-leaf/90">
+            <Plus size={16} /> Add staff
+          </button>
+        </div>
       </div>
 
       {success && <p className="mt-4 rounded-xl border border-leaf/20 bg-mint p-3 text-sm font-semibold text-leaf">{success}</p>}
       {error && <p className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-700">{error}</p>}
+
+      {invitations.length > 0 && (
+        <section className="mt-4 rounded-xl border border-ink/10 bg-white p-4 shadow-sm">
+          <div className="flex items-center justify-between"><div><h2 className="font-display text-base font-bold text-ink">Registration invitations</h2><p className="mt-1 text-xs font-semibold text-ink/45">Single-use codes for joining this business.</p></div><span className="rounded-full bg-mint px-2.5 py-1 text-xs font-bold text-leaf">{invitations.filter((item) => item.status === "ACTIVE").length} active</span></div>
+          <div className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+            {invitations.slice(0, 6).map((invitation) => (
+              <article key={invitation.id} className="rounded-lg border border-ink/10 bg-[#f7faf9] p-3">
+                <div className="flex items-start justify-between gap-3"><div><p className="font-mono text-sm font-bold text-ink">{invitation.codePrefix || "Invitation"}</p><p className="mt-1 text-xs font-semibold text-ink/45">{invitation.role} · {invitation.branch?.name || "All branches"}</p></div><span className={`rounded-full px-2 py-1 text-[10px] font-bold ${invitation.status === "ACTIVE" ? "bg-mint text-leaf" : "bg-ink/5 text-ink/45"}`}>{invitation.status}</span></div>
+                {invitation.email && <p className="mt-2 truncate text-xs text-ink/55">{invitation.email}</p>}
+                <p className="mt-2 text-[11px] text-ink/35">Expires {new Date(invitation.expiresAt).toLocaleDateString()}</p>
+                {invitation.status === "ACTIVE" && <button onClick={() => void revokeInvite(invitation)} className="mt-3 text-xs font-bold text-red-600 hover:underline">Revoke</button>}
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="mt-4 overflow-hidden rounded-xl border border-ink/10 bg-white shadow-sm">
         <div className="overflow-x-auto">
@@ -408,6 +467,32 @@ export default function StaffPage() {
 
       {formOpen && <StaffFormModal mode={formMode} form={form} branches={branches} permissions={permissions} error={formError} isSubmitting={isSubmitting} onChange={setForm} onTogglePermission={togglePermission} onClose={() => setFormOpen(false)} onSubmit={save} />}
       {viewingStaff && <StaffDetailsModal member={viewingStaff} onClose={() => setViewingStaff(null)} />}
+      {inviteOpen && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-ink/40 p-4">
+          <form onSubmit={createInvite} className="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-xl bg-white p-5 shadow-soft">
+            <div className="flex items-start justify-between"><div><p className="text-xs font-bold uppercase tracking-[.08em] text-leaf">Invitation code</p><h2 className="mt-1 font-display text-lg font-bold text-ink">Invite someone to this business</h2></div><button type="button" onClick={() => setInviteOpen(false)} className="p-2 text-ink/40"><X size={18} /></button></div>
+            {inviteError && <p className="mt-4 rounded-lg bg-red-50 p-3 text-sm font-semibold text-red-600">{inviteError}</p>}
+            {createdCode ? (
+              <div className="mt-5 rounded-xl border border-leaf/20 bg-mint p-5 text-center">
+                <p className="text-xs font-bold uppercase tracking-[.1em] text-leaf/70">Copy this single-use code now</p>
+                <p className="mt-3 font-mono text-2xl font-black tracking-wider text-leaf">{createdCode}</p>
+                <button type="button" onClick={() => void navigator.clipboard.writeText(createdCode)} className="mt-4 inline-flex items-center gap-2 rounded-lg bg-leaf px-4 py-2 text-sm font-bold text-white"><Copy size={15} />Copy code</button>
+              </div>
+            ) : (
+              <>
+                <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                  <Field label="Invitee email (optional)" type="email" required={false} value={inviteForm.email} set={(value) => setInviteForm({ ...inviteForm, email: value })} />
+                  <label className="text-xs font-bold text-ink/55">Role<select value={inviteForm.role} onChange={(event) => setInviteForm({ ...inviteForm, role: event.target.value as Exclude<StaffRole, "OWNER"> })} className="mt-1 w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2.5 text-sm font-bold">{roles.map((role) => <option key={role}>{role}</option>)}</select></label>
+                  <label className="text-xs font-bold text-ink/55">Branch<select value={inviteForm.branchId} onChange={(event) => setInviteForm({ ...inviteForm, branchId: event.target.value })} className="mt-1 w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2.5 text-sm font-bold"><option value="">All branches</option>{branches.map((branch) => <option key={branch.id} value={branch.id}>{branch.name}</option>)}</select></label>
+                  <label className="text-xs font-bold text-ink/55">Expires in<select value={inviteForm.expiresInDays} onChange={(event) => setInviteForm({ ...inviteForm, expiresInDays: Number(event.target.value) })} className="mt-1 w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2.5 text-sm font-bold"><option value={1}>1 day</option><option value={3}>3 days</option><option value={7}>7 days</option><option value={14}>14 days</option><option value={30}>30 days</option></select></label>
+                </div>
+                {inviteForm.role === "CUSTOM" && <div className="mt-4 grid max-h-48 gap-2 overflow-y-auto sm:grid-cols-2">{permissions.map((permission) => <label key={permission} className="flex items-center gap-2 rounded-lg border border-ink/10 p-2 text-xs font-semibold"><input type="checkbox" checked={inviteForm.permissions.includes(permission)} onChange={() => setInviteForm((current) => ({ ...current, permissions: current.permissions.includes(permission) ? current.permissions.filter((item) => item !== permission) : [...current.permissions, permission] }))} />{permission}</label>)}</div>}
+                <button disabled={isInviting} className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg bg-leaf py-3 text-sm font-bold text-white disabled:opacity-60">{isInviting && <Loader2 size={15} className="animate-spin" />}Generate invitation code</button>
+              </>
+            )}
+          </form>
+        </div>
+      )}
     </div>
   );
 }

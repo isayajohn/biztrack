@@ -25,18 +25,22 @@ type ApiUser = {
 };
 
 type AuthResponse = {
-  token: string;
+  token: string | null;
   user: ApiUser;
   requiresEmailVerification?: boolean;
   verificationEmailSent?: boolean;
   verificationEmailError?: boolean;
+  requiresVerification?: boolean;
+  verificationMethod?: "EMAIL" | "PHONE";
+  verificationOtpSent?: boolean;
+  phoneNumberMasked?: string | null;
 };
 
 type ProfileResponse = {
   user: ApiUser;
 };
 
-type RegisterApiResult = RegisterResult & { token: string };
+type RegisterApiResult = RegisterResult & { token: string | null };
 
 function unwrap<T>(response: { data: { data: T } }): T {
   return response.data.data;
@@ -64,6 +68,7 @@ export async function login(email: string, password: string): Promise<User> {
   const result = unwrap<AuthResponse>(
     await apiClient.post("/auth/login", { email, password }),
   );
+  if (!result.token) throw new Error("Authentication token was not returned.");
   localStorage.setItem(AUTH_TOKEN_KEY, result.token);
   return mapApiUser(result.user);
 }
@@ -72,6 +77,7 @@ export async function loginWithGoogle(credential: string): Promise<User> {
   const result = unwrap<AuthResponse>(
     await apiClient.post("/auth/google", { credential }),
   );
+  if (!result.token) throw new Error("Authentication token was not returned.");
   localStorage.setItem(AUTH_TOKEN_KEY, result.token);
   return mapApiUser(result.user);
 }
@@ -86,15 +92,45 @@ export async function register(data: RegisterData): Promise<RegisterApiResult> {
       currency: data.currency,
       country: data.country ?? "Tanzania",
       packageId: data.packageId,
+      phone: data.phone,
+      invitationCode: data.invitationCode,
+      verificationMethod: data.verificationMethod,
     }),
   );
   return {
     token: result.token,
     user: mapApiUser(result.user),
+    requiresVerification: Boolean(result.requiresVerification ?? result.requiresEmailVerification),
     requiresEmailVerification: Boolean(result.requiresEmailVerification),
     verificationEmailSent: Boolean(result.verificationEmailSent),
     verificationEmailError: Boolean(result.verificationEmailError),
+    verificationMethod: result.verificationMethod ?? "EMAIL",
+    verificationOtpSent: Boolean(result.verificationOtpSent),
+    phoneNumberMasked: result.phoneNumberMasked,
   };
+}
+
+export type InvitationPreview = {
+  id: string;
+  businessName: string;
+  role: string;
+  branch?: { id: string; name: string } | null;
+  expiresAt: string;
+};
+
+export async function validateInvitation(code: string): Promise<InvitationPreview> {
+  return unwrap<InvitationPreview>(await apiClient.post("/auth/invitations/validate", { code }));
+}
+
+export async function verifyPhone(email: string, otp: string): Promise<User> {
+  const result = unwrap<AuthResponse>(await apiClient.post("/auth/verify-phone", { email, otp }));
+  if (!result.token) throw new Error("Authentication token was not returned.");
+  localStorage.setItem(AUTH_TOKEN_KEY, result.token);
+  return mapApiUser(result.user);
+}
+
+export async function resendPhoneVerification(email: string): Promise<{ message: string; sent: boolean }> {
+  return unwrap<{ message: string; sent: boolean }>(await apiClient.post("/auth/resend-phone-verification", { email }));
 }
 
 export async function getProfile(): Promise<User> {
@@ -106,6 +142,7 @@ export async function verifyEmail(token: string): Promise<User> {
   const result = unwrap<AuthResponse>(
     await apiClient.post("/auth/verify-email", { token }),
   );
+  if (!result.token) throw new Error("Authentication token was not returned.");
   localStorage.setItem(AUTH_TOKEN_KEY, result.token);
   return mapApiUser(result.user);
 }

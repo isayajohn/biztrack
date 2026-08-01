@@ -73,13 +73,15 @@ class LandingPageContentSeeder extends Seeder
             'features_title' => 'Powerful features, simple enough for anyone',
             'features_description' => 'BizTrack packs everything a small business owner needs into a clean, easy-to-use interface.',
             'features' => [
-                ['title' => 'Sales Tracking', 'description' => 'Record every sale in seconds. Know exactly what sold, when, and for how much — all in one searchable history.', 'iconName' => 'ReceiptText', 'imageUrl' => ''],
-                ['title' => 'Expense Tracking', 'description' => 'Log rent, transport, stock purchases, and any other cost. Never lose an expense record again.', 'iconName' => 'WalletCards', 'imageUrl' => ''],
-                ['title' => 'Product & Stock Management', 'description' => 'Add your products, set quantities, and get alerts when stock runs low before you miss a sale.', 'iconName' => 'Boxes', 'imageUrl' => ''],
-                ['title' => 'Daily Profit Dashboard', 'description' => 'See your net profit at a glance every day. No spreadsheets, no mental math — just clear numbers.', 'iconName' => 'BarChart3', 'imageUrl' => ''],
-                ['title' => 'Simple Business Reports', 'description' => 'Weekly and monthly summaries of your sales, expenses, and top-performing products in plain language.', 'iconName' => 'FileText', 'imageUrl' => ''],
-                ['title' => 'Debts & Credit Management', 'description' => "Track customer and supplier debts automatically, record payments, and send SMS, WhatsApp, and email reminders before and after they're due.", 'iconName' => 'HandCoins', 'imageUrl' => ''],
-                ['title' => 'Mobile-Friendly Design', 'description' => 'Built for phones first. Use BizTrack on your Android or iPhone with no downloads required.', 'iconName' => 'Smartphone', 'imageUrl' => ''],
+                ['title' => 'Executive Dashboard', 'description' => 'Real-time revenue, profit, and cash flow at a glance — across every business.', 'iconName' => 'BarChart3', 'imageUrl' => ''],
+                ['title' => 'AI Copilot', 'description' => 'Daily summaries and recommendations that explain what is happening and why.', 'iconName' => 'Bot', 'imageUrl' => ''],
+                ['title' => 'Invoices & Sales', 'description' => 'Create, send, and track invoices and sales with status the moment they change.', 'iconName' => 'ReceiptText', 'imageUrl' => ''],
+                ['title' => 'Inventory Management', 'description' => 'Live stock levels with automatic low-stock alerts before you run out.', 'iconName' => 'Boxes', 'imageUrl' => ''],
+                ['title' => 'Customers & Suppliers', 'description' => 'One profile per relationship — purchase history, balances, and contact info.', 'iconName' => 'Users', 'imageUrl' => ''],
+                ['title' => 'Finance Reports', 'description' => 'P&L, cash flow, and expense breakdowns generated automatically, always current.', 'iconName' => 'FileText', 'imageUrl' => ''],
+                ['title' => 'Automations', 'description' => 'Recurring invoices, reminders, and workflows that run without you touching them.', 'iconName' => 'Repeat2', 'imageUrl' => ''],
+                ['title' => 'Multi-Country & Multi-Currency', 'description' => 'Pick your country and currency during onboarding. BizTrack adapts.', 'iconName' => 'Globe2', 'imageUrl' => ''],
+                ['title' => 'Installable PWA', 'description' => 'Add to your home screen on iOS and Android. No app store required.', 'iconName' => 'Smartphone', 'imageUrl' => ''],
             ],
 
             // How it works
