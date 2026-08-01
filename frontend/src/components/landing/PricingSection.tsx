@@ -3,6 +3,7 @@ import { ArrowRight, Check } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getPublicPackages, type PublicPackage } from "../../services/landingApi";
 import { formatCurrency } from "../../utils/format";
+import { useLandingLanguage } from "../../i18n/LandingLanguageContext";
 
 type Plan = {
   name: string;
@@ -27,24 +28,24 @@ type PricingContent = {
   buttonUrl?: unknown;
 };
 
-function limitLabel(label: string, value: number) {
+function limitLabel(label: string, value: number, isSwahili = false) {
   if (value === 0) return null;
-  return `Up to ${value.toLocaleString()} ${label}`;
+  return `${isSwahili ? "Hadi" : "Up to"} ${value.toLocaleString()} ${label}`;
 }
 
-function packageFeatures(plan: PublicPackage) {
+function packageFeatures(plan: PublicPackage, isSwahili = false) {
   return [
-    limitLabel("businesses", plan.limits.maxBusinesses),
-    limitLabel("users", plan.limits.maxUsers),
-    limitLabel("products", plan.limits.maxProducts),
-    limitLabel("sales per month", plan.limits.maxSalesPerMonth),
-    limitLabel("expenses per month", plan.limits.maxExpensesPerMonth),
-    plan.features.allowReports ? "Reports dashboard" : null,
-    plan.features.allowPdfExport ? "PDF exports" : null,
-    plan.features.allowCsvExport ? "CSV exports" : null,
-    plan.features.allowInventoryAlerts ? "Inventory alerts" : null,
-    plan.features.allowAiInsights ? "AI insights" : null,
-    plan.trialDays > 0 ? `${plan.trialDays}-day trial` : null,
+    limitLabel(isSwahili ? "biashara" : "businesses", plan.limits.maxBusinesses, isSwahili),
+    limitLabel(isSwahili ? "watumiaji" : "users", plan.limits.maxUsers, isSwahili),
+    limitLabel(isSwahili ? "bidhaa" : "products", plan.limits.maxProducts, isSwahili),
+    limitLabel(isSwahili ? "mauzo kwa mwezi" : "sales per month", plan.limits.maxSalesPerMonth, isSwahili),
+    limitLabel(isSwahili ? "matumizi kwa mwezi" : "expenses per month", plan.limits.maxExpensesPerMonth, isSwahili),
+    plan.features.allowReports ? (isSwahili ? "Dashibodi ya ripoti" : "Reports dashboard") : null,
+    plan.features.allowPdfExport ? (isSwahili ? "Pakua PDF" : "PDF exports") : null,
+    plan.features.allowCsvExport ? (isSwahili ? "Pakua CSV" : "CSV exports") : null,
+    plan.features.allowInventoryAlerts ? (isSwahili ? "Tahadhari za stoo" : "Inventory alerts") : null,
+    plan.features.allowAiInsights ? (isSwahili ? "Uchambuzi wa AI" : "AI insights") : null,
+    plan.trialDays > 0 ? `${plan.trialDays} ${isSwahili ? "siku za majaribio" : "day trial"}` : null,
   ].filter((feature): feature is string => Boolean(feature));
 }
 
@@ -107,6 +108,7 @@ type Props = {
 };
 
 export default function PricingSection({ eyebrow, title, description, pricing }: Props) {
+  const { isSwahili } = useLandingLanguage();
   const [packages, setPackages] = useState<PublicPackage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const contentPlans = useMemo(() => contentPlansFrom(pricing), [pricing]);
@@ -152,25 +154,25 @@ export default function PricingSection({ eyebrow, title, description, pricing }:
         price: packagePrice(plan),
         period: packagePeriod(plan),
         description: packageDescription(plan),
-        features: packageFeatures(plan),
-        cta: packageCta(plan),
+        features: packageFeatures(plan, isSwahili),
+        cta: isSwahili ? (plan.priceMonthly === 0 ? "Anza Bure" : plan.trialDays > 0 ? "Anza Majaribio" : "Anza Sasa") : packageCta(plan),
         to: `/register?package=${encodeURIComponent(plan.slug)}`,
         highlighted,
-        badge: highlighted && packages.length > 1 ? "Most Popular" : undefined,
+        badge: highlighted && packages.length > 1 ? (isSwahili ? "Inapendwa Zaidi" : "Most Popular") : undefined,
       };
     });
-  }, [contentPlans, packages]);
+  }, [contentPlans, packages, isSwahili]);
 
   return (
     <section id="pricing" className="scroll-mt-20 border-t border-white/5 bg-[#0a0c0b] py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#12e4d7]">{eyebrow || "Pricing"}</p>
+          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#12e4d7]">{isSwahili ? "Bei" : eyebrow || "Pricing"}</p>
           <h2 className="mt-5 font-display text-4xl font-semibold tracking-[-0.045em] text-white sm:text-5xl lg:text-6xl">
-            {title || <>Simple, transparent <span className="text-white/[0.35]">pricing.</span></>}
+            {isSwahili ? <>Bei rahisi na <span className="text-white/[0.35]">wazi.</span></> : title || <>Simple, transparent <span className="text-white/[0.35]">pricing.</span></>}
           </h2>
           <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-white/[0.45]">
-            {description || "Start free. Upgrade when your business is ready. No hidden fees and no long contracts."}
+            {isSwahili ? "Anza bure. Boresha kifurushi biashara yako inapokuwa tayari. Hakuna gharama zilizofichwa wala mikataba mirefu." : description || "Start free. Upgrade when your business is ready. No hidden fees and no long contracts."}
           </p>
         </div>
 
@@ -211,16 +213,16 @@ export default function PricingSection({ eyebrow, title, description, pricing }:
           </div>
         ) : (
           <div className="mt-14 rounded-[1.75rem] border border-white/10 bg-white/[0.03] p-8 text-center">
-            <p className="font-display text-xl font-bold text-white">Packages are being updated.</p>
+            <p className="font-display text-xl font-bold text-white">{isSwahili ? "Vifurushi vinasasishwa." : "Packages are being updated."}</p>
             <p className="mt-2 text-sm font-semibold leading-6 text-white/40">
-              Please check back soon or create an account to use the default package.
+              {isSwahili ? "Tafadhali rudi tena hivi karibuni au fungua akaunti kutumia kifurushi cha kawaida." : "Please check back soon or create an account to use the default package."}
             </p>
           </div>
         )}
 
         {plans.some((plan) => plan.features.some((feature) => feature.toLowerCase().includes("trial"))) && (
           <p className="mt-8 text-center text-sm font-semibold text-white/[0.35]">
-            Trial length is based on the package configured by admin. No credit card required to start.
+            {isSwahili ? "Muda wa majaribio unategemea kifurushi kilichowekwa. Huhitaji kadi ya benki kuanza." : "Trial length is based on the package configured by admin. No credit card required to start."}
           </p>
         )}
       </div>

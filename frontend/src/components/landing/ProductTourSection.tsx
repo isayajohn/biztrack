@@ -7,9 +7,11 @@ import {
   Landmark,
   ReceiptText,
   Repeat2,
+  ShoppingCart,
   Users,
   type LucideIcon,
 } from "lucide-react";
+import { useLandingLanguage } from "../../i18n/LandingLanguageContext";
 
 type PanelData = {
   title: string;
@@ -29,6 +31,27 @@ type TourSlide = {
 
 const SLIDES: TourSlide[] = [
   { id: "dashboard", label: "Dashboard", icon: BarChart3, image: "/landing-dashboard.png", caption: "Revenue, profit, and cash flow — live, across every business." },
+  {
+    id: "pos",
+    label: "POS",
+    icon: ShoppingCart,
+    caption: "Serve customers faster with a simple checkout built for busy counters.",
+    panel: {
+      title: "Point of Sale",
+      accent: "cyan",
+      metrics: [
+        { label: "Today's sales", value: "TZS 842K", trend: "+18%" },
+        { label: "Transactions", value: "128" },
+        { label: "Average basket", value: "TZS 65K" },
+      ],
+      rows: [
+        { left: "Quick product search", right: "Ready" },
+        { left: "Cash & mobile money", right: "Connected" },
+        { left: "Discounts and tax", right: "Automatic" },
+        { left: "Receipt", right: "Print or share" },
+      ],
+    },
+  },
   { id: "invoices", label: "Invoices", icon: ReceiptText, image: "/landing-invoices.png", caption: "Send invoices in seconds and watch payment status update in real time." },
   { id: "inventory", label: "Inventory", icon: Boxes, image: "/landing-inventory.png", caption: "Live stock levels with automatic low-stock alerts before you run out." },
   { id: "copilot", label: "AI Copilot", icon: Bot, image: "/landing-copilot.png", caption: "Ask anything about your business and get answers grounded in your data." },
@@ -165,34 +188,47 @@ function LivePanel({ panel }: { panel: PanelData }) {
 }
 
 export default function ProductTourSection() {
+  const { isSwahili } = useLandingLanguage();
   const [activeIndex, setActiveIndex] = useState(0);
   const [paused, setPaused] = useState(false);
-  const active = SLIDES[activeIndex];
+  const swLabels: Record<string, [string, string]> = {
+    dashboard: ["Dashibodi", "Mapato, faida na mtiririko wa fedha — moja kwa moja katika kila biashara."],
+    pos: ["POS", "Hudumia wateja haraka kwa sehemu rahisi ya malipo iliyoundwa kwa kaunta zenye shughuli nyingi."],
+    invoices: ["Ankara", "Tuma ankara kwa sekunde na fuatilia hali ya malipo papo hapo."],
+    inventory: ["Stoo", "Kiasi cha bidhaa moja kwa moja na tahadhari kabla bidhaa hazijaisha."],
+    copilot: ["Msaidizi wa AI", "Uliza kuhusu biashara yako na upate majibu yanayotegemea takwimu zako."],
+    finance: ["Fedha", "Daftari la akaunti nyingi lenye mtiririko wa fedha wa moja kwa moja."],
+    customers: ["Wateja", "Wasifu mmoja kwa kila mteja — historia, salio na uchambuzi."],
+    reports: ["Ripoti", "Faida, mtiririko wa fedha na matumizi — vinatengenezwa kiotomatiki."],
+    automations: ["Otomatiki", "Vikumbusho na tahadhari zinazoendelea kufanya kazi bila usimamizi wako."],
+  };
+  const slides = useMemo(() => isSwahili ? SLIDES.map((slide) => ({ ...slide, label: swLabels[slide.id]?.[0] || slide.label, caption: swLabels[slide.id]?.[1] || slide.caption })) : SLIDES, [isSwahili]);
+  const active = slides[activeIndex];
 
   useEffect(() => {
     if (paused) return;
-    const timer = window.setTimeout(() => setActiveIndex((index) => (index + 1) % SLIDES.length), 5200);
+    const timer = window.setTimeout(() => setActiveIndex((index) => (index + 1) % slides.length), 5200);
     return () => window.clearTimeout(timer);
-  }, [activeIndex, paused]);
+  }, [activeIndex, paused, slides.length]);
 
-  const activePosition = useMemo(() => `${((activeIndex + 1) / SLIDES.length) * 100}%`, [activeIndex]);
+  const activePosition = useMemo(() => `${((activeIndex + 1) / slides.length) * 100}%`, [activeIndex, slides.length]);
 
   return (
     <section id="product-tour" className="relative border-t border-white/5 bg-[#070b18] py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/[0.055] px-3 py-1.5 text-xs font-semibold text-emerald-300">
-            <span className="text-sm">✣</span> Product Tour
+            <span className="text-sm">✣</span> {isSwahili ? "Tembelea Bidhaa" : "Product Tour"}
           </span>
           <h2 className="mt-5 font-display text-4xl font-semibold tracking-[-0.045em] text-white sm:text-5xl lg:text-6xl">
-            See it work. <span className="text-white/45">Live.</span>
+            {isSwahili ? <>Ione ikifanya kazi. <span className="text-white/45">Moja kwa moja.</span></> : <>See it work. <span className="text-white/45">Live.</span></>}
           </h2>
-          <p className="mt-6 text-base text-white/55 sm:text-lg">Every module in BizTrack — hover to pause, click to explore.</p>
+          <p className="mt-6 text-base text-white/55 sm:text-lg">{isSwahili ? "Kila sehemu ya BizTrack — elekeza kipanya kusimamisha, bofya kuchunguza." : "Every module in BizTrack — hover to pause, click to explore."}</p>
         </div>
 
         <div className="mt-12 flex justify-center">
           <div role="tablist" className="inline-flex max-w-full flex-wrap justify-center gap-1 rounded-full border border-white/10 bg-white/[0.03] p-1">
-            {SLIDES.map((slide, index) => {
+            {slides.map((slide, index) => {
               const Icon = slide.icon;
               const selected = index === activeIndex;
               return (
@@ -237,11 +273,11 @@ export default function ProductTourSection() {
           {!paused && <div key={`progress-${active.id}`} className="animate-tour-progress absolute -bottom-2 left-6 right-6 h-0.5 origin-left rounded-full bg-gradient-to-r from-emerald-400/80 via-cyan-300/60 to-transparent" />}
           <p key={`caption-${active.id}`} className="animate-fade-up mt-8 text-center text-sm text-white/60 sm:text-base">{active.caption}</p>
           <div className="mt-5 flex justify-center gap-1.5">
-            {SLIDES.map((slide, index) => (
+            {slides.map((slide, index) => (
               <button
                 key={slide.id}
                 onClick={() => setActiveIndex(index)}
-                aria-label={`Go to ${slide.label}`}
+                aria-label={`${isSwahili ? "Nenda" : "Go to"} ${slide.label}`}
                 className={`h-1.5 rounded-full transition-all duration-500 ${index === activeIndex ? "w-8 bg-emerald-400" : "w-1.5 bg-white/20 hover:bg-white/40"}`}
               />
             ))}

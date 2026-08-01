@@ -15,6 +15,7 @@ import {
   Zap,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useLandingLanguage } from "../../i18n/LandingLanguageContext";
 
 const TOUR_TABS = [
   { label: "Dashboard", icon: BarChart3 },
@@ -219,23 +220,28 @@ const AI_ANSWERS: Record<string, string> = {
 };
 
 export function AiCopilotSection() {
-  const questions = Object.keys(AI_ANSWERS);
+  const { isSwahili } = useLandingLanguage();
+  const answers = isSwahili ? {
+    "Mwezi wangu bora ulikuwa upi?": "Juni ulikuwa mwezi wako bora zaidi, ukiwa na mapato ya TZS 18.4M na faida ghafi ya 41%.",
+    "Ninadaiwa kiasi gani na wasambazaji?": "Unadaiwa TZS 6.8M katika akaunti 12 za wasambazaji. TZS 1.2M inatakiwa kulipwa wiki hii.",
+    "Nionyeshe mwenendo wa faida.": "Faida imeongezeka kwa miezi mitatu mfululizo, kwa jumla ya 22% tangu Mei.",
+  } : AI_ANSWERS;
+  const questions = Object.keys(answers);
   const [question, setQuestion] = useState(questions[0]);
-  const answer = AI_ANSWERS[question];
+  const activeQuestion = Object.prototype.hasOwnProperty.call(answers, question) ? question : questions[0];
+  const answer = answers[activeQuestion];
 
   return (
     <section id="ai-copilot" className="border-t border-white/5 bg-[#080a09] py-24 sm:py-32">
       <div className="mx-auto grid max-w-7xl gap-12 px-5 sm:px-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#12e4d7]">AI Copilot</p>
-          <h2 className="mt-5 max-w-xl font-display text-4xl font-semibold tracking-[-0.045em] text-white sm:text-6xl">
-            Ask your business <span className="text-white/[0.35]">anything.</span>
-          </h2>
+          <h2 className="mt-5 max-w-xl font-display text-4xl font-semibold tracking-[-0.045em] text-white sm:text-6xl">{isSwahili ? <>Uliza biashara yako <span className="text-white/[0.35]">chochote.</span></> : <>Ask your business <span className="text-white/[0.35]">anything.</span></>}</h2>
           <p className="mt-6 max-w-xl text-base leading-8 text-white/[0.45] sm:text-lg">
-            BizTrack reads your sales, expenses, stock and customer activity, then explains what is happening in plain language.
+            {isSwahili ? "BizTrack inasoma mauzo, matumizi, stoo na shughuli za wateja, kisha inaeleza kinachoendelea kwa lugha rahisi." : "BizTrack reads your sales, expenses, stock and customer activity, then explains what is happening in plain language."}
           </p>
           <ul className="mt-8 space-y-4 text-sm font-semibold text-white/[0.65]">
-            {["Daily business summaries", "Actionable recommendations", "Answers grounded in your live numbers"].map((item) => (
+            {(isSwahili ? ["Muhtasari wa biashara wa kila siku", "Mapendekezo yanayoweza kutekelezwa", "Majibu yanayotegemea takwimu zako"] : ["Daily business summaries", "Actionable recommendations", "Answers grounded in your live numbers"]).map((item) => (
               <li key={item} className="flex items-center gap-3">
                 <span className="grid h-6 w-6 place-items-center rounded-full bg-[#12e4d7]/10 text-[#12e4d7]"><Check size={14} /></span>
                 {item}
@@ -250,11 +256,11 @@ export function AiCopilotSection() {
               <span className="grid h-11 w-11 place-items-center rounded-2xl bg-[#12e4d7] text-[#06110f]"><Bot size={22} /></span>
               <div>
                 <p className="font-display text-base font-bold text-white">BizTrack Copilot</p>
-                <p className="mt-0.5 text-xs text-[#12e4d7]">Connected to your live data</p>
+                <p className="mt-0.5 text-xs text-[#12e4d7]">{isSwahili ? "Imeunganishwa na taarifa zako" : "Connected to your live data"}</p>
               </div>
             </div>
             <div className="min-h-[210px] py-7">
-              <div className="ml-auto max-w-[86%] rounded-2xl rounded-br-md bg-white/[0.08] px-4 py-3 text-sm text-white/75">{question}</div>
+              <div className="ml-auto max-w-[86%] rounded-2xl rounded-br-md bg-white/[0.08] px-4 py-3 text-sm text-white/75">{activeQuestion}</div>
               <div className="mt-5 flex gap-3">
                 <span className="mt-1 grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-[#12e4d7] text-[#06110f]"><Sparkles size={15} /></span>
                 <p className="rounded-2xl rounded-tl-md border border-[#12e4d7]/10 bg-[#12e4d7]/[0.055] px-4 py-3 text-sm leading-7 text-white/70">{answer}</p>
@@ -288,18 +294,27 @@ const COMPARISON_ROWS = [
 ];
 
 export function ComparisonSection() {
+  const { isSwahili } = useLandingLanguage();
+  const rows = isSwahili ? [
+    ["Kasi", "Karatasi na kazi za mikono", "Papo hapo na kiotomatiki"],
+    ["Ufikiaji", "Kifaa kimoja, faili za ndani", "Mtandaoni, kutoka popote"],
+    ["Usalama", "Vitabu hupotea, hakuna nakala", "Imesimbwa na kuhifadhiwa salama"],
+    ["Vifaa", "Kompyuta pekee", "Simu, tableti na kompyuta"],
+    ["Uchambuzi", "Makisio", "Uchambuzi unaotumia AI"],
+    ["Ripoti", "Saa nyingi za jedwali", "Kiotomatiki na papo hapo"],
+  ] : COMPARISON_ROWS;
   return (
     <section id="why-biztrack" className="border-t border-white/5 bg-[#090b0a] py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
-        <SectionHeading eyebrow="Why BizTrack" title="Built for how Africa" muted="does business." />
+        <SectionHeading eyebrow={isSwahili ? "Kwa nini BizTrack" : "Why BizTrack"} title={isSwahili ? "Imejengwa kwa jinsi Afrika" : "Built for how Africa"} muted={isSwahili ? "inavyofanya biashara." : "does business."} />
         <div className="mt-14 grid gap-4 lg:grid-cols-2">
           <article className="rounded-[2rem] border border-white/10 bg-white/[0.025] p-6 sm:p-8">
             <div className="flex items-center gap-3">
               <span className="grid h-10 w-10 place-items-center rounded-xl bg-rose-400/10 text-rose-300"><X size={19} /></span>
-              <h3 className="font-display text-xl font-bold text-white/[0.65]">Traditional tools</h3>
+              <h3 className="font-display text-xl font-bold text-white/[0.65]">{isSwahili ? "Zana za kawaida" : "Traditional tools"}</h3>
             </div>
             <div className="mt-7 divide-y divide-white/8">
-              {COMPARISON_ROWS.map(([label, traditional]) => (
+              {rows.map(([label, traditional]) => (
                 <div key={label} className="grid grid-cols-[110px_1fr] gap-4 py-4 text-sm">
                   <span className="font-semibold text-white/25">{label}</span>
                   <span className="text-white/[0.45]">{traditional}</span>
@@ -314,7 +329,7 @@ export function ComparisonSection() {
               <h3 className="font-display text-xl font-bold text-white">BizTrack</h3>
             </div>
             <div className="relative mt-7 divide-y divide-white/8">
-              {COMPARISON_ROWS.map(([label, , biztrack]) => (
+              {rows.map(([label, , biztrack]) => (
                 <div key={label} className="grid grid-cols-[110px_1fr] gap-4 py-4 text-sm">
                   <span className="font-semibold text-white/30">{label}</span>
                   <span className="flex items-center gap-2 font-semibold text-white/80"><Check size={15} className="text-[#12e4d7]" />{biztrack}</span>
@@ -325,12 +340,17 @@ export function ComparisonSection() {
         </div>
 
         <div className="mt-14 grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-white/[0.08] bg-white/[0.08] lg:grid-cols-4">
-          {[
+          {(isSwahili ? [
+            ["24/7", "Fikia biashara yako"],
+            ["100%", "Inafanya kazi mtandaoni"],
+            ["Papo hapo", "Ripoti na tahadhari"],
+            ["Chanzo kimoja", "Cha taarifa sahihi"],
+          ] : [
             ["24/7", "Access your business"],
             ["100%", "Cloud based"],
             ["Real time", "Reports and alerts"],
             ["One", "Source of truth"],
-          ].map(([value, label]) => (
+          ]).map(([value, label]) => (
             <div key={label} className="bg-[#0b0e0c] px-5 py-9 text-center">
               <p className="font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">{value}</p>
               <p className="mt-2 text-xs font-semibold uppercase tracking-wider text-white/30">{label}</p>
@@ -343,19 +363,20 @@ export function ComparisonSection() {
 }
 
 export function ContactSection() {
+  const { isSwahili } = useLandingLanguage();
   const email = "info@afrigotech.com";
   const contactCards = useMemo(() => [
-    { icon: CircleDollarSign, title: "Start free", text: "Create your workspace and record your first transaction today.", href: "/register", internal: true },
-    { icon: PackageCheck, title: "Talk to us", text: "Questions, demos and partnerships — reach a real person.", href: `mailto:${email}`, internal: false },
-    { icon: BarChart3, title: "Explore the product", text: "See how dashboard, sales, stock and reporting work together.", href: "#product-tour", internal: false },
-  ], []);
+    { icon: CircleDollarSign, title: isSwahili ? "Anza bure" : "Start free", text: isSwahili ? "Fungua eneo lako la kazi na urekodi muamala wa kwanza leo." : "Create your workspace and record your first transaction today.", href: "/register", internal: true },
+    { icon: PackageCheck, title: isSwahili ? "Ongea nasi" : "Talk to us", text: isSwahili ? "Maswali, maonyesho na ushirikiano — ongea na mtu halisi." : "Questions, demos and partnerships — reach a real person.", href: `mailto:${email}`, internal: false },
+    { icon: BarChart3, title: isSwahili ? "Chunguza bidhaa" : "Explore the product", text: isSwahili ? "Ona jinsi dashibodi, mauzo, stoo na ripoti zinavyofanya kazi pamoja." : "See how dashboard, sales, stock and reporting work together.", href: "#product-tour", internal: false },
+  ], [isSwahili]);
 
   return (
     <section id="contact" className="border-t border-white/5 bg-[#070908] py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
-        <SectionHeading eyebrow="Get in touch" title="Talk to a" muted="real human." />
+        <SectionHeading eyebrow={isSwahili ? "Wasiliana nasi" : "Get in touch"} title={isSwahili ? "Ongea na" : "Talk to a"} muted={isSwahili ? "mtu halisi." : "real human."} />
         <p className="mx-auto mt-6 max-w-2xl text-center text-base leading-7 text-white/[0.45]">
-          Questions, product demos or partnerships — we are ready to help you build a clearer business.
+          {isSwahili ? "Maswali, maonyesho ya bidhaa au ushirikiano — tuko tayari kukusaidia kujenga biashara yenye uwazi zaidi." : "Questions, product demos or partnerships — we are ready to help you build a clearer business."}
         </p>
         <div className="mt-12 grid gap-4 md:grid-cols-3">
           {contactCards.map(({ icon: Icon, title, text, href, internal }) => {

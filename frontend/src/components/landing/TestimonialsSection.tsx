@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Quote, Star } from "lucide-react";
+import { useLandingLanguage } from "../../i18n/LandingLanguageContext";
 
 export type Testimonial = {
   name: string;
@@ -145,8 +146,21 @@ type Props = {
 };
 
 export default function TestimonialsSection({ eyebrow, title, description, testimonials }: Props) {
+  const { isSwahili } = useLandingLanguage();
   const [startIndex, setStartIndex] = useState(0);
-  const visibleSource = useMemo(() => normalizeTestimonials(testimonials), [testimonials]);
+  const visibleSource = useMemo(() => {
+    const source = normalizeTestimonials(testimonials);
+    if (!isSwahili) return source;
+    const swQuotes = [
+      "Kabla ya BizTrack sikujua faida halisi niliyokuwa napata. Sasa naangalia dashibodi kila asubuhi na ninasimamia duka langu kwa uhakika.",
+      "Nilikuwa naandika matengenezo na vipuri kwenye daftari na kupoteza kurasa. BizTrack imeweka kila kitu kidijitali na sasa najua huduma yenye faida zaidi.",
+      "Kufuatilia mauzo ya chakula ilikuwa vigumu. BizTrack ni ya haraka—narekodi mauzo kwa sekunde na mwisho wa siku naona faida yangu halisi.",
+      "Tahadhari za stoo pekee zina thamani kubwa. Sasa napata onyo kabla bidhaa muhimu hazijaisha.",
+      "Nilikuwa na wasiwasi kutumia programu, lakini BizTrack ni rahisi. Sihitaji ujuzi wa uhasibu kuona faida yangu.",
+      "Nauza katika masoko matatu tofauti. BizTrack inapanga matumizi yote na ripoti ya wiki inaonyesha soko lenye faida zaidi.",
+    ];
+    return source.map((item, index) => ({ ...item, role: item.role === "Owner" ? "Mmiliki" : item.role === "Founder" ? "Mwanzilishi" : item.role === "Farmer" ? "Mkulima" : item.role === "Freelancer" ? "Mtoa huduma" : item.role, text: swQuotes[index % swQuotes.length] }));
+  }, [testimonials, isSwahili]);
 
   const movePrevious = () => {
     setStartIndex((current) => (current + 1) % visibleSource.length);
@@ -180,11 +194,11 @@ export default function TestimonialsSection({ eyebrow, title, description, testi
     >
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <div className="mx-auto mb-14 max-w-3xl text-center">
-          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#12e4d7]">{eyebrow || "Testimonials"}</p>
+          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#12e4d7]">{isSwahili ? "Ushuhuda" : eyebrow || "Testimonials"}</p>
           <h2 id="testimonials-heading" className="mt-5 font-display text-4xl font-semibold tracking-[-0.045em] text-white sm:text-5xl lg:text-6xl">
-            {title || <>Loved by ambitious <span className="text-white/[0.35]">operators.</span></>}
+            {isSwahili ? <>Inapendwa na wajasiriamali <span className="text-white/[0.35]">wenye malengo.</span></> : title || <>Loved by ambitious <span className="text-white/[0.35]">operators.</span></>}
           </h2>
-          {description && <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-white/[0.45]">{description}</p>}
+          {(description || isSwahili) && <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-white/[0.45]">{isSwahili ? "Sikia kutoka kwa wamiliki wa biashara wanaotumia BizTrack kufanya maamuzi bora kila siku." : description}</p>}
         </div>
 
         <div className="relative">
@@ -192,7 +206,7 @@ export default function TestimonialsSection({ eyebrow, title, description, testi
             type="button"
             onClick={movePrevious}
             className="absolute left-0 top-1/2 z-10 inline-flex h-11 w-11 -translate-x-3 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-[#141816] text-white/60 transition-all hover:border-[#12e4d7]/30 hover:text-[#12e4d7] sm:-translate-x-5 lg:-translate-x-6"
-            aria-label="Previous testimonials"
+            aria-label={isSwahili ? "Ushuhuda uliopita" : "Previous testimonials"}
           >
             <ChevronLeft size={20} aria-hidden="true" />
           </button>
@@ -200,7 +214,7 @@ export default function TestimonialsSection({ eyebrow, title, description, testi
             type="button"
             onClick={moveNext}
             className="absolute right-0 top-1/2 z-10 inline-flex h-11 w-11 translate-x-3 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-[#141816] text-white/60 transition-all hover:border-[#12e4d7]/30 hover:text-[#12e4d7] sm:translate-x-5 lg:translate-x-6"
-            aria-label="Next testimonials"
+            aria-label={isSwahili ? "Ushuhuda unaofuata" : "Next testimonials"}
           >
             <ChevronRight size={20} aria-hidden="true" />
           </button>

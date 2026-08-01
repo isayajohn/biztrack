@@ -80,6 +80,7 @@ import AdminSubscriptionsPage from "./pages/admin/AdminSubscriptionsPage";
 import AdminUserDetailPage from "./pages/admin/AdminUserDetailPage";
 import AdminUsersPage from "./pages/admin/AdminUsersPage";
 import { muiTheme } from "./theme";
+import { LandingLanguageProvider } from "./i18n/LandingLanguageContext";
 import "./styles.css";
 
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";
@@ -91,6 +92,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <BrowserRouter>
           <AppAlertProvider>
             <AuthProvider>
+              <LandingLanguageProvider>
               <Routes>
             {/* Public routes */}
             <Route path="/" element={<LandingPage />} />
@@ -185,6 +187,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               </Route>
             </Route>
               </Routes>
+              </LandingLanguageProvider>
             </AuthProvider>
           </AppAlertProvider>
         </BrowserRouter>

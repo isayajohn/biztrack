@@ -18,6 +18,7 @@ import { getLandingPageContent } from "../services/landingApi";
 import type { PublicLandingPageContent } from "../services/landingApi";
 import { useSeo } from "../hooks/useSeo";
 import { DEFAULT_DESCRIPTION, DEFAULT_TITLE, SITE_URL } from "../constants/seo";
+import { useLandingLanguage } from "../i18n/LandingLanguageContext";
 
 function optionalText(value?: string | null) {
   const trimmed = value?.trim();
@@ -31,6 +32,7 @@ function textFrom(value: unknown) {
 }
 
 export default function LandingPage() {
+  const { isSwahili } = useLandingLanguage();
   const pageRef = useRef<HTMLDivElement | null>(null);
   const [content, setContent] = useState<PublicLandingPageContent | null>(null);
 
@@ -50,8 +52,8 @@ export default function LandingPage() {
     };
   }, []);
 
-  const seoTitle = content?.seoTitle || DEFAULT_TITLE;
-  const seoDescription = content?.seoDescription || DEFAULT_DESCRIPTION;
+  const seoTitle = isSwahili ? "BizTrack | Mfumo wa usimamizi wa biashara kwa Afrika" : content?.seoTitle || DEFAULT_TITLE;
+  const seoDescription = isSwahili ? "Simamia POS, mauzo, stoo, matumizi, madeni, wateja, timu na ripoti kwa wakati halisi ukitumia BizTrack." : content?.seoDescription || DEFAULT_DESCRIPTION;
 
   const structuredData = useMemo(() => {
     const faqs = Array.isArray(content?.faqs)
