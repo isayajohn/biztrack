@@ -3,17 +3,17 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import LandingNavbar from "../components/landing/LandingNavbar";
 import HeroSection from "../components/landing/HeroSection";
-import DashboardPreview from "../components/landing/DashboardPreview";
-import ProblemSection from "../components/landing/ProblemSection";
-import SolutionSection from "../components/landing/SolutionSection";
 import FeaturesSection from "../components/landing/FeaturesSection";
-import HowItWorksSection from "../components/landing/HowItWorksSection";
 import PricingSection from "../components/landing/PricingSection";
 import TestimonialsSection from "../components/landing/TestimonialsSection";
-import FAQSection from "../components/landing/FAQSection";
 import FinalCTA from "../components/landing/FinalCTA";
-import MobileAppSection from "../components/landing/MobileAppSection";
 import LandingFooter from "../components/landing/LandingFooter";
+import ProductTourSection from "../components/landing/ProductTourSection";
+import {
+  AiCopilotSection,
+  ComparisonSection,
+  ContactSection,
+} from "../components/landing/ExperienceSections";
 import { getLandingPageContent } from "../services/landingApi";
 import type { PublicLandingPageContent } from "../services/landingApi";
 import { useSeo } from "../hooks/useSeo";
@@ -146,7 +146,7 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div ref={pageRef} className="min-h-screen bg-cloud text-ink">
+    <div ref={pageRef} className="min-h-screen bg-[#050706] text-white">
       <LandingNavbar />
       <main>
         <HeroSection
@@ -161,40 +161,26 @@ export default function LandingPage() {
           imageUrl={optionalText(content?.heroImageUrl)}
           trustIndicators={content?.heroTrustIndicators}
         />
-        <DashboardPreview />
-        <ProblemSection content={content?.problemSection} />
-        <SolutionSection content={content?.solutionSection} />
+        <ProductTourSection />
         <FeaturesSection
           eyebrow={content?.featuresEyebrow}
           title={content?.featuresTitle}
           description={content?.featuresDescription}
           features={content?.features}
         />
-        <HowItWorksSection content={content?.howItWorks} />
         <PricingSection
           eyebrow={content?.pricingEyebrow}
           title={content?.pricingTitle}
           description={content?.pricingDescription}
           pricing={content?.pricing}
         />
+        <AiCopilotSection />
+        <ComparisonSection />
         <TestimonialsSection
           eyebrow={content?.testimonialsEyebrow}
           title={content?.testimonialsTitle}
           description={content?.testimonialsDescription}
           testimonials={content?.testimonials}
-        />
-        <MobileAppSection
-          title={content?.mobileAppTitle}
-          description={content?.mobileAppDescription}
-          androidUrl={content?.androidAppUrl}
-          iosUrl={content?.iosAppUrl}
-          apkAvailable={content?.apkAvailable}
-        />
-        <FAQSection
-          eyebrow={content?.faqEyebrow}
-          title={content?.faqTitle}
-          description={content?.faqDescription}
-          faqs={content?.faqs}
         />
         <FinalCTA
           kicker={content?.finalCtaKicker}
@@ -205,6 +191,7 @@ export default function LandingPage() {
           secondaryText={content?.secondaryButtonText}
           secondaryUrl={content?.secondaryButtonUrl}
         />
+        <ContactSection />
       </main>
       <LandingFooter
         seoDescription={content?.seoDescription}

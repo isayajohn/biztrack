@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { PricingCard, SectionHeader } from "./LandingDesignSystem";
+import { ArrowRight, Check } from "lucide-react";
+import { Link } from "react-router-dom";
 import { getPublicPackages, type PublicPackage } from "../../services/landingApi";
 import { formatCurrency } from "../../utils/format";
 
@@ -161,42 +162,64 @@ export default function PricingSection({ eyebrow, title, description, pricing }:
   }, [contentPlans, packages]);
 
   return (
-    <section id="pricing" className="scroll-mt-20 bg-cloud py-16 sm:py-20">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <SectionHeader
-          eyebrow={eyebrow || "Pricing"}
-          title={title || "Start free, scale when you're ready"}
-          description={description || "No hidden fees. No contracts. Cancel anytime."}
-          align="center"
-        />
+    <section id="pricing" className="scroll-mt-20 border-t border-white/5 bg-[#0a0c0b] py-24 sm:py-32">
+      <div className="mx-auto max-w-7xl px-5 sm:px-8">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#12e4d7]">{eyebrow || "Pricing"}</p>
+          <h2 className="mt-5 font-display text-4xl font-semibold tracking-[-0.045em] text-white sm:text-5xl lg:text-6xl">
+            {title || <>Simple, transparent <span className="text-white/[0.35]">pricing.</span></>}
+          </h2>
+          <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-white/[0.45]">
+            {description || "Start free. Upgrade when your business is ready. No hidden fees and no long contracts."}
+          </p>
+        </div>
 
         {isLoading ? (
-          <div className="grid gap-6 lg:grid-cols-3">
+          <div className="mt-14 grid gap-5 lg:grid-cols-3">
             {[0, 1, 2].map((item) => (
-              <div key={item} className="h-96 animate-pulse rounded-xl border border-slate-200 bg-white shadow-sm" />
+              <div key={item} className="h-[470px] animate-pulse rounded-[1.75rem] border border-white/10 bg-white/[0.035]" />
             ))}
           </div>
         ) : plans.length > 0 ? (
-          <div className="grid gap-6 lg:grid-cols-3">
-            {plans.map((plan) => (
-              <PricingCard
-                key={plan.slug}
-                {...plan}
-                to={plan.to}
-              />
-            ))}
+          <div className="mt-14 grid gap-5 lg:grid-cols-3">
+            {plans.map((plan) => {
+              const highlighted = plan.highlighted;
+              return (
+                <article key={plan.slug} className={`relative flex min-h-[470px] flex-col overflow-hidden rounded-[1.75rem] border p-7 transition-transform hover:-translate-y-1 ${highlighted ? "border-[#12e4d7]/40 bg-[#12e4d7]/[0.065] shadow-[0_0_80px_rgba(18,228,215,0.08)]" : "border-white/10 bg-white/[0.025]"}`}>
+                  {plan.badge && <span className="absolute right-5 top-5 rounded-full bg-[#12e4d7] px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#051210]">{plan.badge}</span>}
+                  <p className="text-sm font-bold uppercase tracking-[0.18em] text-white/[0.45]">{plan.name}</p>
+                  <div className="mt-7 flex items-end gap-2">
+                    <span className="font-display text-4xl font-semibold tracking-tight text-white sm:text-5xl">{plan.price}</span>
+                    <span className="mb-2 text-sm text-white/30">/{plan.period}</span>
+                  </div>
+                  <p className="mt-5 min-h-12 text-sm leading-6 text-white/[0.42]">{plan.description}</p>
+                  <div className="my-7 h-px bg-white/[0.08]" />
+                  <ul className="flex-1 space-y-3.5">
+                    {plan.features.map((feature) => (
+                      <li key={feature} className="flex items-start gap-3 text-sm leading-6 text-white/[0.65]">
+                        <span className="mt-1 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-[#12e4d7]/10 text-[#12e4d7]"><Check size={12} /></span>
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link to={plan.to} className={`mt-8 inline-flex min-h-[50px] items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-bold ${highlighted ? "bg-[#12e4d7] text-[#051210] hover:bg-white" : "border border-white/[0.12] bg-white/[0.04] text-white hover:border-white/25 hover:bg-white/[0.08]"}`}>
+                    {plan.cta} <ArrowRight size={15} />
+                  </Link>
+                </article>
+              );
+            })}
           </div>
         ) : (
-          <div className="rounded-xl border border-slate-200 bg-white p-7 text-center shadow-sm">
-            <p className="font-display text-xl font-extrabold text-ink">Packages are being updated.</p>
-            <p className="mt-2 text-sm font-semibold leading-6 text-slateMuted">
+          <div className="mt-14 rounded-[1.75rem] border border-white/10 bg-white/[0.03] p-8 text-center">
+            <p className="font-display text-xl font-bold text-white">Packages are being updated.</p>
+            <p className="mt-2 text-sm font-semibold leading-6 text-white/40">
               Please check back soon or create an account to use the default package.
             </p>
           </div>
         )}
 
         {plans.some((plan) => plan.features.some((feature) => feature.toLowerCase().includes("trial"))) && (
-          <p className="mt-8 text-center text-sm font-semibold text-slateMuted">
+          <p className="mt-8 text-center text-sm font-semibold text-white/[0.35]">
             Trial length is based on the package configured by admin. No credit card required to start.
           </p>
         )}

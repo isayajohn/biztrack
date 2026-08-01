@@ -1,24 +1,23 @@
 import { useEffect, useState } from "react";
+import { ArrowUpRight, Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Menu, X } from "lucide-react";
-import BrandLogo from "../BrandLogo";
-import { PrimaryButton, SecondaryButton } from "./LandingDesignSystem";
 
 const NAV_LINKS = [
-  { label: "Features", href: "#features" },
-  { label: "How It Works", href: "#how-it-works" },
-  { label: "Pricing", href: "#pricing" },
-  { label: "FAQ", href: "#faq" },
+  { label: "Product", href: "/#product-tour" },
+  { label: "Features", href: "/#features" },
+  { label: "Pricing", href: "/#pricing" },
+  { label: "Why BizTrack", href: "/#why-biztrack" },
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/#contact" },
 ];
-
-const mobileMenuId = "landing-mobile-menu";
 
 export default function LandingNavbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 10);
+    const onScroll = () => setScrolled(window.scrollY > 16);
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -27,107 +26,55 @@ export default function LandingNavbar() {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") setMenuOpen(false);
     };
-
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
-  const closeMenu = () => setMenuOpen(false);
-
   return (
-    <header
-      className={[
-        "sticky inset-x-0 top-0 z-50 transition-all duration-200",
-        scrolled
-          ? "border-b border-slate-200 bg-white/95 shadow-sm backdrop-blur-md"
-          : "border-b border-transparent bg-white/85 backdrop-blur-sm",
-      ].join(" ")}
-    >
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
-        <Link
-          to="/"
-          className="flex items-center gap-2 font-display text-lg font-bold tracking-tight text-ink"
-          onClick={closeMenu}
-          aria-label="BizTrack home"
-        >
-          <BrandLogo className="h-auto w-36 max-w-[150px]" />
+    <header className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${scrolled || menuOpen ? "border-b border-white/[0.08] bg-[#070908]/90 backdrop-blur-xl" : "bg-transparent"}`}>
+      <div className="mx-auto flex h-[76px] max-w-7xl items-center justify-between px-5 sm:px-8">
+        <Link to="/" onClick={() => setMenuOpen(false)} aria-label="BizTrack home">
+          <img src="/biztrack-wordmark-cyan.png" alt="BizTrack" className="h-auto w-36 sm:w-40" />
         </Link>
 
-        <nav className="hidden items-center gap-6 md:flex" aria-label="Main navigation">
+        <nav className="hidden items-center gap-7 lg:flex" aria-label="Main navigation">
           {NAV_LINKS.map(({ label, href }) => (
-            <a
-              key={href}
-              href={href}
-              className="text-sm font-semibold text-slateMuted transition-colors hover:text-ink"
-            >
+            <a key={href} href={href} className="text-sm font-semibold text-white/50 transition-colors hover:text-white">
               {label}
             </a>
           ))}
         </nav>
 
-        <div className="hidden items-center gap-3 md:flex">
-          <Link to="/login" className="text-sm font-semibold text-slateMuted transition-colors hover:text-ink">
-            Login
+        <div className="hidden items-center gap-3 lg:flex">
+          <Link to="/login" className="px-3 py-2 text-sm font-semibold text-white/60 hover:text-white">Log in</Link>
+          <Link to="/register" className="inline-flex items-center gap-2 rounded-full bg-[#12e4d7] px-5 py-2.5 text-sm font-bold text-[#051210] shadow-[0_0_30px_rgba(18,228,215,0.14)] hover:-translate-y-0.5 hover:bg-white">
+            Start free <ArrowUpRight size={15} />
           </Link>
-          <PrimaryButton to="/register" className="min-h-10 px-4 py-2">
-            Get Started
-          </PrimaryButton>
         </div>
 
         <button
           type="button"
-          className="grid h-9 w-9 place-items-center rounded-lg border border-slate-200 bg-white text-slateMuted shadow-sm transition-colors hover:bg-cloud hover:text-ink focus:outline-none focus:ring-4 focus:ring-leaf/15 md:hidden"
-          onClick={() => setMenuOpen((v) => !v)}
-          aria-controls={mobileMenuId}
+          onClick={() => setMenuOpen((open) => !open)}
+          className="grid h-10 w-10 place-items-center rounded-full border border-white/10 bg-white/[0.04] text-white lg:hidden"
+          aria-label={menuOpen ? "Close navigation" : "Open navigation"}
           aria-expanded={menuOpen}
-          aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
         >
-          <span className="grid transition-transform duration-200" aria-hidden="true">
-            {menuOpen ? <X size={19} /> : <Menu size={19} />}
-          </span>
+          {menuOpen ? <X size={19} /> : <Menu size={19} />}
         </button>
       </div>
 
-      <div
-        id={mobileMenuId}
-        aria-hidden={!menuOpen}
-        className={[
-          "overflow-hidden border-t border-slate-200 bg-white transition-all duration-300 ease-out md:hidden",
-          menuOpen
-            ? "max-h-96 translate-y-0 opacity-100"
-            : "pointer-events-none max-h-0 -translate-y-2 opacity-0",
-        ].join(" ")}
-      >
-        <div className="px-4 pb-4 pt-2">
-          <nav className="flex flex-col gap-1" aria-label="Mobile navigation">
-            {NAV_LINKS.map(({ label, href }) => (
-              <a
-                key={href}
-                href={href}
-                onClick={closeMenu}
-                className="rounded-lg px-3 py-2.5 text-sm font-semibold text-slateMuted transition-colors hover:bg-cloud hover:text-ink"
-              >
-                {label}
-              </a>
-            ))}
-          </nav>
-          <div className="mt-3 flex flex-col gap-2 border-t border-ink/10 pt-3">
-            <SecondaryButton
-              to="/login"
-              onClick={closeMenu}
-              className="w-full"
-            >
-              Login
-            </SecondaryButton>
-            <PrimaryButton
-              to="/register"
-              onClick={closeMenu}
-              className="w-full"
-            >
-              Get Started
-            </PrimaryButton>
+      <div className={`overflow-hidden border-t border-white/[0.08] bg-[#070908] transition-all duration-300 lg:hidden ${menuOpen ? "max-h-[520px] opacity-100" : "max-h-0 border-transparent opacity-0"}`}>
+        <nav className="mx-auto flex max-w-7xl flex-col px-5 py-5 sm:px-8" aria-label="Mobile navigation">
+          {NAV_LINKS.map(({ label, href }) => (
+            <a key={href} href={href} onClick={() => setMenuOpen(false)} className="border-b border-white/[0.06] py-3.5 text-sm font-semibold text-white/[0.65] last:border-0">
+              {label}
+            </a>
+          ))}
+          <div className="mt-5 grid grid-cols-2 gap-3">
+            <Link to="/login" onClick={() => setMenuOpen(false)} className="rounded-full border border-white/10 px-4 py-3 text-center text-sm font-bold text-white">Log in</Link>
+            <Link to="/register" onClick={() => setMenuOpen(false)} className="rounded-full bg-[#12e4d7] px-4 py-3 text-center text-sm font-bold text-[#051210]">Start free</Link>
           </div>
-        </div>
+        </nav>
       </div>
     </header>
   );

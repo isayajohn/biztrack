@@ -10,6 +10,7 @@ import AdminLayout from "./components/admin/AdminLayout";
 import AppLayout from "./components/app/AppLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
+import AboutPage from "./pages/AboutPage";
 import DemoDashboard from "./pages/DemoDashboard";
 import ForbiddenPage from "./pages/ForbiddenPage";
 import LoginPage from "./pages/LoginPage";
@@ -90,6 +91,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               <Routes>
             {/* Public routes */}
             <Route path="/" element={<LandingPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/auth" element={<LoginPage />} />
             <Route path="/demo" element={<DemoDashboard />} />
             <Route path="/403" element={<ForbiddenPage />} />
             <Route path="/login" element={<LoginPage />} />

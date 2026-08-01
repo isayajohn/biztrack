@@ -1,274 +1,122 @@
 import { useCallback, useState } from "react";
-import { ArrowLeft, Eye, EyeOff, Loader2, Mail, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Eye, EyeOff, Loader2, LockKeyhole, Mail, Sparkles } from "lucide-react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import AuthLoadingScreen from "../components/AuthLoadingScreen";
-import AuthShowcasePanel from "../components/auth/AuthShowcasePanel";
-import BrandLogo from "../components/BrandLogo";
-import GoogleAuthButton from "../components/GoogleAuthButton";
 import { useNoIndex } from "../hooks/useSeo";
 import { getApiErrorMessage } from "../services/apiClient";
 import { notifyError, notifySuccess } from "../lib/notifications";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-type FormErrors = {
-  email?: string;
-  password?: string;
-  general?: string;
-};
+type FormErrors = { email?: string; password?: string; general?: string };
 
 function validate(email: string, password: string): FormErrors {
-  const errs: FormErrors = {};
-  if (!email.trim()) errs.email = "Email is required.";
-  else if (!EMAIL_RE.test(email)) errs.email = "Enter a valid email address.";
-  if (!password) errs.password = "Password is required.";
-  else if (password.length < 6) errs.password = "Password must be at least 6 characters.";
-  return errs;
+  const errors: FormErrors = {};
+  if (!email.trim()) errors.email = "Email is required.";
+  else if (!EMAIL_RE.test(email)) errors.email = "Enter a valid email address.";
+  if (!password) errors.password = "Password is required.";
+  else if (password.length < 6) errors.password = "Password must be at least 6 characters.";
+  return errors;
 }
 
-function inputCls(hasError?: boolean) {
-  return [
-    "minimal-input w-full rounded-lg px-5 py-3.5 text-sm font-semibold text-ink outline-none",
-    "transition-all placeholder:text-slateMuted/55 focus:ring-2",
-    hasError
-      ? "border-red-400 focus:border-red-400 focus:ring-red-200/50"
-      : "focus:border-leaf focus:ring-leaf/15",
-  ].join(" ");
+function inputClass(hasError?: boolean) {
+  return `h-12 w-full rounded-xl border bg-white/[0.075] px-11 pr-12 text-sm font-semibold text-white outline-none transition-all placeholder:text-white/35 focus:ring-4 ${hasError ? "border-red-400/70 focus:border-red-400 focus:ring-red-400/10" : "border-white/15 focus:border-emerald-400/60 focus:ring-emerald-400/10"}`;
 }
 
 export default function LoginPage() {
   useNoIndex();
-  const { login, loginWithGoogle, isAuthenticated, isLoading: isCheckingAuth, user } = useAuth();
+  const { login, isAuthenticated, isLoading: isCheckingAuth, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const locationState = location.state as { message?: string } | null;
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   if (isCheckingAuth) return <AuthLoadingScreen />;
+  if (isAuthenticated) return <Navigate to={user?.role === "SUPER_ADMIN" ? "/admin" : "/dashboard"} replace />;
 
-  if (isAuthenticated) {
-    return <Navigate to={user?.role === "SUPER_ADMIN" ? "/admin" : "/dashboard"} replace />;
-  }
+  const routeAfterLogin = (loggedInUser: typeof user) => loggedInUser?.role === "SUPER_ADMIN" ? "/admin" : loggedInUser?.businessId ? "/dashboard" : "/onboarding";
 
-  const routeAfterLogin = (loggedInUser: typeof user) => {
-    if (loggedInUser?.role === "SUPER_ADMIN") return "/admin";
-    return loggedInUser?.businessId ? "/dashboard" : "/onboarding";
-  };
-
-  const handleSubmit = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
-      const errs = validate(email, password);
-      if (Object.keys(errs).length > 0) {
-        setErrors(errs);
-        return;
-      }
-      setErrors({});
-      setIsLoading(true);
-      try {
-        const loggedInUser = await login(email, password);
-        notifySuccess(`Welcome back, ${loggedInUser.name}.`);
-        navigate(routeAfterLogin(loggedInUser), { replace: true });
-      } catch (err) {
-        const message = getApiErrorMessage(err);
-        setErrors({ general: message });
-        notifyError(message);
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [email, password, login, navigate],
-  );
-
-  const handleGoogleCredential = useCallback(
-    async (credential: string) => {
-      setErrors({});
-      setIsGoogleLoading(true);
-      try {
-        const loggedInUser = await loginWithGoogle(credential);
-        notifySuccess(`Welcome back, ${loggedInUser.name}.`);
-        navigate(routeAfterLogin(loggedInUser), { replace: true });
-      } catch (error) {
-        const message = getApiErrorMessage(error);
-        setErrors({ general: message });
-        notifyError(message);
-      } finally {
-        setIsGoogleLoading(false);
-      }
-    },
-    [loginWithGoogle, navigate],
-  );
+  const handleSubmit = useCallback(async (event: React.FormEvent) => {
+    event.preventDefault();
+    const nextErrors = validate(email, password);
+    if (Object.keys(nextErrors).length) return setErrors(nextErrors);
+    setErrors({});
+    setIsLoading(true);
+    try {
+      const loggedInUser = await login(email, password);
+      notifySuccess(`Welcome back, ${loggedInUser.name}.`);
+      navigate(routeAfterLogin(loggedInUser), { replace: true });
+    } catch (error) {
+      const message = getApiErrorMessage(error);
+      setErrors({ general: message });
+      notifyError(message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [email, password, login, navigate]);
 
   return (
-    <main className="spatial-shell min-h-screen text-ink lg:grid lg:grid-cols-2">
-      <section className="flex min-h-screen items-center justify-center px-5 py-8 sm:px-8 lg:px-12">
-        <div className="w-full max-w-md">
-          <div className="mb-12 sm:mb-14">
-            <BrandLogo className="h-auto w-44 max-w-full" />
-          </div>
+    <main className="relative flex min-h-screen flex-col overflow-hidden bg-[#07102b] text-white">
+      <div className="pointer-events-none absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/auth-bg.jpg')" }} />
+      <div className="pointer-events-none absolute inset-0 bg-[#07102b]/45" />
 
-          <div>
-            <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-leaf/15 bg-white/70 px-3 py-1 text-xs font-black text-leaf shadow-sm">
-              <Sparkles size={14} aria-hidden="true" />
-              Welcome back
-            </p>
-            <h1 className="font-display text-3xl font-black tracking-normal text-ink">
-              Log in to your account
-            </h1>
-            <p className="mt-3 text-sm font-semibold leading-6 text-slateMuted">
-              Track sales, expenses, stock, and profit from one simple workspace.
-            </p>
-          </div>
+      <header className="relative z-10 flex items-center justify-between px-5 pb-4 pt-7 sm:px-8 sm:pt-9">
+        <Link to="/" aria-label="BizTrack home"><img src="/biztrack-wordmark-cyan.png" alt="BizTrack" className="h-auto w-40" /></Link>
+        <Link to="/about" className="hidden text-sm font-semibold text-white/60 hover:text-white sm:block">About BizTrack</Link>
+      </header>
 
-          {locationState?.message && (
-            <div className="mt-6 rounded-lg border border-leaf/20 bg-mint px-4 py-3 text-sm font-semibold text-leaf">
-              {locationState.message}
-            </div>
-          )}
+      <section className="relative z-10 flex flex-1 items-center justify-center px-5 pb-12 pt-4">
+        <div className="group relative w-full max-w-md overflow-hidden rounded-[28px] border border-amber-100/20 bg-[#071032]/75 p-7 shadow-[0_40px_100px_-30px_rgba(3,7,30,0.88),inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-xl sm:p-8">
+          <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-amber-200/40 to-transparent" />
+          <div className="relative">
+            <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-200/30 bg-amber-200/10 px-3 py-1 text-xs font-semibold text-amber-100"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-300" /> Sign in to BizTrack</span>
+            <h1 className="font-display text-3xl font-semibold tracking-tight">Welcome back.</h1>
+            <p className="mt-2 text-[15px] text-white/60">Sign in to keep your business one tap away.</p>
 
-          {errors.general && (
-            <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600">
-              {errors.general}
-            </div>
-          )}
+            {locationState?.message && <div className="mt-5 rounded-xl border border-emerald-400/25 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-100">{locationState.message}</div>}
+            {errors.general && <div className="mt-5 rounded-xl border border-red-400/25 bg-red-400/10 px-4 py-3 text-sm text-red-100">{errors.general}</div>}
 
-          <form className="mt-8 grid gap-5" onSubmit={handleSubmit} noValidate>
-            <div>
-              <label htmlFor="email" className="mb-2 block text-sm font-bold text-ink">
-                Email
-              </label>
-              <div className="relative">
-                <input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    if (errors.email) setErrors((p) => ({ ...p, email: undefined }));
-                  }}
-                  className={inputCls(Boolean(errors.email)) + " pr-12"}
-                  aria-invalid={Boolean(errors.email)}
-                  aria-describedby={errors.email ? "email-error" : undefined}
-                />
-                <Mail
-                  size={17}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slateMuted/60"
-                  aria-hidden="true"
-                />
+            <form className="mt-7 space-y-5" onSubmit={handleSubmit} noValidate>
+              <div>
+                <label htmlFor="email" className="mb-2 block text-sm font-semibold text-white/90">Email address</label>
+                <div className="relative">
+                  <Mail size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/45" />
+                  <input id="email" type="email" autoComplete="email" placeholder="Enter your email" value={email} onChange={(event) => { setEmail(event.target.value); if (errors.email) setErrors((current) => ({ ...current, email: undefined })); }} className={inputClass(Boolean(errors.email))} aria-invalid={Boolean(errors.email)} />
+                </div>
+                {errors.email && <p className="mt-1.5 text-xs font-semibold text-red-300">{errors.email}</p>}
               </div>
-              {errors.email && (
-                <p id="email-error" className="mt-1.5 text-xs font-semibold text-red-500">
-                  {errors.email}
-                </p>
-              )}
-            </div>
 
-            <div>
-              <label htmlFor="password" className="mb-2 block text-sm font-bold text-ink">
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  autoComplete="current-password"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    if (errors.password) setErrors((p) => ({ ...p, password: undefined }));
-                  }}
-                  className={inputCls(Boolean(errors.password)) + " pr-12"}
-                  aria-invalid={Boolean(errors.password)}
-                  aria-describedby={errors.password ? "pw-error" : undefined}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slateMuted/60 transition-colors hover:text-leaf"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
-                </button>
+              <div>
+                <label htmlFor="password" className="mb-2 block text-sm font-semibold text-white/90">Password</label>
+                <div className="relative">
+                  <LockKeyhole size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/45" />
+                  <input id="password" type={showPassword ? "text" : "password"} autoComplete="current-password" placeholder="Enter your password" value={password} onChange={(event) => { setPassword(event.target.value); if (errors.password) setErrors((current) => ({ ...current, password: undefined })); }} className={inputClass(Boolean(errors.password))} aria-invalid={Boolean(errors.password)} />
+                  <button type="button" onClick={() => setShowPassword((visible) => !visible)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/45 hover:text-white" aria-label={showPassword ? "Hide password" : "Show password"}>{showPassword ? <EyeOff size={18} /> : <Eye size={18} />}</button>
+                </div>
+                {errors.password && <p className="mt-1.5 text-xs font-semibold text-red-300">{errors.password}</p>}
               </div>
-              {errors.password && (
-                <p id="pw-error" className="mt-1.5 text-xs font-semibold text-red-500">
-                  {errors.password}
-                </p>
-              )}
-            </div>
 
-            <div className="flex items-center justify-between gap-3">
-              <label className="flex items-center gap-2 text-sm font-semibold text-slateMuted">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 rounded border-ink/20 text-leaf focus:ring-leaf"
-                />
-                Remember me
-              </label>
-              <Link to="/forgot-password" className="text-sm font-black text-leaf hover:underline">
-                Forgot password?
-              </Link>
-            </div>
+              <div className="flex items-center justify-between gap-3 text-sm">
+                <label className="flex items-center gap-2 text-white/65"><input type="checkbox" className="h-4 w-4 rounded border-white/30 bg-white/10 text-emerald-400 focus:ring-emerald-400" /> Remember me</label>
+                <Link to="/forgot-password" className="font-semibold text-white/80 hover:text-white hover:underline">Forgot password?</Link>
+              </div>
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="mt-1 flex w-full items-center justify-center gap-2 rounded-lg bg-leaf py-4 text-sm font-black text-white shadow-[0_14px_32px_rgba(11,146,121,0.22)] transition-all hover:-translate-y-0.5 hover:bg-[#0b5f59] disabled:cursor-not-allowed disabled:opacity-65"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 size={16} className="animate-spin" aria-hidden="true" />
-                  Signing in...
-                </>
-              ) : (
-                "Log in"
-              )}
-            </button>
-          </form>
+              <button type="submit" disabled={isLoading} className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-emerald-400 text-sm font-bold text-[#031b12] shadow-[0_15px_40px_-12px_rgba(16,185,129,0.7)] hover:bg-emerald-300 disabled:opacity-60">
+                {isLoading ? <><Loader2 size={17} className="animate-spin" /> Signing in...</> : <>Sign in <ArrowRight size={17} /></>}
+              </button>
+            </form>
 
-          <div className="my-7 flex items-center gap-3 text-sm font-bold text-slateMuted/70">
-            <span className="h-px flex-1 bg-ink/10" />
-            Or
-            <span className="h-px flex-1 bg-ink/10" />
+            <p className="mt-7 text-center text-sm text-white/65">Don&apos;t have an account? <Link to="/register" className="font-semibold text-emerald-300 hover:text-emerald-200 hover:underline">Sign up</Link></p>
+            <Link to="/" className="mt-5 flex items-center justify-center gap-2 text-xs font-semibold text-white/45 hover:text-white"><ArrowLeft size={14} /> Back to home</Link>
           </div>
-
-          <GoogleAuthButton
-            disabled={isGoogleLoading || isLoading}
-            onCredential={handleGoogleCredential}
-            onError={(message) => setErrors({ general: message })}
-          />
-
-          <p className="mt-8 text-center text-sm font-semibold text-slateMuted">
-            Don't have an account?{" "}
-            <Link to="/register" className="font-black text-leaf hover:underline">
-              Sign up
-            </Link>
-          </p>
-
-          <Link
-            to="/"
-            className="mt-8 flex items-center justify-center gap-2 text-sm font-bold text-slateMuted transition-colors hover:text-ink"
-          >
-            <ArrowLeft size={15} aria-hidden="true" />
-            Back to home
-          </Link>
         </div>
       </section>
 
-      <AuthShowcasePanel
-        title="Very simple way to manage business"
-        text="Welcome to BizTrack. Record daily sales, control expenses, manage products, and understand your profit with less effort."
-      />
+      <footer className="relative z-10 pb-6 text-center text-xs text-white/45"><span className="inline-flex items-center gap-2"><Sparkles size={13} /> Secure business management for growing teams</span></footer>
     </main>
   );
 }

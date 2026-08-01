@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, Star } from "lucide-react";
-import { SectionHeader } from "./LandingDesignSystem";
+import { ChevronLeft, ChevronRight, Quote, Star } from "lucide-react";
 
 export type Testimonial = {
   name: string;
@@ -117,23 +116,19 @@ function normalizeTestimonials(items?: TestimonialContent[] | null) {
 }
 
 function TestimonialCard({ name, role, business, text, avatarSeed, avatarUrl, stars }: Testimonial) {
+  const initials = name.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase();
   return (
-    <article className="flex min-h-[260px] flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-card">
+    <article className="flex min-h-[300px] flex-col rounded-[1.6rem] border border-white/10 bg-white/[0.025] p-6 transition-all hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.045]">
+      <Quote size={30} className="mb-5 text-[#12e4d7]/50" />
       <StarRow count={stars} />
-      <blockquote className="mt-3 flex-1 text-sm leading-6 text-slateMuted">
+      <blockquote className="mt-4 flex-1 text-sm leading-7 text-white/[0.55]">
         &ldquo;{text}&rdquo;
       </blockquote>
-      <div className="mt-4 flex items-center gap-2.5 border-t border-slate-200 pt-4">
-        <img
-          src={avatarUrl || `https://i.pravatar.cc/36?u=${avatarSeed}`}
-          alt={name}
-          className="h-9 w-9 rounded-full object-cover"
-          width={36}
-          height={36}
-        />
+      <div className="mt-5 flex items-center gap-3 border-t border-white/[0.08] pt-5">
+        {avatarUrl ? <img src={avatarUrl} alt={name} className="h-10 w-10 rounded-full object-cover" width={40} height={40} /> : <span className="grid h-10 w-10 place-items-center rounded-full bg-[#12e4d7]/10 text-xs font-bold text-[#12e4d7]" title={avatarSeed}>{initials}</span>}
         <div>
-          <p className="text-sm font-bold text-ink">{name}</p>
-          <p className="text-xs text-slateMuted">
+          <p className="text-sm font-bold text-white">{name}</p>
+          <p className="text-xs text-white/30">
             {role} · {business}
           </p>
         </div>
@@ -180,23 +175,23 @@ export default function TestimonialsSection({ eyebrow, title, description, testi
 
   return (
     <section
-      className="bg-cloud py-14 sm:py-20"
+      className="border-t border-white/5 bg-[#0a0c0b] py-24 sm:py-32"
       aria-labelledby="testimonials-heading"
     >
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <SectionHeader
-          id="testimonials-heading"
-          eyebrow={eyebrow || "Real stories"}
-          title={title || "What business owners say."}
-          description={description || undefined}
-          align="center"
-        />
+      <div className="mx-auto max-w-7xl px-5 sm:px-8">
+        <div className="mx-auto mb-14 max-w-3xl text-center">
+          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#12e4d7]">{eyebrow || "Testimonials"}</p>
+          <h2 id="testimonials-heading" className="mt-5 font-display text-4xl font-semibold tracking-[-0.045em] text-white sm:text-5xl lg:text-6xl">
+            {title || <>Loved by ambitious <span className="text-white/[0.35]">operators.</span></>}
+          </h2>
+          {description && <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-white/[0.45]">{description}</p>}
+        </div>
 
         <div className="relative">
           <button
             type="button"
             onClick={movePrevious}
-            className="absolute left-0 top-1/2 z-10 inline-flex h-11 w-11 -translate-x-3 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white text-ink shadow-sm transition-all hover:-translate-y-[calc(50%+0.125rem)] hover:border-leaf/30 hover:text-leaf hover:shadow-card focus:outline-none focus:ring-4 focus:ring-leaf/15 sm:-translate-x-5 lg:-translate-x-6"
+            className="absolute left-0 top-1/2 z-10 inline-flex h-11 w-11 -translate-x-3 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-[#141816] text-white/60 transition-all hover:border-[#12e4d7]/30 hover:text-[#12e4d7] sm:-translate-x-5 lg:-translate-x-6"
             aria-label="Previous testimonials"
           >
             <ChevronLeft size={20} aria-hidden="true" />
@@ -204,7 +199,7 @@ export default function TestimonialsSection({ eyebrow, title, description, testi
           <button
             type="button"
             onClick={moveNext}
-            className="absolute right-0 top-1/2 z-10 inline-flex h-11 w-11 translate-x-3 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white text-ink shadow-sm transition-all hover:-translate-y-[calc(50%+0.125rem)] hover:border-leaf/30 hover:text-leaf hover:shadow-card focus:outline-none focus:ring-4 focus:ring-leaf/15 sm:translate-x-5 lg:translate-x-6"
+            className="absolute right-0 top-1/2 z-10 inline-flex h-11 w-11 translate-x-3 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-[#141816] text-white/60 transition-all hover:border-[#12e4d7]/30 hover:text-[#12e4d7] sm:translate-x-5 lg:translate-x-6"
             aria-label="Next testimonials"
           >
             <ChevronRight size={20} aria-hidden="true" />

@@ -9,9 +9,6 @@ import {
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth, type RegisterData } from "../auth/AuthContext";
 import AuthLoadingScreen from "../components/AuthLoadingScreen";
-import AuthShowcasePanel from "../components/auth/AuthShowcasePanel";
-import BrandLogo from "../components/BrandLogo";
-import GoogleAuthButton from "../components/GoogleAuthButton";
 import { useNoIndex } from "../hooks/useSeo";
 import { getApiErrorMessage, getRateLimitSeconds } from "../services/apiClient";
 import { getPublicPackages, type PublicPackage } from "../services/landingApi";
@@ -91,17 +88,17 @@ function validate(f: Fields, acceptedTerms: boolean): FormErrors {
 
 function inputCls(hasError?: boolean) {
   return [
-    "w-full rounded-lg border px-5 py-3.5 text-sm font-semibold text-ink outline-none",
-    "bg-[#f5f9f8] transition-all placeholder:text-slateMuted/55 focus:ring-2",
+    "w-full rounded-xl border px-4 py-3.5 text-sm font-semibold text-white outline-none",
+    "bg-white/[0.075] transition-all placeholder:text-white/30 focus:ring-4",
     hasError
-      ? "border-red-400 focus:border-red-400 focus:ring-red-200/50"
-      : "border-transparent focus:border-leaf focus:ring-leaf/15",
+      ? "border-red-400/70 focus:border-red-400 focus:ring-red-400/10"
+      : "border-white/[0.12] focus:border-[#12e4d7]/60 focus:ring-[#12e4d7]/10",
   ].join(" ");
 }
 
 export default function RegisterPage() {
   useNoIndex();
-  const { register, loginWithGoogle, isAuthenticated, isLoading: isCheckingAuth, user } = useAuth();
+  const { register, isAuthenticated, isLoading: isCheckingAuth, user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const packageSlug = searchParams.get("package")?.trim().toLowerCase() ?? "";
@@ -120,7 +117,6 @@ export default function RegisterPage() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [retrySeconds, setRetrySeconds] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [packages, setPackages] = useState<PublicPackage[]>([]);
   const [isLoadingPackages, setIsLoadingPackages] = useState(true);
   const [selectedPackageId, setSelectedPackageId] = useState("");
@@ -214,11 +210,6 @@ export default function RegisterPage() {
     return <Navigate to={user?.role === "SUPER_ADMIN" ? "/admin" : "/dashboard"} replace />;
   }
 
-  const routeAfterLogin = (loggedInUser: typeof user) => {
-    if (loggedInUser?.role === "SUPER_ADMIN") return "/admin";
-    return loggedInUser?.businessId ? "/dashboard" : "/onboarding";
-  };
-
   const set =
     <K extends keyof Fields>(key: K) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -290,44 +281,37 @@ export default function RegisterPage() {
     ],
   );
 
-  const handleGoogleCredential = useCallback(
-    async (credential: string) => {
-      setErrors({});
-      showLoadingNotification("Connecting your Google account...");
-      setIsGoogleLoading(true);
-      try {
-        const loggedInUser = await loginWithGoogle(credential);
-        showNotification("Google account connected.", "success");
-        navigate(routeAfterLogin(loggedInUser), { replace: true });
-      } catch (error) {
-        const message = getApiErrorMessage(error);
-        setErrors({ general: message });
-        showNotification(message, "error");
-      } finally {
-        closeLoadingNotification();
-        setIsGoogleLoading(false);
-      }
-    },
-    [closeLoadingNotification, loginWithGoogle, navigate, showLoadingNotification, showNotification],
-  );
-
   return (
-    <main className="min-h-screen bg-white text-ink lg:grid lg:grid-cols-2">
-      <section className="flex min-h-screen items-center justify-center px-5 py-8 sm:px-8 lg:px-12">
-        <div className="w-full max-w-md">
-          <div className="mb-12">
-            <BrandLogo className="h-auto w-44 max-w-full" />
-          </div>
+    <main className="relative min-h-screen overflow-hidden bg-[#07102b] text-white">
+      <div className="pointer-events-none absolute inset-0 bg-[url('/auth-bg.jpg')] bg-cover bg-center" aria-hidden="true" />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(110deg,rgba(3,8,26,.96)_5%,rgba(5,14,42,.79)_50%,rgba(3,8,26,.95)_100%)]" aria-hidden="true" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(18,228,215,.12),transparent_36%)]" aria-hidden="true" />
 
-          <h1 className="font-display text-3xl font-black tracking-normal text-ink">
-            Create an account
+      <header className="absolute inset-x-0 top-0 z-20 flex items-center justify-between px-5 py-5 sm:px-8">
+        <Link to="/" aria-label="BizTrack home">
+          <img src="/biztrack-wordmark-cyan.png" alt="BizTrack" className="h-auto w-36 sm:w-40" />
+        </Link>
+        <p className="hidden text-sm text-white/45 sm:block">
+          Already a member?{" "}
+          <Link to="/login" className="font-bold text-[#12e4d7] hover:text-white">Log in</Link>
+        </p>
+      </header>
+
+      <section className="relative z-10 flex min-h-screen items-center justify-center px-5 py-28 sm:px-8">
+        <div className="w-full max-w-xl rounded-[28px] border border-white/[0.13] bg-[#071032]/80 p-6 shadow-[0_35px_100px_rgba(0,0,0,.45)] backdrop-blur-2xl sm:p-9">
+          <div className="mb-7 h-px w-full bg-gradient-to-r from-transparent via-amber-400/75 to-transparent" />
+          <span className="inline-flex rounded-full border border-amber-300/20 bg-amber-300/[0.08] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-amber-200">
+            Start for free
+          </span>
+          <h1 className="mt-4 font-display text-3xl font-black tracking-[-0.035em] text-white sm:text-4xl">
+            Create your account.
           </h1>
-          <p className="mt-3 text-sm font-semibold leading-6 text-slateMuted">
-            Sign up with Google, or create your account with business details now.
+          <p className="mt-3 text-sm font-medium leading-6 text-white/45">
+            Set up your business workspace and see every important number in one place.
           </p>
 
           {errors.general && (
-            <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600">
+            <div className="mt-6 rounded-xl border border-red-400/25 bg-red-400/10 px-4 py-3 text-sm font-semibold text-red-200">
               {errors.general}
             </div>
           )}
@@ -371,7 +355,7 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slateMuted/60 transition-colors hover:text-leaf"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/35 transition-colors hover:text-[#12e4d7]"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
@@ -393,7 +377,7 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword((v) => !v)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slateMuted/60 transition-colors hover:text-leaf"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/35 transition-colors hover:text-[#12e4d7]"
                   aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                 >
                   {showConfirmPassword ? <EyeOff size={17} /> : <Eye size={17} />}
@@ -429,7 +413,7 @@ export default function RegisterPage() {
                   </select>
                   <ChevronDown
                     size={15}
-                    className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-slateMuted/55"
+                    className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-white/35"
                     aria-hidden="true"
                   />
                 </div>
@@ -437,11 +421,11 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label htmlFor="packageId" className="mb-2 block text-sm font-bold text-ink">
+              <label htmlFor="packageId" className="mb-2 block text-sm font-bold text-white/75">
                 Package
               </label>
               {isLoadingPackages ? (
-                <div className="rounded-lg bg-[#f5f9f8] px-5 py-3.5 text-sm font-semibold text-slateMuted">
+                <div className="rounded-xl border border-white/10 bg-white/[0.06] px-5 py-3.5 text-sm font-semibold text-white/45">
                   Loading packages...
                 </div>
               ) : packages.length > 0 ? (
@@ -461,26 +445,26 @@ export default function RegisterPage() {
                     </select>
                     <ChevronDown
                       size={15}
-                      className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-slateMuted/55"
+                      className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-white/35"
                       aria-hidden="true"
                     />
                   </div>
                   {selectedPackage && (
-                    <p className="mt-2 text-xs font-semibold leading-5 text-slateMuted">
-                      <span className="font-black text-ink">{selectedPackage.name}</span>{" "}
+                    <p className="mt-2 text-xs font-semibold leading-5 text-white/40">
+                      <span className="font-black text-white/75">{selectedPackage.name}</span>{" "}
                       includes {packageSummary(selectedPackage)}.
                     </p>
                   )}
                 </>
               ) : (
-                <p className="rounded-lg bg-[#f5f9f8] px-5 py-3.5 text-sm font-semibold text-slateMuted">
+                <p className="rounded-xl border border-white/10 bg-white/[0.06] px-5 py-3.5 text-sm font-semibold text-white/45">
                   Free package will be assigned automatically.
                 </p>
               )}
             </div>
 
             <div>
-              <label className="flex items-start gap-2 text-sm font-semibold text-slateMuted">
+              <label className="flex items-start gap-2 text-sm font-semibold text-white/45">
                 <input
                   type="checkbox"
                   checked={acceptedTerms}
@@ -488,11 +472,11 @@ export default function RegisterPage() {
                     setAcceptedTerms(event.target.checked);
                     if (errors.terms) setErrors((p) => ({ ...p, terms: undefined }));
                   }}
-                  className="mt-0.5 h-4 w-4 rounded border-ink/20 text-leaf focus:ring-leaf"
+                  className="mt-0.5 h-4 w-4 rounded border-white/20 bg-white/10 text-[#12e4d7] focus:ring-[#12e4d7]"
                 />
                 <span>
                   I agree to the{" "}
-                  <a href="#" className="font-black text-leaf underline">
+                  <a href="#" className="font-black text-[#12e4d7] underline">
                     Terms & Conditions
                   </a>
                 </span>
@@ -505,7 +489,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={isLoading || retrySeconds > 0}
-              className="mt-1 flex w-full items-center justify-center gap-2 rounded-lg bg-leaf py-4 text-sm font-black text-white shadow-sm transition-all hover:bg-[#0b5f59] disabled:cursor-not-allowed disabled:opacity-65"
+              className="mt-1 flex w-full items-center justify-center gap-2 rounded-xl bg-[#12e4d7] py-4 text-sm font-black text-[#051210] shadow-[0_12px_35px_rgba(18,228,215,.16)] transition-all hover:-translate-y-0.5 hover:bg-white disabled:cursor-not-allowed disabled:opacity-65"
             >
               {retrySeconds > 0 ? (
                 `Try again in ${retrySeconds}s`
@@ -520,42 +504,22 @@ export default function RegisterPage() {
             </button>
           </form>
 
-          <div className="my-7 flex items-center gap-3 text-sm font-bold text-slateMuted/70">
-            <span className="h-px flex-1 bg-ink/10" />
-            Or
-            <span className="h-px flex-1 bg-ink/10" />
-          </div>
-
-          <GoogleAuthButton
-            disabled={isGoogleLoading || isLoading || retrySeconds > 0}
-            onCredential={handleGoogleCredential}
-            onError={(message) => {
-              setErrors({ general: message });
-              showNotification(message, "error");
-            }}
-          />
-
-          <p className="mt-8 text-center text-sm font-semibold text-slateMuted">
+          <p className="mt-8 text-center text-sm font-semibold text-white/45 sm:hidden">
             Already have an account?{" "}
-            <Link to="/login" className="font-black text-leaf hover:underline">
+            <Link to="/login" className="font-black text-[#12e4d7] hover:underline">
               Log in
             </Link>
           </p>
 
           <Link
             to="/"
-            className="mt-8 flex items-center justify-center gap-2 text-sm font-bold text-slateMuted transition-colors hover:text-ink"
+            className="mt-8 flex items-center justify-center gap-2 text-sm font-bold text-white/35 transition-colors hover:text-white"
           >
             <ArrowLeft size={15} aria-hidden="true" />
             Back to home
           </Link>
         </div>
       </section>
-
-      <AuthShowcasePanel
-        title="Very simple way you can engage"
-        text="Welcome to BizTrack. Efficiently track sales, inventory, expenses, and profit with a guided account setup."
-      />
     </main>
   );
 }
@@ -573,7 +537,7 @@ function Field({
 }) {
   return (
     <div>
-      <label htmlFor={id} className="mb-2 block text-sm font-bold text-ink">
+      <label htmlFor={id} className="mb-2 block text-sm font-bold text-white/75">
         {label}
       </label>
       {children}

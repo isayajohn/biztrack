@@ -1,5 +1,5 @@
 import { ArrowRight, Sparkles } from "lucide-react";
-import { PrimaryButton, SecondaryButton } from "./LandingDesignSystem";
+import { Link } from "react-router-dom";
 
 type Props = {
   kicker?: string | null;
@@ -11,76 +11,33 @@ type Props = {
   secondaryUrl?: string | null;
 };
 
-export default function FinalCTA({
-  kicker,
-  title,
-  description,
-  primaryText,
-  primaryUrl,
-  secondaryText,
-  secondaryUrl,
-}: Props) {
+export default function FinalCTA({ kicker, title, description, primaryText, primaryUrl }: Props) {
   return (
-    <section
-      className="relative overflow-hidden bg-ink py-16 sm:py-20"
-      aria-labelledby="cta-heading"
-    >
-      {/* Dot pattern overlay */}
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          backgroundImage:
-            "radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px)",
-          backgroundSize: "24px 24px",
-        }}
-        aria-hidden="true"
-      />
-      {/* Glow */}
-      <div
-        className="pointer-events-none absolute left-1/2 top-0 h-64 w-96 -translate-x-1/2 rounded-full bg-leaf/20 blur-3xl"
-        aria-hidden="true"
-      />
+    <section className="relative overflow-hidden border-t border-white/5 bg-[#070908] py-24 sm:py-32" aria-labelledby="cta-heading">
+      <div className="pointer-events-none absolute inset-x-5 inset-y-0 mx-auto max-w-7xl overflow-hidden rounded-[2.5rem] bg-[#111513]" aria-hidden="true">
+        <div className="absolute -left-32 -top-40 h-[32rem] w-[32rem] rounded-full bg-[#12e4d7]/20 blur-[120px]" />
+        <div className="absolute -bottom-44 -right-28 h-[30rem] w-[30rem] rounded-full bg-[#4a183f]/70 blur-[100px]" />
+        <div className="absolute inset-0 opacity-[0.13] [background-image:radial-gradient(rgba(255,255,255,.4)_1px,transparent_1px)] [background-size:26px_26px]" />
+      </div>
 
-      <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6">
-        <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/8 px-4 py-1.5 text-sm font-semibold text-white/70">
-          <Sparkles size={14} aria-hidden="true" />
-          {kicker || "Free forever on the basic plan"}
+      <div className="relative mx-auto max-w-5xl px-8 py-20 text-center sm:px-12 sm:py-24">
+        <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.045] px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-[#12e4d7]">
+          <Sparkles size={14} /> {kicker || "Your business deserves clarity"}
         </span>
-
-        <h2
-          id="cta-heading"
-          className="font-display text-3xl font-extrabold text-white sm:text-5xl"
-        >
-          {title || (
-            <>
-              Start tracking your <span className="text-leaf">business</span> today
-            </>
-          )}
+        <h2 id="cta-heading" className="mx-auto mt-7 max-w-4xl font-display text-4xl font-semibold leading-[1.03] tracking-[-0.05em] text-white sm:text-6xl lg:text-7xl">
+          {title || <>Ready to transform <span className="text-[#12e4d7]">your business?</span></>}
         </h2>
-
-        <p className="mx-auto mt-5 max-w-xl text-base leading-7 text-white/55">
-          {description || "Join thousands of small business owners who use BizTrack to understand their numbers and grow with confidence."}
+        <p className="mx-auto mt-6 max-w-2xl text-base leading-8 text-white/[0.45]">
+          {description || "Join growing businesses that use BizTrack to replace guesswork with clear, live numbers."}
         </p>
-
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-          <PrimaryButton
-            to={primaryUrl || "/register"}
-            className="px-8 py-3.5 text-base"
-            icon={<ArrowRight size={18} aria-hidden="true" />}
-          >
-            {primaryText || "Get Started Free"}
-          </PrimaryButton>
-          <SecondaryButton
-            to={secondaryUrl || "/demo"}
-            className="border-white/15 bg-white/5 px-8 py-3.5 text-base text-white hover:border-white/25 hover:bg-white/10"
-          >
-            {secondaryText || "View Demo"}
-          </SecondaryButton>
+        <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <Link to={primaryUrl || "/register"} className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-[#12e4d7] px-7 py-3 text-sm font-bold text-[#051210] hover:-translate-y-0.5 hover:bg-white">
+            {primaryText || "Start free"} <ArrowRight size={16} />
+          </Link>
+          <Link to="/login" className="inline-flex min-h-[52px] items-center justify-center rounded-full border border-white/10 bg-white/[0.04] px-7 py-3 text-sm font-bold text-white/75 hover:border-white/25 hover:bg-white/[0.08]">
+            Sign up or log in
+          </Link>
         </div>
-
-        <p className="mt-5 text-xs font-semibold text-white/30">
-          No credit card required · Cancel anytime · Instant setup
-        </p>
       </div>
     </section>
   );

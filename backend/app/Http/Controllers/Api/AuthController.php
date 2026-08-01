@@ -11,12 +11,12 @@ use App\Models\SecurityConfig;
 use App\Models\User;
 use App\Services\AuditService;
 use App\Services\EmailService;
+use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Tymon\JWTAuth\Facades\JWTAuth;
-use GuzzleHttp\Client;
 
 class AuthController extends Controller
 {
@@ -50,7 +50,7 @@ class AuthController extends Controller
 
         // Create business if businessName provided
         $business = null;
-        if (!empty($data['businessName'])) {
+        if (! empty($data['businessName'])) {
             $business = Business::create([
                 'id' => Str::uuid(),
                 'user_id' => $user->id,
@@ -113,7 +113,7 @@ class AuthController extends Controller
 
         $user = User::where('email', strtolower($data['email']))->first();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['success' => false, 'error' => 'Invalid credentials'], 401);
         }
 
@@ -125,11 +125,12 @@ class AuthController extends Controller
             return response()->json(['success' => false, 'error' => 'Account temporarily locked'], 423);
         }
 
-        if (!Hash::check($data['password'], $user->password_hash)) {
+        if (! Hash::check($data['password'], $user->password_hash)) {
             $user->increment('failed_login_attempts');
             if ($user->failed_login_attempts >= $maxAttempts) {
                 $user->update(['locked_until' => now()->addMinutes($lockoutMinutes)]);
             }
+
             return response()->json(['success' => false, 'error' => 'Invalid credentials'], 401);
         }
 
@@ -137,7 +138,7 @@ class AuthController extends Controller
             return response()->json(['success' => false, 'error' => 'Account suspended'], 403);
         }
 
-        if ($secConfig?->require_email_verification && !$user->email_verified_at) {
+        if ($secConfig?->require_email_verification && ! $user->email_verified_at) {
             return response()->json([
                 'success' => false,
                 'error' => 'Email not verified',
@@ -179,13 +180,13 @@ class AuthController extends Controller
         ]);
 
         $token = $data['credential'] ?? $data['idToken'] ?? null;
-        if (!$token) {
+        if (! $token) {
             return response()->json(['success' => false, 'error' => 'Google token required'], 422);
         }
 
         try {
             $client = new Client(['timeout' => 10]);
-            $response = $client->get('https://oauth2.googleapis.com/tokeninfo?id_token=' . $token);
+            $response = $client->get('https://oauth2.googleapis.com/tokeninfo?id_token='.$token);
             $payload = json_decode($response->getBody(), true);
 
             if (($payload['aud'] ?? '') !== env('GOOGLE_CLIENT_ID')) {
@@ -197,7 +198,7 @@ class AuthController extends Controller
 
             $user = User::where('email', $email)->first();
 
-            if (!$user) {
+            if (! $user) {
                 $user = User::create([
                     'id' => Str::uuid(),
                     'name' => $name,
@@ -241,7 +242,7 @@ class AuthController extends Controller
         $data = $request->validate(['email' => 'required|email']);
         $user = User::where('email', strtolower($data['email']))->first();
 
-        if (!$user || $user->email_verified_at) {
+        if (! $user || $user->email_verified_at) {
             return response()->json(['success' => true, 'data' => ['message' => 'If the email exists, a verification link was sent.']]);
         }
 
@@ -261,7 +262,7 @@ class AuthController extends Controller
             ->where('expires_at', '>', now())
             ->first();
 
-        if (!$authToken) {
+        if (! $authToken) {
             return response()->json(['success' => false, 'error' => 'Invalid or expired token'], 400);
         }
 
@@ -317,7 +318,7 @@ class AuthController extends Controller
                 'password_reset_expires_at' => now()->addHour(),
             ]);
 
-            $resetUrl = env('FRONTEND_URL', 'http://127.0.0.1:5173') . '/reset-password?token=' . $rawToken;
+            $resetUrl = rtrim((string) config('app.frontend_url'), '/').'/reset-password?token='.$rawToken;
             $this->emailService->sendFromTemplate('PASSWORD_RESET', $user->email, $user->name, [
                 'name' => $user->name,
                 'resetUrl' => $resetUrl,
@@ -342,7 +343,7 @@ class AuthController extends Controller
             ->where('expires_at', '>', now())
             ->first();
 
-        if (!$authToken) {
+        if (! $authToken) {
             return response()->json(['success' => false, 'error' => 'Invalid or expired token'], 400);
         }
 
@@ -374,7 +375,7 @@ class AuthController extends Controller
             'newPassword' => 'required|string|min:8',
         ]);
 
-        if (!Hash::check($data['currentPassword'], $user->password_hash)) {
+        if (! Hash::check($data['currentPassword'], $user->password_hash)) {
             return response()->json(['success' => false, 'error' => 'Current password is incorrect'], 400);
         }
 
@@ -395,7 +396,7 @@ class AuthController extends Controller
         $data = $request->validate(['email' => 'required|email']);
         $user = User::where('email', strtolower($data['email']))->first();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['success' => true, 'data' => ['message' => 'OTP sent if account exists.']]);
         }
 
@@ -424,11 +425,11 @@ class AuthController extends Controller
 
         $user = User::where('email', strtolower($data['email']))->first();
 
-        if (!$user || !$user->otp_code_hash || !$user->otp_expires_at || now()->gt($user->otp_expires_at)) {
+        if (! $user || ! $user->otp_code_hash || ! $user->otp_expires_at || now()->gt($user->otp_expires_at)) {
             return response()->json(['success' => false, 'error' => 'Invalid or expired OTP'], 401);
         }
 
-        if (!Hash::check($data['otp'], $user->otp_code_hash)) {
+        if (! Hash::check($data['otp'], $user->otp_code_hash)) {
             return response()->json(['success' => false, 'error' => 'Invalid or expired OTP'], 401);
         }
 
@@ -482,7 +483,7 @@ class AuthController extends Controller
             'email_verification_expires_at' => now()->addDay(),
         ]);
 
-        $verifyUrl = env('FRONTEND_URL', 'http://127.0.0.1:5173') . '/verify-email?token=' . $rawToken;
+        $verifyUrl = rtrim((string) config('app.frontend_url'), '/').'/verify-email?token='.$rawToken;
         $this->emailService->sendFromTemplate('EMAIL_VERIFICATION', $user->email, $user->name, [
             'name' => $user->name,
             'verifyUrl' => $verifyUrl,
@@ -493,6 +494,7 @@ class AuthController extends Controller
     private function formatUser(User $user, ?Business $business = null): array
     {
         $membership = $business?->memberships()->where('user_id', $user->id)->with('branch')->first();
+
         return [
             'id' => $user->id,
             'name' => $user->name,
