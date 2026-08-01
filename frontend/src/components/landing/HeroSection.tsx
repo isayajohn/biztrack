@@ -60,10 +60,10 @@ export default function HeroSection({
   const useStyledDefault = !isSwahili && title === DEFAULT_TITLE;
 
   return (
-    <section ref={heroRef} className="relative overflow-hidden bg-[#050706] pb-0 pt-32 text-white sm:pt-40" aria-labelledby="hero-heading">
+    <section ref={heroRef} className="relative overflow-hidden bg-[#080b17] pb-0 pt-32 text-white sm:pt-40" aria-labelledby="hero-heading">
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
         <div className="absolute left-1/2 top-[-22rem] h-[52rem] w-[52rem] -translate-x-1/2 rounded-full bg-[#12e4d7]/[0.08] blur-[110px]" />
-        <div className="absolute bottom-0 left-[-10rem] h-[28rem] w-[28rem] rounded-full bg-[#39132f]/45 blur-[100px]" />
+        <div className="absolute bottom-0 left-[-10rem] h-[28rem] w-[28rem] rounded-full bg-[#080b17] blur-[100px]" />
         <div className="absolute inset-0 opacity-[0.14] [background-image:linear-gradient(rgba(255,255,255,.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.08)_1px,transparent_1px)] [background-size:64px_64px] [mask-image:linear-gradient(to_bottom,black,transparent_78%)]" />
       </div>
 

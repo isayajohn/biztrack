@@ -214,7 +214,7 @@ export default function ProductTourSection() {
   const activePosition = useMemo(() => `${((activeIndex + 1) / slides.length) * 100}%`, [activeIndex, slides.length]);
 
   return (
-    <section id="product-tour" className="relative border-t border-white/5 bg-[#070b18] py-24 sm:py-32">
+    <section id="product-tour" className="relative bg-[#080b17] py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/[0.055] px-3 py-1.5 text-xs font-semibold text-emerald-300">

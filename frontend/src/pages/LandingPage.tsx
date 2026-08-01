@@ -148,7 +148,7 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div ref={pageRef} className="min-h-screen bg-[#050706] text-white">
+    <div ref={pageRef} className="min-h-screen bg-[#080b17] text-white">
       <LandingNavbar />
       <main>
         <HeroSection
