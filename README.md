@@ -66,5 +66,24 @@ cd frontend && npm run build
 cd mobile && flutter build apk
 ```
 
-For Hostinger deployment, deploy `frontend/` as the Vite web application and
-deploy `backend/` as the custom PHP/Laravel application.
+For the current same-origin Hostinger deployment, the CI/CD workflow builds the
+React application into Laravel's `public/` directory and deploys the combined
+application as one custom PHP/Laravel website. This keeps the frontend and
+`/api` on the same origin.
+
+## Git workflow and CI/CD
+
+The repository uses these long-lived branches:
+
+- `develop` deploys to the development environment.
+- `staging` deploys to testing/UAT.
+- `main` deploys to production after CI and environment approval.
+
+Create features and normal fixes from `develop` using `feature/*` and
+`bugfix/*`. Create emergency production fixes from `main` using `hotfix/*`.
+Production deployment is disabled until the GitHub environments and Hostinger
+SSH settings are configured explicitly.
+
+See [docs/GIT_WORKFLOW.md](docs/GIT_WORKFLOW.md) for practical commands,
+promotion rules, required GitHub variables and secrets, branch protections,
+Hostinger preparation, and rollback procedures.

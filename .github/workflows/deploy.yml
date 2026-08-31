@@ -1,0 +1,97 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows:
+      - CI
+    types:
+      - completed
+    branches:
+      - develop
+      - staging
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy ${{ github.event.workflow_run.head_branch }}
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      vars.HOSTINGER_DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event.workflow_run.head_branch == 'main' && 'production' || github.event.workflow_run.head_branch == 'staging' && 'staging' || 'development' }}
+      url: ${{ vars.APP_URL }}
+    steps:
+      - name: Check out the validated revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: mbstring, sodium
+          coverage: none
+          tools: composer:v2
+
+      - name: Build environment-specific frontend
+        working-directory: frontend
+        env:
+          APP_URL: ${{ vars.APP_URL }}
+          VITE_GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID }}
+        run: |
+          npm ci
+          VITE_API_URL="${APP_URL%/}/api" npm run build
+
+      - name: Prepare production backend package
+        working-directory: backend
+        run: composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-progress
+
+      - name: Assemble same-origin application
+        run: |
+          cp -R frontend/dist/. backend/public/
+          cp backend/deployment/hostinger.htaccess backend/.htaccess
+
+      - name: Configure SSH
+        env:
+          HOSTINGER_SSH_KEY: ${{ secrets.HOSTINGER_SSH_KEY }}
+          HOSTINGER_KNOWN_HOSTS: ${{ secrets.HOSTINGER_KNOWN_HOSTS }}
+        run: |
+          mkdir -p "${RUNNER_TEMP}/biztrack-ssh"
+          printf '%s\n' "${HOSTINGER_SSH_KEY}" > "${RUNNER_TEMP}/biztrack-ssh/key"
+          printf '%s\n' "${HOSTINGER_KNOWN_HOSTS}" > "${RUNNER_TEMP}/biztrack-ssh/known_hosts"
+          chmod 600 "${RUNNER_TEMP}/biztrack-ssh/key" "${RUNNER_TEMP}/biztrack-ssh/known_hosts"
+
+      - name: Deploy to Hostinger
+        env:
+          APP_URL: ${{ vars.APP_URL }}
+          HOSTINGER_HOST: ${{ vars.HOSTINGER_HOST }}
+          HOSTINGER_PORT: ${{ vars.HOSTINGER_PORT }}
+          HOSTINGER_USER: ${{ vars.HOSTINGER_USER }}
+          HOSTINGER_PATH: ${{ vars.HOSTINGER_PATH }}
+          HOSTINGER_PHP_BINARY: ${{ vars.HOSTINGER_PHP_BINARY }}
+          SSH_KEY_PATH: ${{ runner.temp }}/biztrack-ssh/key
+          SSH_KNOWN_HOSTS_PATH: ${{ runner.temp }}/biztrack-ssh/known_hosts
+        run: bash .github/scripts/deploy-hostinger.sh
+
+      - name: Verify deployment health
+        env:
+          APP_URL: ${{ vars.APP_URL }}
+        run: curl --fail --show-error --silent --retry 3 --retry-delay 5 "${APP_URL%/}/api/health"
