@@ -31,6 +31,7 @@ class User {
   final List<String> permissions;
   final Map<String, dynamic>? branch;
   final Business? business;
+  final String onboardingIntent;
 
   User({
     required this.id,
@@ -42,6 +43,7 @@ class User {
     this.permissions = const [],
     this.branch,
     this.business,
+    this.onboardingIntent = 'CREATE',
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -70,6 +72,7 @@ class User {
           ? Map<String, dynamic>.from(json['branch'] as Map)
           : null,
       business: businessJson != null ? Business.fromJson(businessJson) : null,
+      onboardingIntent: json['onboardingIntent']?.toString() ?? 'CREATE',
     );
   }
 

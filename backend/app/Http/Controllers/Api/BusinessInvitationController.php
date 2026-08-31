@@ -5,13 +5,68 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Business;
 use App\Models\BusinessInvitation;
+use App\Models\BusinessMembership;
 use App\Services\AuditService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class BusinessInvitationController extends Controller
 {
+    public function accept(Request $request): JsonResponse
+    {
+        $user = auth()->user();
+        $data = $request->validate(['code' => 'required|string|min:6|max:40']);
+
+        if (($user->registration_verification_method === 'EMAIL' && !$user->email_verified_at)
+            || ($user->registration_verification_method === 'PHONE' && !$user->phone_verified_at)) {
+            return response()->json(['success' => false, 'error' => 'Verify your account before joining a workspace.'], 403);
+        }
+        if (Business::forUser($user)) {
+            return response()->json(['success' => false, 'error' => 'This account already belongs to a business workspace.'], 409);
+        }
+
+        $business = DB::transaction(function () use ($data, $user) {
+            $invitation = BusinessInvitation::where('code_hash', BusinessInvitation::hashCode($data['code']))
+                ->lockForUpdate()
+                ->first();
+            if (!$invitation || !$invitation->isAvailable()) {
+                throw \Illuminate\Validation\ValidationException::withMessages(['code' => 'This invitation code is invalid or has expired.']);
+            }
+            if ($invitation->email && strtolower($invitation->email) !== strtolower((string) $user->email)) {
+                throw \Illuminate\Validation\ValidationException::withMessages(['code' => 'This invitation was issued for a different email address.']);
+            }
+
+            BusinessMembership::create([
+                'business_id' => $invitation->business_id,
+                'user_id' => $user->id,
+                'branch_id' => $invitation->branch_id,
+                'role' => $invitation->role,
+                'permissions' => $invitation->permissions ?? [],
+                'status' => 'ACTIVE',
+            ]);
+            $invitation->update([
+                'status' => 'ACCEPTED',
+                'accepted_by' => $user->id,
+                'accepted_at' => now(),
+            ]);
+
+            return $invitation->business()->firstOrFail();
+        });
+
+        AuditService::log([
+            'actor_id' => $user->id,
+            'action' => 'BUSINESS_INVITATION_ACCEPTED',
+            'target_type' => 'Business',
+            'target_id' => $business->id,
+        ]);
+
+        return response()->json(['success' => true, 'data' => [
+            'business' => ['id' => $business->id, 'name' => $business->name, 'currency' => $business->currency, 'country' => $business->country],
+        ]]);
+    }
+
     public function validateCode(Request $request): JsonResponse
     {
         $data = $request->validate(['code' => 'required|string|min:6|max:40']);

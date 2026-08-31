@@ -18,19 +18,20 @@ export type User = {
   businessId?: string;
   currency: string;
   country?: string;
+  onboardingIntent: "CREATE" | "JOIN";
+  requiresOnboarding: boolean;
 };
 
 export type RegisterData = {
   name: string;
-  email: string;
+  email?: string;
   password: string;
-  businessName: string;
-  currency: string;
-  country?: string;
-  packageId?: string;
   phone?: string;
-  invitationCode?: string;
   verificationMethod: "EMAIL" | "PHONE";
+  onboardingIntent: "CREATE" | "JOIN";
+  termsAccepted: true;
+  termsVersion: string;
+  privacyVersion: string;
 };
 
 export type RegisterResult = {
@@ -42,13 +43,16 @@ export type RegisterResult = {
   verificationMethod: "EMAIL" | "PHONE";
   verificationOtpSent: boolean;
   phoneNumberMasked?: string | null;
+  emailAddressMasked?: string | null;
+  verificationId: string;
+  onboardingIntent: "CREATE" | "JOIN";
 };
 
 type AuthContextType = {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<User>;
+  login: (identifier: string, password: string) => Promise<User>;
   loginWithGoogle: (credential: string) => Promise<User>;
   register: (data: RegisterData) => Promise<RegisterResult>;
   updateUser: (data: Partial<User>) => void;
@@ -123,8 +127,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setToken(storedToken);
   }, []);
 
-  const login = useCallback(async (email: string, password: string) => {
-    const loggedInUser = await authApi.login(email, password);
+  const login = useCallback(async (identifier: string, password: string) => {
+    const loggedInUser = await authApi.login(identifier, password);
     saveAuth(loggedInUser, readStoredToken() ?? "");
     return loggedInUser;
   }, []);
@@ -153,6 +157,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       verificationMethod: result.verificationMethod,
       verificationOtpSent: result.verificationOtpSent,
       phoneNumberMasked: result.phoneNumberMasked,
+      emailAddressMasked: result.emailAddressMasked,
+      verificationId: result.verificationId,
+      onboardingIntent: result.onboardingIntent,
     };
   }, []);
 

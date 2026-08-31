@@ -159,16 +159,13 @@ class _LoginScreenState extends State<LoginScreen>
 
                             AuthInputField(
                               controller: _emailCtrl,
-                              label: 'Email address',
+                              label: 'Email or phone number',
                               icon: Icons.email_outlined,
-                              keyboardType: TextInputType.emailAddress,
+                              keyboardType: TextInputType.text,
                               action: TextInputAction.next,
                               validator: (v) {
                                 if (v == null || v.isEmpty) {
                                   return 'Enter your email';
-                                }
-                                if (!v.contains('@')) {
-                                  return 'Enter a valid email';
                                 }
                                 return null;
                               },

@@ -17,6 +17,9 @@ import 'providers/sale_provider.dart';
 import 'screens/auth/forgot_password_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
+import 'screens/auth/registration_verification_screen.dart';
+import 'screens/auth/onboarding_screen.dart';
+import 'core/api/auth_api.dart';
 import 'screens/dashboard/dashboard_screen.dart';
 import 'screens/debts/debt_detail_screen.dart';
 import 'screens/debts/debt_form_screen.dart';
@@ -85,9 +88,28 @@ class _BizTrackAppState extends State<BizTrackApp> {
         }
 
         final isAuthRoute =
-            loc == '/login' || loc == '/register' || loc == '/forgot-password';
+            loc == '/login' ||
+            loc == '/register' ||
+            loc == '/forgot-password' ||
+            loc == '/verify-account';
 
         if (!isAuth && !isAuthRoute && loc != '/splash') return '/login';
+        if (!isAuth &&
+            _authProvider.pendingRegistration != null &&
+            loc == '/splash') {
+          return '/verify-account';
+        }
+        if (isAuth &&
+            role != 'SUPER_ADMIN' &&
+            _authProvider.user?.business == null &&
+            loc != '/onboarding') {
+          return '/onboarding';
+        }
+        if (isAuth &&
+            _authProvider.user?.business != null &&
+            loc == '/onboarding') {
+          return '/';
+        }
         if (isAuth && (isAuthRoute || loc == '/splash')) {
           return role == 'SUPER_ADMIN' ? '/admin-restricted' : '/';
         }
@@ -104,6 +126,23 @@ class _BizTrackAppState extends State<BizTrackApp> {
         ),
         GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
         GoRoute(path: '/register', builder: (_, __) => const RegisterScreen()),
+        GoRoute(
+          path: '/verify-account',
+          builder: (_, state) {
+            final registration = state.extra;
+            final pending = registration is RegistrationResult
+                ? registration
+                : _authProvider.pendingRegistration;
+            if (pending == null) {
+              return const RegisterScreen();
+            }
+            return RegistrationVerificationScreen(registration: pending);
+          },
+        ),
+        GoRoute(
+          path: '/onboarding',
+          builder: (_, __) => const OnboardingScreen(),
+        ),
         GoRoute(
           path: '/forgot-password',
           builder: (_, __) => const ForgotPasswordScreen(),
@@ -252,15 +291,21 @@ class _BizTrackAppState extends State<BizTrackApp> {
         GoRoute(path: '/settings', builder: (_, __) => const SettingsScreen()),
 
         // --- Debts & Credit ---
-        GoRoute(path: '/debts', builder: (_, __) => const DebtsOverviewScreen()),
+        GoRoute(
+          path: '/debts',
+          builder: (_, __) => const DebtsOverviewScreen(),
+        ),
         GoRoute(
           path: '/debts/list',
-          builder: (_, state) => DebtsListScreen(initialType: state.uri.queryParameters['type'] ?? 'CUSTOMER'),
+          builder: (_, state) => DebtsListScreen(
+            initialType: state.uri.queryParameters['type'] ?? 'CUSTOMER',
+          ),
         ),
         GoRoute(path: '/debts/new', builder: (_, __) => const DebtFormScreen()),
         GoRoute(
           path: '/debts/:id',
-          builder: (_, state) => DebtDetailScreen(debtId: state.pathParameters['id']!),
+          builder: (_, state) =>
+              DebtDetailScreen(debtId: state.pathParameters['id']!),
         ),
       ],
     );

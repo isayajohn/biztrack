@@ -4,13 +4,103 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Business;
+use App\Models\Branch;
+use App\Models\BusinessMembership;
+use App\Models\BusinessSubscription;
+use App\Models\Package;
 use App\Services\AuditService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class BusinessController extends Controller
 {
+    public function createWorkspace(Request $request): JsonResponse
+    {
+        $user = auth()->user();
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'currency' => 'required|in:TZS',
+            'country' => 'nullable|string|max:100',
+        ]);
+
+        if (($user->registration_verification_method === 'EMAIL' && !$user->email_verified_at)
+            || ($user->registration_verification_method === 'PHONE' && !$user->phone_verified_at)) {
+            return response()->json(['success' => false, 'error' => 'Verify your account before creating a workspace.'], 403);
+        }
+        if (Business::forUser($user)) {
+            return response()->json(['success' => false, 'error' => 'This account already belongs to a business workspace.'], 409);
+        }
+
+        $business = DB::transaction(function () use ($user, $data) {
+            $business = Business::create([
+                'id' => Str::uuid(),
+                'user_id' => $user->id,
+                'name' => trim($data['name']),
+                'currency' => strtoupper($data['currency']),
+                'country' => $data['country'] ?? 'Tanzania',
+            ]);
+            $branch = Branch::create([
+                'business_id' => $business->id,
+                'name' => 'Main Branch',
+                'code' => 'MAIN',
+                'is_default' => true,
+                'is_active' => true,
+            ]);
+            BusinessMembership::create([
+                'business_id' => $business->id,
+                'user_id' => $user->id,
+                'branch_id' => $branch->id,
+                'role' => 'OWNER',
+                'permissions' => ['*'],
+                'status' => 'ACTIVE',
+            ]);
+
+            $freePackage = Package::firstOrCreate(['slug' => 'free'], [
+                'name' => 'Free',
+                'description' => 'Free starter plan assigned during workspace onboarding.',
+                'price_monthly' => 0,
+                'price_yearly' => 0,
+                'currency' => 'TZS',
+                'trial_days' => 0,
+                'max_businesses' => 1,
+                'max_users' => 1,
+                'max_products' => 100,
+                'max_sales_per_month' => 100,
+                'max_expenses_per_month' => 100,
+                'allow_reports' => true,
+                'allow_pdf_export' => false,
+                'allow_csv_export' => false,
+                'allow_inventory_alerts' => true,
+                'allow_ai_insights' => false,
+                'status' => 'ACTIVE',
+                'is_visible' => true,
+                'sort_order' => 0,
+            ]);
+            BusinessSubscription::create([
+                'id' => Str::uuid(),
+                'business_id' => $business->id,
+                'package_id' => $freePackage->id,
+                'status' => 'ACTIVE',
+                'billing_cycle' => 'LIFETIME',
+                'starts_at' => now(),
+                'notes' => 'Free plan assigned during workspace onboarding.',
+            ]);
+
+            return $business;
+        });
+
+        AuditService::log([
+            'actor_id' => $user->id,
+            'action' => 'BUSINESS_WORKSPACE_CREATED',
+            'target_type' => 'Business',
+            'target_id' => $business->id,
+        ]);
+
+        return response()->json(['success' => true, 'data' => $this->formatBusiness($business->load('activeSubscription.package'))], 201);
+    }
+
     public function getBusinessProfile(Request $request): JsonResponse
     {
         $user = auth()->user();

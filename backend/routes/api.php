@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\EmailConfigController;
 use App\Http\Controllers\Api\EmailTemplateController;
 use App\Http\Controllers\Api\ExpenseController;
 use App\Http\Controllers\Api\LandingController;
+use App\Http\Controllers\Api\LegalDocumentController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\PublicPackageController;
@@ -51,6 +52,8 @@ Route::prefix('public')->group(function () {
     Route::get('/landing-page/branding/logo', [LandingController::class, 'getBrandingLogo']);
     Route::get('/landing-page/mobile-app.apk', [LandingController::class, 'downloadApk']);
     Route::get('/packages', [PublicPackageController::class, 'listPackages']);
+    Route::get('/legal-documents', [LegalDocumentController::class, 'index']);
+    Route::get('/legal-documents/{type}', [LegalDocumentController::class, 'show'])->whereIn('type', ['terms', 'privacy']);
 });
 
 // Landing (duplicate public routes for backward compat)
@@ -89,7 +92,10 @@ Route::middleware('jwt.auth')->group(function () {
 
     // Business
     Route::get('/business', [BusinessController::class, 'getBusinessProfile']);
+    Route::post('/business/onboarding', [BusinessController::class, 'createWorkspace']);
     Route::put('/business', [BusinessController::class, 'updateBusinessProfile'])->middleware('permission:settings.manage');
+
+    Route::post('/invitations/accept', [BusinessInvitationController::class, 'accept'])->middleware('throttle:10,1');
 
     // Products
     Route::prefix('products')->group(function () {

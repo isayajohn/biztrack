@@ -6,7 +6,7 @@ import { useNoIndex } from "../hooks/useSeo";
 import { resendPhoneVerification, verifyPhone } from "../services/authApi";
 import { getApiErrorMessage } from "../services/apiClient";
 
-type LocationState = { email?: string; phone?: string; message?: string };
+type LocationState = { verificationId?: string; method?: "EMAIL" | "PHONE"; target?: string; onboardingIntent?: "CREATE" | "JOIN"; sent?: boolean };
 
 export default function VerifyPhonePage() {
   useNoIndex();
@@ -16,19 +16,19 @@ export default function VerifyPhonePage() {
   const locationState = (location.state ?? {}) as LocationState;
   let persistedState: LocationState = {};
   try {
-    persistedState = JSON.parse(sessionStorage.getItem("biztrack_phone_verification") ?? "{}") as LocationState;
+    persistedState = JSON.parse(sessionStorage.getItem("biztrack_registration_verification") ?? "{}") as LocationState;
   } catch {
     persistedState = {};
   }
-  const state = locationState.email ? locationState : persistedState;
+  const state = locationState.verificationId ? locationState : persistedState;
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
-  const [notice, setNotice] = useState(state.message ?? "Enter the 6-digit code sent to your phone.");
+  const [notice, setNotice] = useState(state.sent === false ? "Your account was created, but the code could not be sent. Use resend to try again." : "Enter the 6-digit code sent to your phone.");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [verified, setVerified] = useState(false);
 
-  if (!state.email) return <Navigate to="/register" replace />;
+  if (!state.verificationId || state.method !== "PHONE") return <Navigate to="/register" replace />;
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -39,12 +39,12 @@ export default function VerifyPhonePage() {
     setIsSubmitting(true);
     setError("");
     try {
-      const user = await verifyPhone(state.email!, otp);
+      const user = await verifyPhone(state.verificationId!, otp);
       await refreshUser();
-      sessionStorage.removeItem("biztrack_phone_verification");
+      sessionStorage.removeItem("biztrack_registration_verification");
       setVerified(true);
       setNotice("Phone verified. Opening your BizTrack workspace...");
-      window.setTimeout(() => navigate(user.role === "SUPER_ADMIN" ? "/admin" : "/dashboard", { replace: true }), 900);
+      window.setTimeout(() => navigate(user.role === "SUPER_ADMIN" ? "/admin" : user.businessId ? "/dashboard" : "/onboarding", { replace: true }), 900);
     } catch (err) {
       setError(getApiErrorMessage(err));
     } finally {
@@ -56,7 +56,7 @@ export default function VerifyPhonePage() {
     setIsResending(true);
     setError("");
     try {
-      const result = await resendPhoneVerification(state.email!);
+      const result = await resendPhoneVerification(state.verificationId!);
       setNotice(result.message);
       if (!result.sent) setError(result.message);
     } catch (err) {
@@ -78,7 +78,7 @@ export default function VerifyPhonePage() {
         </span>
         <h1 className="mt-5 font-display text-3xl font-bold tracking-[-0.035em]">{verified ? "Phone verified." : "Verify your phone."}</h1>
         <p className="mt-3 text-sm leading-6 text-white/50">{notice}</p>
-        {state.phone && <p className="mt-2 text-sm font-bold text-[#55e7c3]">{state.phone}</p>}
+        {state.target && <p className="mt-2 text-sm font-bold text-[#55e7c3]">{state.target}</p>}
 
         {!verified && (
           <form onSubmit={submit} className="mt-7">

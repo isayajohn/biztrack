@@ -7,13 +7,11 @@ import { useNoIndex } from "../hooks/useSeo";
 import { getApiErrorMessage } from "../services/apiClient";
 import { notifyError, notifySuccess } from "../lib/notifications";
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 type FormErrors = { email?: string; password?: string; general?: string };
 
 function validate(email: string, password: string): FormErrors {
   const errors: FormErrors = {};
-  if (!email.trim()) errors.email = "Email is required.";
-  else if (!EMAIL_RE.test(email)) errors.email = "Enter a valid email address.";
+  if (!email.trim()) errors.email = "Email address or phone number is required.";
   if (!password) errors.password = "Password is required.";
   else if (password.length < 6) errors.password = "Password must be at least 6 characters.";
   return errors;
@@ -82,10 +80,10 @@ export default function LoginPage() {
 
             <form className="mt-7 space-y-5" onSubmit={handleSubmit} noValidate>
               <div>
-                <label htmlFor="email" className="mb-2 block text-sm font-semibold text-white/90">Email address</label>
+                <label htmlFor="email" className="mb-2 block text-sm font-semibold text-white/90">Email or phone number</label>
                 <div className="relative">
                   <Mail size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/45" />
-                  <input id="email" type="email" autoComplete="email" placeholder="Enter your email" value={email} onChange={(event) => { setEmail(event.target.value); if (errors.email) setErrors((current) => ({ ...current, email: undefined })); }} className={inputClass(Boolean(errors.email))} aria-invalid={Boolean(errors.email)} />
+                  <input id="email" type="text" autoComplete="username" placeholder="Email address or 07XXXXXXXX" value={email} onChange={(event) => { setEmail(event.target.value); if (errors.email) setErrors((current) => ({ ...current, email: undefined })); }} className={inputClass(Boolean(errors.email))} aria-invalid={Boolean(errors.email)} />
                 </div>
                 {errors.email && <p className="mt-1.5 text-xs font-semibold text-red-300">{errors.email}</p>}
               </div>

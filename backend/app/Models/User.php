@@ -19,6 +19,8 @@ class User extends Authenticatable implements JWTSubject
     protected $fillable = [
         'name', 'email', 'phone', 'password_hash', 'role', 'status',
         'email_verified_at', 'phone_verified_at', 'registration_verification_method',
+        'onboarding_intent', 'terms_accepted_at', 'terms_accepted_version',
+        'privacy_accepted_at', 'privacy_accepted_version',
         'email_verification_token_hash', 'email_verification_expires_at',
         'password_reset_token_hash', 'password_reset_expires_at',
         'otp_code_hash', 'otp_login_token_hash', 'otp_expires_at',
@@ -33,6 +35,8 @@ class User extends Authenticatable implements JWTSubject
         'email_verification_expires_at' => 'datetime',
         'password_reset_expires_at' => 'datetime',
         'otp_expires_at' => 'datetime',
+        'terms_accepted_at' => 'datetime',
+        'privacy_accepted_at' => 'datetime',
         'locked_until' => 'datetime',
         'last_login_at' => 'datetime',
     ];

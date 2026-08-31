@@ -55,6 +55,11 @@ class EmailLinkTest extends TestCase
             'name' => 'New Owner',
             'email' => 'new-owner@example.com',
             'password' => 'StrongPassword123!',
+            'verificationMethod' => 'EMAIL',
+            'onboardingIntent' => 'CREATE',
+            'termsAccepted' => true,
+            'termsVersion' => '2026.08',
+            'privacyVersion' => '2026.08',
         ])->assertCreated();
     }
 }

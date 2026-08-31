@@ -16,6 +16,7 @@ import ForbiddenPage from "./pages/ForbiddenPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
+import VerifyAccountPage from "./pages/VerifyAccountPage";
 import VerifyPhonePage from "./pages/VerifyPhonePage";
 import ForgetPasswordPage from "./pages/ForgetPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
@@ -85,6 +86,20 @@ import "./styles.css";
 
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";
 
+if ("serviceWorker" in navigator) {
+  let refreshingForUpdate = false;
+
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (refreshingForUpdate) return;
+    refreshingForUpdate = true;
+    window.location.reload();
+  });
+
+  window.addEventListener("load", () => {
+    void navigator.serviceWorker.getRegistration().then((registration) => registration?.update());
+  });
+}
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <GoogleOAuthProvider clientId={googleClientId}>
@@ -102,6 +117,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="/403" element={<ForbiddenPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/verify-account" element={<VerifyAccountPage />} />
 <Route path="/verify-email" element={<VerifyEmailPage />} />
             <Route path="/verify-phone" element={<VerifyPhonePage />} />
             <Route path="/forgot-password" element={<ForgetPasswordPage />} />

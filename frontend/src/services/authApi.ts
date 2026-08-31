@@ -14,7 +14,7 @@ type ApiBusiness = {
 type ApiUser = {
   id: string;
   name: string;
-  email: string;
+  email: string | null;
   role: "USER" | "SUPER_ADMIN";
   status: "ACTIVE" | "SUSPENDED";
   businessRole?: User["businessRole"];
@@ -22,6 +22,8 @@ type ApiUser = {
   branch?: { id: string; name: string } | null;
   business?: ApiBusiness | null;
   businesses?: ApiBusiness[];
+  onboardingIntent?: "CREATE" | "JOIN";
+  requiresOnboarding?: boolean;
 };
 
 type AuthResponse = {
@@ -34,6 +36,9 @@ type AuthResponse = {
   verificationMethod?: "EMAIL" | "PHONE";
   verificationOtpSent?: boolean;
   phoneNumberMasked?: string | null;
+  emailAddressMasked?: string | null;
+  verificationId?: string;
+  onboardingIntent?: "CREATE" | "JOIN";
 };
 
 type ProfileResponse = {
@@ -51,7 +56,7 @@ export function mapApiUser(user: ApiUser): User {
   return {
     id: user.id,
     name: user.name,
-    email: user.email,
+    email: user.email ?? "",
     role: user.role,
     status: user.status,
     businessRole: user.businessRole,
@@ -61,12 +66,14 @@ export function mapApiUser(user: ApiUser): User {
     businessId: business?.id,
     currency: business?.currency ?? "TZS",
     country: business?.country,
+    onboardingIntent: user.onboardingIntent ?? "CREATE",
+    requiresOnboarding: user.requiresOnboarding ?? !business,
   };
 }
 
-export async function login(email: string, password: string): Promise<User> {
+export async function login(identifier: string, password: string): Promise<User> {
   const result = unwrap<AuthResponse>(
-    await apiClient.post("/auth/login", { email, password }),
+    await apiClient.post("/auth/login", { identifier, password }),
   );
   if (!result.token) throw new Error("Authentication token was not returned.");
   localStorage.setItem(AUTH_TOKEN_KEY, result.token);
@@ -88,13 +95,12 @@ export async function register(data: RegisterData): Promise<RegisterApiResult> {
       name: data.name,
       email: data.email,
       password: data.password,
-      businessName: data.businessName,
-      currency: data.currency,
-      country: data.country ?? "Tanzania",
-      packageId: data.packageId,
       phone: data.phone,
-      invitationCode: data.invitationCode,
       verificationMethod: data.verificationMethod,
+      onboardingIntent: data.onboardingIntent,
+      termsAccepted: data.termsAccepted,
+      termsVersion: data.termsVersion,
+      privacyVersion: data.privacyVersion,
     }),
   );
   return {
@@ -107,6 +113,9 @@ export async function register(data: RegisterData): Promise<RegisterApiResult> {
     verificationMethod: result.verificationMethod ?? "EMAIL",
     verificationOtpSent: Boolean(result.verificationOtpSent),
     phoneNumberMasked: result.phoneNumberMasked,
+    emailAddressMasked: result.emailAddressMasked,
+    verificationId: result.verificationId ?? result.user.id,
+    onboardingIntent: result.onboardingIntent ?? "CREATE",
   };
 }
 
@@ -122,15 +131,20 @@ export async function validateInvitation(code: string): Promise<InvitationPrevie
   return unwrap<InvitationPreview>(await apiClient.post("/auth/invitations/validate", { code }));
 }
 
-export async function verifyPhone(email: string, otp: string): Promise<User> {
-  const result = unwrap<AuthResponse>(await apiClient.post("/auth/verify-phone", { email, otp }));
+export async function verifyPhone(verificationId: string, otp: string): Promise<User> {
+  const result = unwrap<AuthResponse>(await apiClient.post("/auth/verify-phone", { verificationId, otp }));
   if (!result.token) throw new Error("Authentication token was not returned.");
   localStorage.setItem(AUTH_TOKEN_KEY, result.token);
   return mapApiUser(result.user);
 }
 
-export async function resendPhoneVerification(email: string): Promise<{ message: string; sent: boolean }> {
-  return unwrap<{ message: string; sent: boolean }>(await apiClient.post("/auth/resend-phone-verification", { email }));
+export async function resendPhoneVerification(verificationId: string): Promise<{ message: string; sent: boolean }> {
+  return unwrap<{ message: string; sent: boolean }>(await apiClient.post("/auth/resend-phone-verification", { verificationId }));
+}
+
+export async function resendVerificationEmail(verificationId: string): Promise<string> {
+  const result = unwrap<{ message: string }>(await apiClient.post("/auth/send-verification-email", { verificationId }));
+  return result.message;
 }
 
 export async function getProfile(): Promise<User> {
@@ -173,6 +187,15 @@ export async function updateBusinessProfile(data: {
   defaultTaxRate?: number;
 }): Promise<ApiBusiness> {
   return unwrap<ApiBusiness>(await apiClient.put("/business", data));
+}
+
+export async function createBusinessWorkspace(data: { name: string; currency: string; country?: string }): Promise<ApiBusiness> {
+  return unwrap<ApiBusiness>(await apiClient.post("/business/onboarding", data));
+}
+
+export async function acceptInvitation(code: string): Promise<ApiBusiness> {
+  const result = unwrap<{ business: ApiBusiness }>(await apiClient.post("/invitations/accept", { code }));
+  return result.business;
 }
 
 export async function getBusinessProfile(): Promise<ApiBusiness> {
