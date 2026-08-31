@@ -50,7 +50,7 @@ function Badge({ value, tone = "emerald" }: { value?: number; tone?: "emerald" |
     <span
       className={cn(
         "ml-auto inline-flex min-w-5 items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-extrabold leading-none",
-        tone === "orange" ? "bg-orange-100 text-orange-700" : "bg-emerald-100 text-emerald-700",
+        tone === "orange" ? "bg-[#fff1d6] text-[#9a5200]" : "bg-[#e60023] text-white",
       )}
     >
       {value > 99 ? "99+" : value}
@@ -60,7 +60,7 @@ function Badge({ value, tone = "emerald" }: { value?: number; tone?: "emerald" |
 
 function SectionLabel({ children }: { children: string }) {
   return (
-    <p className="px-3 pb-1 pt-3 text-[10px] font-extrabold uppercase tracking-widest text-ink/35">
+    <p className="px-3 pb-1.5 pt-4 text-[10px] font-bold uppercase tracking-[0.12em] text-[#62625b]">
       {children}
     </p>
   );
@@ -122,11 +122,11 @@ export default function Sidebar({
         className={() => {
           const active = isRouteActive(location.pathname, item.to);
           return cn(
-            "relative flex h-10 items-center rounded-lg text-sm font-semibold transition-colors duration-200",
-            isCollapsed ? "w-10 justify-center px-0" : "gap-3 px-3",
+            "relative flex h-11 items-center rounded-2xl text-sm font-semibold transition-colors duration-200",
+            isCollapsed ? "w-11 justify-center px-0" : "gap-3 px-3.5",
             active
-              ? "bg-white/80 text-emerald-700 ring-1 ring-emerald-200 shadow-sm"
-              : "text-ink/68 hover:bg-white/58 hover:text-ink",
+              ? "bg-[#f6f6f3] text-[#e60023]"
+              : "text-[#62625b] hover:bg-[#f6f6f3] hover:text-black",
           );
         }}
       >
@@ -138,7 +138,7 @@ export default function Sidebar({
           </>
         )}
         {isCollapsed && badgeFor(item.label) ? (
-          <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-white" />
+          <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-[#e60023] ring-2 ring-white" />
         ) : null}
       </NavLink>
     );
@@ -155,9 +155,9 @@ export default function Sidebar({
 
   const content = (
     <TooltipProvider>
-      <div className={cn("flex h-full flex-col bg-white/58 backdrop-blur-xl", isCollapsed ? "w-20" : "w-60")}>
-        <div className={cn("flex h-16 shrink-0 items-center border-b border-ink/10 bg-white/40", isCollapsed ? "justify-center px-3" : "px-5")}>
-          <BrandLogo className={cn("h-auto max-w-full", isCollapsed ? "w-9" : "w-36")} />
+      <div className={cn("flex h-full flex-col bg-white", isCollapsed ? "w-20" : "w-64")}>
+        <div className={cn("flex h-16 shrink-0 items-center border-b border-[#e5e5e0] bg-white", isCollapsed ? "justify-center px-3" : "px-5")}>
+          <BrandLogo className={cn("h-auto max-w-full", isCollapsed ? "w-9" : "w-36")} variant="transparent" />
         </div>
 
         <nav className={cn("flex-1 overflow-y-auto py-4", isCollapsed ? "px-2" : "px-3")} aria-label="Sidebar navigation">
@@ -187,7 +187,7 @@ export default function Sidebar({
 
               return (
                 <Collapsible key={section} defaultOpen={hasActiveItem || section !== "Reports"} className="mb-2">
-                  <CollapsibleTrigger className="group flex w-full items-center justify-between rounded-lg px-3 pb-1 pt-3 text-left text-[10px] font-extrabold uppercase tracking-widest text-ink/35 transition-colors hover:text-ink/55">
+                  <CollapsibleTrigger className="group flex w-full items-center justify-between rounded-2xl px-3 pb-1.5 pt-4 text-left text-[10px] font-bold uppercase tracking-[0.12em] text-[#62625b] transition-colors hover:text-black">
                     <span>{section}</span>
                     <ChevronDown size={14} className="transition-transform duration-300 group-data-[state=open]:rotate-180" />
                   </CollapsibleTrigger>
@@ -212,8 +212,8 @@ export default function Sidebar({
   return (
     <aside
       className={cn(
-        "fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-white/70 bg-white/58 shadow-[12px_0_44px_rgba(13,60,52,0.08)] backdrop-blur-xl transition-[width] duration-300 lg:flex",
-        isCollapsed ? "w-20" : "w-60",
+        "fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-[#dadad3] bg-white transition-[width] duration-300 lg:flex",
+        isCollapsed ? "w-20" : "w-64",
       )}
     >
       {content}

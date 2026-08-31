@@ -66,13 +66,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
             padding: const EdgeInsets.only(right: 16),
             child: CircleAvatar(
               radius: 16,
-              backgroundColor: Colors.white.withValues(alpha: 0.25),
+              backgroundColor: kSurfaceCard,
               child: Text(
                 user?.name.isNotEmpty == true
                     ? user!.name[0].toUpperCase()
                     : 'B',
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: kPrimary,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -126,9 +126,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Text(
           'Hello, $firstName!',
           style: const TextStyle(
-            fontSize: 22,
+            fontSize: 28,
             fontWeight: FontWeight.w800,
             color: kDark,
+            letterSpacing: -1.2,
           ),
         ),
         const SizedBox(height: 2),
@@ -142,7 +143,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: kPrimaryGreen,
+            color: kSurfaceCard,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
@@ -152,16 +153,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 children: [
                   const Icon(
                     Icons.trending_up_rounded,
-                    color: Colors.white70,
+                    color: kPrimary,
                     size: 18,
                   ),
                   const SizedBox(width: 6),
                   Text(
                     'Net Profit',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.8),
-                      fontSize: 13,
-                    ),
+                    style: TextStyle(color: kMuted, fontSize: 13),
                   ),
                 ],
               ),
@@ -169,7 +167,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Text(
                 _fmt(stats.profit, currency),
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: kInk,
                   fontSize: 30,
                   fontWeight: FontWeight.w800,
                   letterSpacing: -1,
@@ -182,14 +180,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     icon: Icons.arrow_upward_rounded,
                     label: 'Sales',
                     value: _fmt(stats.totalSales, currency),
-                    color: Colors.white.withValues(alpha: 0.85),
+                    color: kPrimary,
                   ),
                   const SizedBox(width: 16),
                   _miniStat(
                     icon: Icons.arrow_downward_rounded,
                     label: 'Expenses',
                     value: _fmt(stats.totalExpenses, currency),
-                    color: Colors.white.withValues(alpha: 0.85),
+                    color: kMuted,
                   ),
                 ],
               ),
@@ -253,7 +251,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: _quickAction(
                 icon: Icons.add_circle_rounded,
                 label: 'New Sale',
-                color: kPrimaryGreen,
+                color: kPrimary,
                 onTap: () => context.push('/sales/add'),
               ),
             ),
@@ -262,7 +260,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: _quickAction(
                 icon: Icons.remove_circle_rounded,
                 label: 'New Expense',
-                color: kPrimaryGreen,
+                color: kMuted,
                 onTap: () => context.push('/expenses/add'),
               ),
             ),
@@ -271,7 +269,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: _quickAction(
                 icon: Icons.add_box_rounded,
                 label: 'New Product',
-                color: kPrimaryGreen,
+                color: kDark,
                 onTap: () => context.push('/products/add'),
               ),
             ),
@@ -299,15 +297,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
               children: [
                 Text(
                   label,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.7),
-                    fontSize: 10,
-                  ),
+                  style: const TextStyle(color: kMuted, fontSize: 10),
                 ),
                 Text(
                   value,
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: kDark,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),

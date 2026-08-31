@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Open+Sans:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700&family=Open+Sans:wght@400;500;600&family=Sora:wght@400;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -256,4 +256,211 @@ textarea {
 
 .animate-tour-progress {
   animation: tour-progress 5.2s linear both;
+}
+
+/* Authenticated portal — adapted from the supplied warm editorial design system. */
+.portal-shell {
+  --portal-primary: #e60023;
+  --portal-primary-pressed: #cc001f;
+  --portal-ink: #000000;
+  --portal-ink-soft: #211922;
+  --portal-body: #33332e;
+  --portal-muted: #62625b;
+  --portal-hairline: #dadad3;
+  --portal-hairline-soft: #e5e5e0;
+  --portal-card: #f6f6f3;
+  --portal-soft: #fbfbf9;
+  color: var(--portal-body);
+  background: var(--portal-soft);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.portal-shell.spatial-shell {
+  background: var(--portal-soft);
+  background-image: none;
+}
+
+.portal-content {
+  background: var(--portal-soft);
+}
+
+.portal-shell .font-display {
+  font-family: 'Manrope', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  letter-spacing: -0.035em;
+}
+
+.portal-shell .text-ink {
+  color: var(--portal-ink) !important;
+}
+
+.portal-shell [class*="text-ink/"] {
+  color: var(--portal-muted) !important;
+}
+
+.portal-shell .rounded-md,
+.portal-shell .rounded-lg,
+.portal-shell .rounded-xl,
+.portal-shell .rounded-2xl {
+  border-radius: 16px !important;
+}
+
+.portal-shell [class*="shadow-"] {
+  box-shadow: none !important;
+}
+
+.portal-shell .glass-panel,
+.portal-shell .bento-card {
+  border: 1px solid var(--portal-hairline-soft);
+  background: #ffffff;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.portal-shell .bento-card:hover {
+  box-shadow: none;
+  transform: none;
+}
+
+.portal-feature-card {
+  border: 0;
+  background: var(--portal-card);
+}
+
+.portal-shell .minimal-input {
+  border: 1px solid transparent;
+  background: var(--portal-card);
+  box-shadow: none;
+}
+
+.portal-shell .minimal-input:focus {
+  border-color: var(--portal-ink);
+  outline: 2px solid #435ee5;
+  outline-offset: 2px;
+}
+
+.portal-icon-button {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.portal-popover,
+.portal-modal {
+  border: 1px solid var(--portal-hairline-soft);
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.16) !important;
+}
+
+.portal-shell :where(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid #435ee5;
+  outline-offset: 3px;
+}
+
+.portal-shell button.bg-leaf,
+.portal-shell a.bg-leaf,
+.portal-shell button.bg-emerald-600,
+.portal-shell a.bg-emerald-600 {
+  background-color: var(--portal-primary) !important;
+}
+
+.portal-shell button.bg-leaf:hover,
+.portal-shell a.bg-leaf:hover,
+.portal-shell button.bg-emerald-600:hover,
+.portal-shell a.bg-emerald-600:hover {
+  background-color: var(--portal-primary-pressed) !important;
+}
+
+body.portal-active .MuiPaper-root,
+body.portal-active .MuiCard-root,
+body.portal-active .MuiTableContainer-root {
+  border: 1px solid var(--portal-hairline-soft) !important;
+  border-radius: 16px !important;
+  background: #ffffff !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+body.portal-active .MuiDialog-paper,
+body.portal-active .MuiPopover-paper,
+body.portal-active .MuiMenu-paper {
+  border: 1px solid var(--portal-hairline-soft) !important;
+  border-radius: 32px !important;
+  background: #ffffff !important;
+  background-image: none !important;
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.16) !important;
+  backdrop-filter: none !important;
+}
+
+body.portal-active .MuiButton-root {
+  min-height: 40px;
+  border-radius: 16px !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: none;
+  box-shadow: none !important;
+}
+
+body.portal-active .MuiButton-contained,
+body.portal-active .MuiButton-containedPrimary {
+  color: #ffffff !important;
+  background: var(--portal-primary) !important;
+}
+
+body.portal-active .MuiButton-contained:hover,
+body.portal-active .MuiButton-containedPrimary:hover {
+  background: var(--portal-primary-pressed) !important;
+}
+
+body.portal-active .MuiButton-outlined,
+body.portal-active .MuiButton-text {
+  color: var(--portal-ink) !important;
+  border-color: transparent !important;
+  background: var(--portal-card) !important;
+}
+
+body.portal-active .MuiOutlinedInput-root {
+  min-height: 44px;
+  border-radius: 16px !important;
+  background: #ffffff !important;
+}
+
+body.portal-active .MuiOutlinedInput-root fieldset {
+  border-color: #91918c !important;
+}
+
+body.portal-active .MuiOutlinedInput-root.Mui-focused {
+  box-shadow: 0 0 0 4px #ffffff, 0 0 0 6px #435ee5 !important;
+}
+
+body.portal-active .MuiOutlinedInput-root.Mui-focused fieldset {
+  border-width: 2px !important;
+  border-color: var(--portal-ink) !important;
+}
+
+body.portal-active .MuiTableHead-root .MuiTableCell-root {
+  color: var(--portal-muted) !important;
+  background: var(--portal-card) !important;
+  background-image: none !important;
+}
+
+body.portal-active .MuiTableCell-root,
+body.portal-active .MuiTablePagination-root {
+  border-color: var(--portal-hairline-soft) !important;
+  color: var(--portal-body) !important;
+}
+
+body.portal-active .MuiTableRow-hover:hover {
+  background-color: var(--portal-soft) !important;
+}
+
+body.portal-active .swal2-popup.biztrack-sweet-alert {
+  border-radius: 32px;
+}
+
+@media (max-width: 767px) {
+  .portal-shell .portal-modal {
+    margin-top: auto;
+    border-radius: 32px 32px 0 0 !important;
+  }
 }

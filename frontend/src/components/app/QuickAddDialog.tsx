@@ -18,7 +18,7 @@ const formMeta: Record<
   sale: {
     title: "Record Sale",
     icon: CircleDollarSign,
-    tone: "bg-mint text-leaf",
+    tone: "bg-[#f6f6f3] text-[#e60023]",
   },
   expense: {
     title: "Add Expense",
@@ -43,7 +43,7 @@ type QuickAddDialogProps = {
 export default function QuickAddDialog({
   formType,
   triggerLabel,
-  triggerClassName = "inline-flex items-center gap-1.5 rounded-xl bg-leaf px-3.5 py-2 text-sm font-bold text-white shadow-sm transition-colors hover:bg-leaf/90",
+  triggerClassName = "inline-flex min-h-11 items-center gap-1.5 rounded-2xl bg-[#e60023] px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-[#cc001f]",
   triggerIconSize = 15,
   onSaved,
 }: QuickAddDialogProps) {
@@ -72,20 +72,20 @@ export default function QuickAddDialog({
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/45 px-3 py-5 backdrop-blur-sm sm:px-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-3 py-5 sm:px-4">
           <div
             role="dialog"
             aria-modal="true"
             aria-labelledby="quick-add-form-title"
-            className="flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-xl border border-ink/10 bg-white shadow-card"
+            className="portal-modal flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-[32px] bg-white"
           >
             <div className="flex shrink-0 items-start justify-between gap-4 border-b border-ink/10 px-5 py-4">
               <div className="flex items-center gap-3">
-                <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${meta.tone}`}>
+                <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-2xl ${meta.tone}`}>
                   <Icon size={19} aria-hidden="true" />
                 </span>
                 <div>
-                  <p className="text-xs font-extrabold uppercase tracking-[0.1em] text-leaf">Add form</p>
+                  <p className="text-xs font-extrabold uppercase tracking-[0.1em] text-[#e60023]">Add form</p>
                   <h2 id="quick-add-form-title" className="font-display text-xl font-extrabold text-ink">
                     {meta.title}
                   </h2>
@@ -94,14 +94,14 @@ export default function QuickAddDialog({
               <button
                 type="button"
                 onClick={close}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full text-ink/45 transition-colors hover:bg-[#eef8f4] hover:text-ink"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#f6f6f3] text-ink/45 transition-colors hover:bg-[#e5e5e0] hover:text-ink"
                 aria-label="Close form dialog"
               >
                 <X size={18} aria-hidden="true" />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto bg-[#f7faf9] px-4 py-4 sm:px-5">{form}</div>
+            <div className="flex-1 overflow-y-auto bg-[#fbfbf9] px-4 py-4 sm:px-5">{form}</div>
           </div>
         </div>
       )}

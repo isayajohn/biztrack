@@ -35,16 +35,12 @@ class StatCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: (iconColor ?? kPrimaryGreen).withValues(
-                        alpha: kBadgeAlpha,
-                      ),
-                      borderRadius: BorderRadius.circular(10),
+                      color: iconColor == null
+                          ? kSurfaceCard
+                          : iconColor!.withValues(alpha: kBadgeAlpha),
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    child: Icon(
-                      icon,
-                      size: 20,
-                      color: iconColor ?? kPrimaryGreen,
-                    ),
+                    child: Icon(icon, size: 20, color: iconColor ?? kDark),
                   ),
                   const Spacer(),
                   if (onTap != null)

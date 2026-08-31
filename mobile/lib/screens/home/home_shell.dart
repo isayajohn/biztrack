@@ -14,7 +14,7 @@ class HomeShell extends StatelessWidget {
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: Colors.white,
-          border: Border(top: BorderSide(color: kCardBorder)),
+          border: Border(top: BorderSide(color: kHairline)),
         ),
         child: SafeArea(
           child: BottomNavigationBar(
@@ -25,7 +25,7 @@ class HomeShell extends StatelessWidget {
             ),
             type: BottomNavigationBarType.fixed,
             backgroundColor: Colors.white,
-            selectedItemColor: kPrimaryGreen,
+            selectedItemColor: kPrimary,
             unselectedItemColor: kMuted,
             selectedLabelStyle: const TextStyle(
               fontSize: 11,

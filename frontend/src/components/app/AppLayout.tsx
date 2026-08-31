@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import { ADMIN_NAV_ITEMS } from "../../constants/adminNav";
@@ -16,6 +16,12 @@ export default function AppLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const isAdminSection = location.pathname.startsWith("/admin");
+
+  useEffect(() => {
+    document.body.classList.add("portal-active");
+    return () => document.body.classList.remove("portal-active");
+  }, []);
+
   const navItems = useMemo(() => {
     if (isAdminSection) return ADMIN_NAV_ITEMS;
     if (user?.role === "SUPER_ADMIN") return [...NAV_ITEMS, ADMIN_BUTTON_NAV_ITEM];
@@ -24,7 +30,7 @@ export default function AppLayout() {
   }, [isAdminSection, user?.role, user?.permissions]);
 
   return (
-    <div className="spatial-shell flex min-h-screen text-ink">
+    <div className="portal-shell spatial-shell flex min-h-screen text-ink">
       {/* Desktop sidebar — fixed left, visible on lg+ */}
       <Sidebar
         navItems={navItems}
@@ -32,13 +38,13 @@ export default function AppLayout() {
       />
 
       {/* Main column: topbar + page content */}
-      <div className={`flex min-h-screen flex-1 flex-col transition-[padding] duration-300 ${sidebarCollapsed ? "lg:pl-20" : "lg:pl-60"}`}>
+      <div className={`flex min-h-screen flex-1 flex-col transition-[padding] duration-300 ${sidebarCollapsed ? "lg:pl-20" : "lg:pl-64"}`}>
         <Topbar
           isAdminSection={isAdminSection}
           onOpenSidebar={() => setMobileSidebarOpen(true)}
           onToggleSidebar={() => setSidebarCollapsed((value) => !value)}
         />
-        <main className="flex-1 overflow-y-auto">
+        <main className="portal-content flex-1 overflow-y-auto">
           <MotionPage key={location.pathname}>
             <Outlet />
           </MotionPage>

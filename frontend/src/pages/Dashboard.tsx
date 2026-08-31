@@ -100,16 +100,16 @@ function DashboardTooltip({
 function PanelTitle({ title, icon: Icon }: { title: string; icon: LucideIcon }) {
   return (
     <div className="flex items-center gap-2">
-      <span className="grid h-7 w-7 place-items-center rounded-lg bg-emerald-50 text-emerald-700">
+      <span className="grid h-8 w-8 place-items-center rounded-full bg-[#f6f6f3] text-[#e60023]">
         <Icon size={15} aria-hidden="true" />
       </span>
-      <h2 className="font-display text-sm font-bold text-ink">{title}</h2>
+      <h2 className="font-display text-base font-bold text-ink">{title}</h2>
     </div>
   );
 }
 
 function Sparkline({ tone = "emerald" }: { tone?: "emerald" | "orange" }) {
-  const stroke = tone === "orange" ? "#ea580c" : "#059669";
+  const stroke = tone === "orange" ? "#62625b" : "#e60023";
   const points = tone === "orange" ? "0,24 18,24 36,24 54,24 72,24 90,24" : "0,26 14,18 28,20 42,8 56,18 70,25 84,14 98,20 112,10 126,17";
   return (
     <svg className="h-8 w-32" viewBox="0 0 126 32" aria-hidden="true">
@@ -142,7 +142,7 @@ function KpiCard({
   const isPositive = (trend ?? 0) >= 0;
 
   return (
-    <section className="bento-card min-h-[8.75rem] rounded-xl p-5">
+    <section className="bento-card min-h-[9.25rem] rounded-2xl p-6">
       {loading ? (
         <div className="animate-pulse space-y-4">
           <div className="h-10 w-10 rounded-lg bg-ink/8" />
@@ -152,7 +152,7 @@ function KpiCard({
       ) : (
         <>
           <div className="flex items-start gap-4">
-            <span className={`grid h-10 w-10 place-items-center rounded-lg ${iconClass}`}>
+            <span className={`grid h-11 w-11 place-items-center rounded-full ${iconClass}`}>
               <AnimatedIcon icon={Icon} size={18} />
             </span>
             <div>
@@ -185,7 +185,7 @@ function EmptyBreakdown() {
   return (
     <div className="flex min-h-[13rem] items-center justify-center gap-8">
       <div className="relative grid h-36 w-36 place-items-center rounded-full bg-gradient-to-br from-ink/5 to-ink/10">
-        <div className="grid h-20 w-20 place-items-center rounded-full bg-white shadow-sm">
+        <div className="grid h-20 w-20 place-items-center rounded-full bg-white">
           <WalletCards size={28} className="text-ink/75" />
         </div>
       </div>
@@ -199,7 +199,7 @@ function EmptyBreakdown() {
 
 function CardButton({ to, children }: { to: string; children: string }) {
   return (
-    <Link to={to} className="rounded-lg border border-ink/10 px-3 py-1.5 text-xs font-bold text-ink/70 transition-colors hover:bg-emerald-50 hover:text-emerald-700">
+    <Link to={to} className="rounded-full bg-[#f6f6f3] px-3.5 py-2 text-xs font-bold text-[#211922] transition-colors hover:bg-[#e5e5e0]">
       {children}
     </Link>
   );
@@ -271,34 +271,34 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="mx-auto max-w-[94rem] px-5 py-6 sm:px-7">
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="font-display text-2xl font-bold text-ink">
+          <h1 className="font-display text-3xl font-bold tracking-[-1.2px] text-ink sm:text-4xl">
             {getGreeting()}, {firstName} 👋
           </h1>
-          <p className="mt-2 text-sm font-semibold text-ink/50">Here&apos;s what&apos;s happening with your business today.</p>
+          <p className="mt-2 text-base text-ink/50">Here&apos;s what&apos;s happening with your business today.</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <QuickAddDialog formType="sale" triggerLabel="Add Sale" triggerIconSize={16} triggerClassName="inline-flex h-11 items-center gap-2 rounded-lg bg-emerald-600 px-5 text-sm font-bold text-white shadow-[0_14px_32px_rgba(11,146,121,0.2)] transition-all hover:-translate-y-0.5 hover:bg-emerald-700" />
-          <QuickAddDialog formType="expense" triggerLabel="Add Expense" triggerIconSize={16} triggerClassName="minimal-input inline-flex h-11 items-center gap-2 rounded-lg px-5 text-sm font-bold text-ink transition-all hover:-translate-y-0.5 hover:bg-white/80" />
-          <QuickAddDialog formType="product" triggerLabel="Add Product" triggerIconSize={16} triggerClassName="minimal-input inline-flex h-11 items-center gap-2 rounded-lg px-5 text-sm font-bold text-ink transition-all hover:-translate-y-0.5 hover:bg-white/80" />
+          <QuickAddDialog formType="sale" triggerLabel="Add Sale" triggerIconSize={16} triggerClassName="inline-flex h-11 items-center gap-2 rounded-2xl bg-[#e60023] px-5 text-sm font-bold text-white transition-colors hover:bg-[#cc001f]" />
+          <QuickAddDialog formType="expense" triggerLabel="Add Expense" triggerIconSize={16} triggerClassName="minimal-input inline-flex h-11 items-center gap-2 rounded-2xl px-5 text-sm font-bold text-ink transition-colors hover:bg-[#e5e5e0]" />
+          <QuickAddDialog formType="product" triggerLabel="Add Product" triggerIconSize={16} triggerClassName="minimal-input inline-flex h-11 items-center gap-2 rounded-2xl px-5 text-sm font-bold text-ink transition-colors hover:bg-[#e5e5e0]" />
         </div>
       </div>
 
       {error && <div className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600">{error}</div>}
 
       <div className="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <KpiCard title="Total Sales" value={formatCurrency(todayReport.summary.totalSales, currency)} icon={CircleDollarSign} iconClass="bg-emerald-50 text-emerald-700" trend={percentChange(todayReport.summary.totalSales, yesterdayReport.summary.totalSales)} loading={isLoading} />
-        <KpiCard title="Total Expenses" value={formatCurrency(todayReport.summary.totalExpenses, currency)} icon={WalletCards} iconClass="bg-orange-50 text-orange-600" trend={percentChange(todayReport.summary.totalExpenses, yesterdayReport.summary.totalExpenses)} loading={isLoading} sparkTone="orange" />
-        <KpiCard title="Net Profit" value={formatCurrency(todayReport.summary.netProfit, currency)} icon={ArrowUpRight} iconClass="bg-emerald-50 text-emerald-700" trend={percentChange(todayReport.summary.netProfit, yesterdayReport.summary.netProfit)} loading={isLoading} />
-        <KpiCard title="Low Stock Items" value={lowStockCount} icon={AlertTriangle} iconClass="bg-amber-50 text-amber-600" linkLabel="View items" linkTo="/products" loading={isLoading} />
+        <KpiCard title="Total Sales" value={formatCurrency(todayReport.summary.totalSales, currency)} icon={CircleDollarSign} iconClass="bg-[#f6f6f3] text-[#e60023]" trend={percentChange(todayReport.summary.totalSales, yesterdayReport.summary.totalSales)} loading={isLoading} />
+        <KpiCard title="Total Expenses" value={formatCurrency(todayReport.summary.totalExpenses, currency)} icon={WalletCards} iconClass="bg-[#f6f6f3] text-[#62625b]" trend={percentChange(todayReport.summary.totalExpenses, yesterdayReport.summary.totalExpenses)} loading={isLoading} sparkTone="orange" />
+        <KpiCard title="Net Profit" value={formatCurrency(todayReport.summary.netProfit, currency)} icon={ArrowUpRight} iconClass="bg-[#f6f6f3] text-[#262622]" trend={percentChange(todayReport.summary.netProfit, yesterdayReport.summary.netProfit)} loading={isLoading} />
+        <KpiCard title="Low Stock Items" value={lowStockCount} icon={AlertTriangle} iconClass="bg-[#fff1d6] text-[#9a5200]" linkLabel="View items" linkTo="/products" loading={isLoading} />
       </div>
 
-      <section className="glass-panel mt-5 rounded-xl p-5">
+      <section className="portal-feature-card mt-5 rounded-2xl p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex gap-4">
-            <span className="mt-0.5 text-emerald-700"><Sparkles size={18} /></span>
+            <span className="mt-0.5 text-[#e60023]"><Sparkles size={18} /></span>
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="font-display text-sm font-bold text-ink">AI Business Summary</h2>
@@ -314,9 +314,9 @@ export default function Dashboard() {
             </div>
           </div>
           {summaryNeedsUpgrade ? (
-            <Link to="/subscription" className="inline-flex h-11 shrink-0 items-center justify-center rounded-lg bg-emerald-600 px-5 text-sm font-bold text-white">Pay package</Link>
+            <Link to="/subscription" className="inline-flex h-11 shrink-0 items-center justify-center rounded-2xl bg-[#e60023] px-5 text-sm font-bold text-white hover:bg-[#cc001f]">Pay package</Link>
           ) : (
-            <button type="button" onClick={handleGenerateSummary} disabled={isGeneratingSummary} className="minimal-input inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-lg px-5 text-sm font-bold text-ink transition-colors hover:bg-white/80 disabled:opacity-60">
+            <button type="button" onClick={handleGenerateSummary} disabled={isGeneratingSummary} className="minimal-input inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-2xl px-5 text-sm font-bold text-ink transition-colors hover:bg-[#e5e5e0] disabled:opacity-60">
               <Bot size={16} />
               Generate Summary
             </button>
@@ -325,14 +325,14 @@ export default function Dashboard() {
       </section>
 
       <div className="mt-5 grid gap-5 xl:grid-cols-2">
-        <section className="bento-card rounded-xl p-5">
+        <section className="bento-card rounded-2xl p-6">
           <div className="flex items-center justify-between">
             <PanelTitle title="Sales vs Expenses" icon={TrendingUp} />
-            <button className="rounded-lg border border-ink/10 px-3 py-1.5 text-xs font-bold text-ink/60">Last 7 days</button>
+            <button className="rounded-full bg-[#f6f6f3] px-3.5 py-2 text-xs font-bold text-ink/60">Last 7 days</button>
           </div>
           <div className="mt-4 flex gap-6 pl-11 text-xs font-semibold text-ink/55">
-            <span className="inline-flex items-center gap-2"><span className="h-2 w-2 rounded-sm bg-emerald-600" /> Sales</span>
-            <span className="inline-flex items-center gap-2"><span className="h-2 w-2 rounded-sm bg-orange-600" /> Expenses</span>
+            <span className="inline-flex items-center gap-2"><span className="h-2 w-2 rounded-sm bg-[#e60023]" /> Sales</span>
+            <span className="inline-flex items-center gap-2"><span className="h-2 w-2 rounded-sm bg-[#62625b]" /> Expenses</span>
           </div>
           <div className="mt-3 h-52">
             <ResponsiveContainer width="100%" height="100%">
@@ -340,18 +340,18 @@ export default function Dashboard() {
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(16,35,30,0.12)" vertical={false} />
                 <XAxis dataKey="day" tick={{ fontSize: 12, fill: "rgba(16,35,30,0.5)" }} axisLine={false} tickLine={false} tickMargin={10} />
                 <YAxis tick={{ fontSize: 12, fill: "rgba(16,35,30,0.5)" }} axisLine={false} tickLine={false} width={42} tickFormatter={(value) => `${Number(value) / 1000}K`} />
-                <Tooltip content={<DashboardTooltip currency={currency} />} cursor={{ fill: "rgba(16,185,129,0.08)" } as object} />
-                <Bar dataKey="sales" name="Sales" fill="#059669" radius={[2, 2, 0, 0]} />
-                <Bar dataKey="expenses" name="Expenses" fill="#ea580c" radius={[2, 2, 0, 0]} />
+                <Tooltip content={<DashboardTooltip currency={currency} />} cursor={{ fill: "rgba(230,0,35,0.06)" } as object} />
+                <Bar dataKey="sales" name="Sales" fill="#e60023" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="expenses" name="Expenses" fill="#62625b" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </section>
 
-        <section className="bento-card rounded-xl p-5">
+        <section className="bento-card rounded-2xl p-6">
           <div className="flex items-center justify-between">
             <PanelTitle title="Expense Breakdown" icon={WalletCards} />
-            <button className="rounded-lg border border-ink/10 px-3 py-1.5 text-xs font-bold text-ink/60">This month</button>
+            <button className="rounded-full bg-[#f6f6f3] px-3.5 py-2 text-xs font-bold text-ink/60">This month</button>
           </div>
           {monthReport.expenseByCategory.length === 0 ? (
             <EmptyBreakdown />
@@ -379,7 +379,7 @@ export default function Dashboard() {
       </div>
 
       <div className="mt-5 grid gap-5 xl:grid-cols-2">
-        <section className="bento-card rounded-xl p-5">
+        <section className="bento-card rounded-2xl p-6">
           <div className="flex items-center justify-between">
             <PanelTitle title="Recent Sales" icon={CircleDollarSign} />
             <CardButton to="/sales">View all</CardButton>
@@ -397,7 +397,7 @@ export default function Dashboard() {
           </div>
         </section>
 
-        <section className="bento-card rounded-xl p-5">
+        <section className="bento-card rounded-2xl p-6">
           <div className="flex items-center justify-between">
             <PanelTitle title="Recent Expenses" icon={WalletCards} />
             <CardButton to="/expenses">View all</CardButton>
@@ -416,7 +416,7 @@ export default function Dashboard() {
         </section>
       </div>
 
-      <section className="glass-panel mt-5 flex items-center justify-between gap-4 rounded-xl p-5">
+      <section className="portal-feature-card mt-5 flex items-center justify-between gap-4 rounded-2xl p-6">
         <div className="flex gap-4">
           <Lightbulb size={20} className="mt-0.5 text-amber-500" />
           <div>
@@ -424,7 +424,7 @@ export default function Dashboard() {
             <p className="mt-3 text-sm text-ink/65">Keep your inventory updated to avoid stockouts and boost sales.</p>
           </div>
         </div>
-        <div className="hidden rounded-xl bg-emerald-100 p-3 text-emerald-700 md:block">
+        <div className="hidden rounded-[32px] bg-[#f6f6f3] p-3 text-[#e60023] md:block">
           <Plus size={42} />
         </div>
       </section>

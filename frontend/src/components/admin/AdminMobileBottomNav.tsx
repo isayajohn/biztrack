@@ -6,7 +6,7 @@ export default function AdminMobileBottomNav() {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-30 border-t border-ink/10 bg-white text-ink shadow-[0_-10px_30px_rgba(17,24,20,0.08)] lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-30 border-t border-[#dadad3] bg-white text-ink lg:hidden"
       aria-label="Admin mobile navigation"
     >
       <ul className="flex overflow-x-auto" role="list">
@@ -18,7 +18,7 @@ export default function AdminMobileBottomNav() {
                 to={to}
                 className={[
                   "flex min-h-[58px] flex-col items-center justify-center gap-1 px-2 text-center text-[10px] font-bold leading-tight transition-colors",
-                  isActive ? "bg-emerald-50 text-emerald-700" : "text-ink/45 hover:text-ink",
+                  isActive ? "bg-[#f7f3ea] text-[#e60023]" : "text-ink/45 hover:bg-[#fbfaf7] hover:text-ink",
                 ].join(" ")}
               >
                 <Icon size={18} aria-hidden="true" />

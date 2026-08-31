@@ -14,15 +14,15 @@ export default function AdminTopbar() {
 
   const handleLogout = () => {
     logout();
-    navigate("/login", { replace: true });
+    navigate("/", { replace: true });
   };
 
   return (
-    <header className="sticky top-0 z-20 border-b border-white/70 bg-white/62 px-4 shadow-[0_12px_36px_rgba(13,60,52,0.07)] backdrop-blur-xl lg:px-6">
-      <div className="flex h-14 items-center justify-between gap-3">
+    <header className="sticky top-0 z-20 border-b border-[#dadad3] bg-white px-4 lg:px-6">
+      <div className="flex h-16 items-center justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-emerald-50 text-emerald-700 lg:hidden">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#f6f6f3] text-[#e60023] lg:hidden">
               <ShieldCheck size={16} aria-hidden="true" />
             </span>
             <div className="min-w-0">
@@ -37,8 +37,8 @@ export default function AdminTopbar() {
         </div>
 
         <div className="flex shrink-0 items-center gap-3">
-          <div className="flex items-center gap-2 rounded-full px-1.5 pr-2">
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-ink/5 text-xs font-bold text-ink/65">
+          <div className="flex h-11 items-center gap-2 rounded-full bg-[#f6f6f3] px-1.5 pr-3">
+            <span className="grid h-9 w-9 place-items-center rounded-full bg-white text-xs font-bold text-[#211922]">
               {initials(user?.name)}
             </span>
             <span className="hidden text-sm font-bold text-ink sm:inline">{roleLabel}</span>
@@ -46,7 +46,7 @@ export default function AdminTopbar() {
           </div>
           <button
             onClick={handleLogout}
-            className="grid h-10 w-10 place-items-center rounded-full text-ink/45 transition-colors hover:bg-red-50 hover:text-clay"
+            className="grid h-11 w-11 place-items-center rounded-full bg-[#f6f6f3] text-[#62625b] transition-colors hover:bg-red-50 hover:text-[#9e0a0a]"
             aria-label="Log out"
           >
             <LogOut size={16} aria-hidden="true" />

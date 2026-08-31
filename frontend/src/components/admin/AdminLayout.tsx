@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { useNoIndex } from "../../hooks/useSeo";
 import { MotionPage } from "../animate-ui/MotionPrimitives";
@@ -9,8 +10,13 @@ export default function AdminLayout() {
   useNoIndex(false);
   const location = useLocation();
 
+  useEffect(() => {
+    document.body.classList.add("portal-active");
+    return () => document.body.classList.remove("portal-active");
+  }, []);
+
   return (
-    <div className="spatial-shell min-h-screen text-ink">
+    <div className="portal-shell spatial-shell min-h-screen text-ink">
       <AdminSidebar />
       <div className="min-h-screen lg:pl-64">
         <AdminTopbar />

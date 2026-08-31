@@ -76,7 +76,7 @@ export function SheetContent({ children, className, ...props }: HTMLAttributes<H
       />
       <div
         className={cn(
-          "relative flex h-full w-[18rem] max-w-[86vw] flex-col bg-white shadow-2xl",
+          "relative flex h-full w-[18rem] max-w-[86vw] flex-col overflow-hidden rounded-r-[32px] bg-white shadow-2xl",
           "animate-[sheet-slide-in_180ms_ease-out]",
           className,
         )}

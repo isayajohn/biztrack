@@ -55,11 +55,11 @@ export default function Topbar({ isAdminSection = false, onOpenSidebar, onToggle
 
   const handleLogout = () => {
     logout();
-    navigate("/login", { replace: true });
+    navigate("/", { replace: true });
   };
 
   return (
-    <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center justify-between border-b border-white/70 bg-white/62 px-4 shadow-[0_12px_36px_rgba(13,60,52,0.07)] backdrop-blur-xl lg:px-6">
+    <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between border-b border-[#dadad3] bg-white px-4 lg:px-6">
       <div className="flex items-center gap-2">
         <button
           type="button"
@@ -70,7 +70,7 @@ export default function Topbar({ isAdminSection = false, onOpenSidebar, onToggle
               onOpenSidebar?.();
             }
           }}
-          className="grid h-10 w-10 place-items-center rounded-lg text-ink/70 transition-colors hover:bg-white/70 hover:text-ink"
+          className="portal-icon-button grid h-11 w-11 place-items-center rounded-full text-[#62625b] transition-colors hover:bg-[#e5e5e0] hover:text-black"
           aria-label="Open sidebar"
         >
           <Menu size={18} aria-hidden="true" />
@@ -79,11 +79,11 @@ export default function Topbar({ isAdminSection = false, onOpenSidebar, onToggle
       </div>
 
       <div className="ml-auto flex items-center gap-3">
-        {branches.length > 1 && <select value={activeBranch} onChange={(event) => { setActiveBranch(event.target.value); localStorage.setItem(ACTIVE_BRANCH_KEY, event.target.value); window.location.reload(); }} className="minimal-input hidden h-10 rounded-lg px-3 text-xs font-bold text-ink/70 sm:block">{branches.map((branch) => <option key={branch.id} value={branch.id}>{branch.name}</option>)}</select>}
+        {branches.length > 1 && <select value={activeBranch} onChange={(event) => { setActiveBranch(event.target.value); localStorage.setItem(ACTIVE_BRANCH_KEY, event.target.value); window.location.reload(); }} className="minimal-input hidden h-11 rounded-full px-4 text-xs font-bold text-[#62625b] sm:block">{branches.map((branch) => <option key={branch.id} value={branch.id}>{branch.name}</option>)}</select>}
         {user?.role === "SUPER_ADMIN" && !isAdminSection && (
           <Link
             to="/admin"
-            className="hidden h-10 items-center gap-1.5 rounded-lg border border-leaf/20 bg-mint px-3 text-xs font-bold text-leaf transition-colors hover:bg-leaf hover:text-white sm:flex"
+            className="hidden h-11 items-center gap-1.5 rounded-2xl bg-[#f6f6f3] px-4 text-xs font-bold text-black transition-colors hover:bg-[#e5e5e0] sm:flex"
           >
             <ShieldCheck size={14} aria-hidden="true" />
             Admin
@@ -94,21 +94,21 @@ export default function Topbar({ isAdminSection = false, onOpenSidebar, onToggle
           <button
             type="button"
             onClick={() => { setNotificationsOpen((open) => !open); setProfileOpen(false); }}
-            className="relative grid h-10 w-10 place-items-center rounded-full text-ink/70 transition-colors hover:bg-white/70 hover:text-ink"
+            className="portal-icon-button relative grid h-11 w-11 place-items-center rounded-full bg-[#f6f6f3] text-[#62625b] transition-colors hover:bg-[#e5e5e0] hover:text-black"
             aria-label="Notifications"
             aria-expanded={notificationsOpen}
           >
             <Bell size={18} aria-hidden="true" />
-            {unreadNotifications > 0 && <span className="absolute right-1.5 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-emerald-600 px-1 text-[10px] font-extrabold leading-none text-white">{unreadNotifications > 9 ? "9+" : unreadNotifications}</span>}
+            {unreadNotifications > 0 && <span className="absolute right-1 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-[#e60023] px-1 text-[10px] font-extrabold leading-none text-white">{unreadNotifications > 9 ? "9+" : unreadNotifications}</span>}
           </button>
           {notificationsOpen && (
-            <div className="glass-panel absolute right-0 top-12 z-50 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl">
+            <div className="portal-popover absolute right-0 top-14 z-50 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-[32px] bg-white">
               <div className="flex items-center justify-between border-b border-ink/10 px-4 py-3">
                 <div>
                   <p className="font-display text-sm font-bold text-ink">Notifications</p>
                   <p className="text-xs font-semibold text-ink/45">{unreadNotifications} unread</p>
                 </div>
-                <Link to="/notifications" onClick={() => setNotificationsOpen(false)} className="text-xs font-bold text-emerald-700 hover:text-emerald-800">View all</Link>
+                <Link to="/notifications" onClick={() => setNotificationsOpen(false)} className="text-xs font-bold text-[#e60023] hover:text-[#cc001f]">View all</Link>
               </div>
               <div className="max-h-80 overflow-y-auto">
                 {recentNotifications.length === 0 ? (
@@ -118,7 +118,7 @@ export default function Topbar({ isAdminSection = false, onOpenSidebar, onToggle
                     key={notification.id}
                     to="/notifications"
                     onClick={() => setNotificationsOpen(false)}
-                    className="block border-b border-ink/8 px-4 py-3 last:border-0 hover:bg-emerald-50/70"
+                    className="block border-b border-ink/8 px-4 py-3 last:border-0 hover:bg-[#f6f6f3]"
                   >
                     <p className="text-sm font-bold text-ink">{notification.title}</p>
                     <p className="mt-1 line-clamp-2 text-xs font-semibold leading-5 text-ink/50">{notification.message}</p>
@@ -133,19 +133,19 @@ export default function Topbar({ isAdminSection = false, onOpenSidebar, onToggle
           <button
             type="button"
             onClick={() => { setProfileOpen((open) => !open); setNotificationsOpen(false); }}
-            className="flex h-10 items-center gap-2 rounded-full px-1.5 pr-2 transition-colors hover:bg-white/70"
+            className="flex h-11 items-center gap-2 rounded-full bg-[#f6f6f3] px-1.5 pr-3 transition-colors hover:bg-[#e5e5e0]"
             aria-label="Open profile menu"
             aria-expanded={profileOpen}
           >
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-ink/5 text-xs font-bold text-ink/65">{initials(user?.name)}</span>
+            <span className="grid h-9 w-9 place-items-center rounded-full bg-white text-xs font-bold text-[#211922]">{initials(user?.name)}</span>
             <span className="hidden text-sm font-bold text-ink sm:inline">{user?.name ?? "User"}</span>
             <ChevronDown size={16} className="hidden text-ink/45 sm:block" aria-hidden="true" />
           </button>
           {profileOpen && (
-            <div className="glass-panel absolute right-0 top-12 z-50 w-72 overflow-hidden rounded-xl">
+            <div className="portal-popover absolute right-0 top-14 z-50 w-72 overflow-hidden rounded-[32px] bg-white">
               <div className="border-b border-ink/10 px-4 py-4">
                 <div className="flex items-center gap-3">
-                  <span className="grid h-11 w-11 place-items-center rounded-full bg-emerald-50 text-sm font-extrabold text-emerald-700">{initials(user?.name)}</span>
+                  <span className="grid h-11 w-11 place-items-center rounded-full bg-[#f6f6f3] text-sm font-extrabold text-[#e60023]">{initials(user?.name)}</span>
                   <div className="min-w-0">
                     <p className="truncate font-display text-sm font-bold text-ink">{user?.name ?? "User"}</p>
                     <p className="truncate text-xs font-semibold text-ink/45">{user?.businessName ?? "My Business"}</p>
@@ -154,21 +154,21 @@ export default function Topbar({ isAdminSection = false, onOpenSidebar, onToggle
               </div>
               <div className="p-2">
                 {user?.role === "SUPER_ADMIN" && !isAdminSection && (
-                  <Link to="/admin" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold text-ink/70 hover:bg-emerald-50 hover:text-ink">
+                  <Link to="/admin" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold text-ink/70 hover:bg-[#f6f6f3] hover:text-ink">
                     <ShieldCheck size={16} />
                     Admin
                   </Link>
                 )}
-                <Link to="/settings" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold text-ink/70 hover:bg-emerald-50 hover:text-ink">
+                <Link to="/settings" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold text-ink/70 hover:bg-[#f6f6f3] hover:text-ink">
                   <Settings size={16} />
                   Settings
                 </Link>
-                <Link to="/subscription" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold text-ink/70 hover:bg-emerald-50 hover:text-ink">
+                <Link to="/subscription" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold text-ink/70 hover:bg-[#f6f6f3] hover:text-ink">
                   <CreditCard size={16} />
                   Billing
                 </Link>
                 <div className="my-2 border-t border-ink/10" />
-                <button onClick={handleLogout} className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-clay hover:bg-red-50">
+                <button onClick={handleLogout} className="flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left text-sm font-semibold text-[#9e0a0a] hover:bg-red-50">
                   <LogOut size={16} />
                   Logout
                 </button>

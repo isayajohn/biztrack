@@ -67,7 +67,7 @@ class ListItemCard extends StatelessWidget {
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 15,
-                      color: trailingColor ?? kPrimaryGreen,
+                      color: trailingColor ?? kDark,
                     ),
                   ),
                   if (trailingSubtitle != null)
