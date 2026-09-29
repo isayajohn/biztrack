@@ -178,7 +178,7 @@ export default function CustomersPage() {
 
       {error && <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</div>}
 
-      <section className="mt-4 overflow-hidden rounded-xl border border-ink/10 bg-white shadow-sm">
+      <section className="portal-table-card mt-4">
         <div className="border-b border-ink/10 p-4">
           <label className="flex max-w-md items-center gap-2 rounded-xl border border-ink/15 px-3 py-2">
             <Search size={16} className="text-ink/35" />
@@ -191,7 +191,7 @@ export default function CustomersPage() {
           <div className="p-10 text-center"><UserRound className="mx-auto text-ink/20" /><p className="mt-3 text-sm font-semibold text-ink/45">No customers found.</p></div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[820px] text-left text-sm">
+            <table className="portal-data-table w-full min-w-[820px] text-left text-sm">
               <thead className="bg-[#f7faf9] text-xs uppercase tracking-wide text-ink/45"><tr><th className="px-4 py-3">Customer</th><th className="px-4 py-3">Contact</th><th className="px-4 py-3">Sales</th><th className="px-4 py-3">Credit limit</th><th className="px-4 py-3">Owing</th><th className="px-4 py-3 text-right">Actions</th></tr></thead>
               <tbody className="divide-y divide-ink/8">
                 {visibleCustomers.map((customer) => (

@@ -200,7 +200,7 @@ export default function AdminCollectionsPage() {
         <StatTile label="Failed" value={formatCurrency(failed.amount)} helper={`${failed.count} failed`} />
       </section>
 
-      <section className="mt-5 rounded-lg border border-ink/10 bg-white shadow-sm">
+      <section className="portal-table-card mt-5">
         <div className="grid gap-3 border-b border-ink/10 p-4 md:grid-cols-[1fr_220px]">
           <div className="relative">
             <Search
@@ -240,7 +240,7 @@ export default function AdminCollectionsPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-ink/10 text-left text-sm">
+            <table className="portal-data-table min-w-full divide-y divide-ink/10 text-left text-sm">
               <thead className="bg-[#f7faf9] text-xs font-extrabold uppercase tracking-[0.05em] text-ink/45">
                 <tr>
                   <th className="px-4 py-3">Business</th>

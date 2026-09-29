@@ -74,8 +74,8 @@ export default function DebtReportsPage() {
             <Card label="Overdue amount" value={formatCurrency(overdueAmount, currency)} icon={Landmark} tone="text-red-600" />
           </div>
 
-          <section className="mt-4 overflow-hidden rounded-xl border border-ink/10 bg-white shadow-sm">
-            <table className="w-full text-left text-sm">
+          <section className="portal-table-card mt-4">
+            <table className="portal-data-table w-full text-left text-sm">
               <thead className="bg-[#f7faf9] text-xs uppercase text-ink/45">
                 <tr>
                   <th className="px-4 py-3">Aging bucket</th>

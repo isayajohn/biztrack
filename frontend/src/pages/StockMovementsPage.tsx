@@ -169,8 +169,8 @@ export default function StockMovementsPage() {
       ) : (
         <>
           {/* Desktop table */}
-          <div className="mt-4 hidden overflow-hidden rounded-xl border border-ink/10 bg-white shadow-sm lg:block">
-            <table className="w-full text-sm">
+          <div className="portal-table-card mt-4 hidden lg:block">
+            <table className="portal-data-table w-full text-sm">
               <thead>
                 <tr className="border-b border-ink/8 bg-[#f7faf9]">
                   <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-ink/45">

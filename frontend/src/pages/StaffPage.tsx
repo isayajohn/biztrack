@@ -412,9 +412,9 @@ export default function StaffPage() {
         </section>
       )}
 
-      <section className="mt-4 overflow-hidden rounded-xl border border-ink/10 bg-white shadow-sm">
+      <section className="portal-table-card mt-4">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[980px] text-left text-sm">
+          <table className="portal-data-table w-full min-w-[980px] text-left text-sm">
             <thead className="bg-[#f7faf9] text-xs uppercase text-ink/45">
               <tr>
                 <th className="px-4 py-3">User</th>

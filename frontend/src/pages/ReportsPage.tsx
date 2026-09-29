@@ -624,16 +624,16 @@ export default function ReportsPage() {
         </ChartCard>
       </section>
 
-      <section className="mt-4 rounded-xl border border-ink/10 bg-white p-4 shadow-sm">
+      <section className="mt-4">
         <SectionHeader title="Report table" subtitle="Sales and expenses" icon={FileText} />
         {reportRows.length === 0 ? (
           <EmptyState message="No sales or expenses to show in this date range." icon={FileText} />
         ) : (
-          <div className="mt-4 overflow-hidden rounded-xl border border-ink/8">
+          <div className="portal-table-card mt-4">
             <TableContainer>
               <Table aria-label="Report transactions table">
                 <TableHead>
-                  <TableRow className="bg-[#f7faf9]">
+                  <TableRow className="portal-table-head-row">
                     <TableCell sx={{ py: 1.25, pl: 2 }} className="text-xs font-bold uppercase tracking-wide text-ink/45">
                       Date
                     </TableCell>

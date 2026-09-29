@@ -535,11 +535,11 @@ export default function ProductsPage() {
           </div>
 
           {/* Desktop table */}
-          <div className="mt-4 hidden overflow-hidden rounded-xl border border-ink/10 bg-white shadow-sm lg:block">
+          <div className="portal-table-card mt-4 hidden lg:block">
             <TableContainer>
               <Table aria-label="Products table" sx={{ tableLayout: "fixed" }}>
                 <TableHead>
-                  <TableRow className="bg-[#f7faf9]">
+                  <TableRow className="portal-table-head-row">
                     <TableCell sx={{ py: 1.25, pl: 2 }} className="text-xs font-bold uppercase tracking-wide text-ink/45">
                     Product
                     </TableCell>

@@ -468,7 +468,7 @@ export default function PurchasesPage() {
           {orders.map((order) => (
             <div
               key={order.id}
-              className="overflow-hidden rounded-xl border border-ink/10 bg-white shadow-sm"
+              className="portal-table-card"
             >
               {/* Order header row */}
               <div className="flex items-center gap-3 px-4 py-3">
@@ -515,7 +515,7 @@ export default function PurchasesPage() {
               {/* Expanded items */}
               {expandedId === order.id && (
                 <div className="border-t border-ink/8 px-4 pb-3 pt-2">
-                  <table className="w-full text-sm">
+                  <table className="portal-data-table w-full text-sm">
                     <thead>
                       <tr>
                         <th className="pb-1.5 text-left text-xs font-bold uppercase text-ink/40">

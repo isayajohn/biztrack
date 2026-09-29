@@ -21,7 +21,7 @@ export function exportTablePdf<T>(options: {
     options.summary.forEach(([label, value], index) => document.text(`${label}: ${value}`, 14 + (index % 3) * 62, startY + Math.floor(index / 3) * 6));
     startY += Math.ceil(options.summary.length / 3) * 6 + 4;
   }
-  autoTable(document, { startY, head: [options.columns.map((column) => column.header)], body: options.rows.map((row) => options.columns.map((column) => column.value(row))), styles: { fontSize: 8 }, headStyles: { fillColor: [18, 184, 144] } });
+  autoTable(document, { startY, head: [options.columns.map((column) => column.header)], body: options.rows.map((row) => options.columns.map((column) => column.value(row))), styles: { fontSize: 8 }, headStyles: { fillColor: [230, 0, 35] } });
   document.save(options.fileName);
 }
 
@@ -55,7 +55,7 @@ export async function exportTableExcel<T>(options: {
   const sheet = workbook.addWorksheet(options.sheetName.slice(0, 31));
   sheet.columns = options.columns.map((column) => ({ header: column.header, key: column.header, width: Math.max(14, column.header.length + 4) }));
   for (const row of options.rows) sheet.addRow(Object.fromEntries(options.columns.map((column) => [column.header, column.value(row)])));
-  const header = sheet.getRow(1); header.font = { bold: true, color: { argb: "FFFFFFFF" } }; header.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF12B890" } };
+  const header = sheet.getRow(1); header.font = { bold: true, color: { argb: "FFFFFFFF" } }; header.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFE60023" } };
   sheet.views = [{ state: "frozen", ySplit: 1 }];
   const buffer = await workbook.xlsx.writeBuffer();
   const url = URL.createObjectURL(new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));

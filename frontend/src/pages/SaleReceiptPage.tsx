@@ -43,7 +43,7 @@ export default function SaleReceiptPage() {
           <div className="sm:text-right"><p className="text-xs font-bold uppercase tracking-wide text-ink/40">Sale date</p><p className="mt-1 font-bold text-ink">{new Date(`${sale.saleDate}T00:00:00`).toLocaleDateString()}</p>{sale.paymentDueDate && sale.balanceDue > 0 && <p className="mt-1 text-xs font-semibold text-red-600">Due {new Date(`${sale.paymentDueDate}T00:00:00`).toLocaleDateString()}</p>}</div>
         </section>
 
-        <table className="mt-6 w-full text-left text-sm">
+        <table className="portal-data-table mt-6 w-full text-left text-sm">
           <thead className="bg-[#f7faf9] text-xs uppercase text-ink/45"><tr><th className="px-3 py-2.5">Item</th><th className="px-3 py-2.5 text-right">Qty</th><th className="px-3 py-2.5 text-right">Price</th><th className="px-3 py-2.5 text-right">Amount</th></tr></thead>
           <tbody>
             {sale.items && sale.items.length > 0 ? (

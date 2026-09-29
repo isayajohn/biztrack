@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TablePagination from "@mui/material/TablePagination";
-import TableRow from "@mui/material/TableRow";
-import { AlertCircle, Building2, Eye, Search } from "lucide-react";
-import { Link } from "react-router-dom";
+import { AlertCircle, Building2, CreditCard, Eye, Search } from "lucide-react";
 import { getAdminBusinessesPage } from "../../services/adminApi";
 import type { AdminBusiness } from "../../services/adminApi";
 import { getApiErrorMessage } from "../../services/apiClient";
 import { formatCurrency } from "../../utils/format";
+import {
+  AdminActionMenu,
+  AdminFilterPanel,
+  AdminPageFrame,
+  AdminPageHeader,
+  AdminTablePagination,
+  EntityAvatar,
+} from "../../components/admin/AdminTableUi";
 
 function formatDate(value?: string | null) {
   if (!value) return "Never";
@@ -55,13 +55,13 @@ function LoadingRows() {
   return (
     <>
       {Array.from({ length: 5 }).map((_, index) => (
-        <TableRow key={index}>
-          {Array.from({ length: 12 }).map((__, cellIndex) => (
-            <TableCell key={cellIndex}>
+        <tr key={index}>
+          {Array.from({ length: 7 }).map((__, cellIndex) => (
+            <td key={cellIndex}>
               <div className="h-3 w-full max-w-28 animate-pulse rounded-full bg-ink/8" />
-            </TableCell>
+            </td>
           ))}
-        </TableRow>
+        </tr>
       ))}
     </>
   );
@@ -85,30 +85,15 @@ function MobileLoadingCards() {
   );
 }
 
-function ViewLink({ id }: { id: string }) {
-  return (
-    <Link
-      to={`/admin/businesses/${id}`}
-      className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-ink/15 px-2.5 py-1.5 text-xs font-bold text-ink/60 transition-colors hover:bg-[#eef8f4]"
-    >
-      <Eye size={13} aria-hidden="true" />
-      View
-    </Link>
-  );
-}
-
 function BusinessMobileCard({ business }: { business: AdminBusiness }) {
   return (
-    <article className="rounded-lg border border-ink/10 bg-white p-3 shadow-sm">
+    <article className="p-5">
       <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h2 className="truncate text-sm font-extrabold text-ink">{business.name}</h2>
-          <p className="mt-0.5 truncate text-xs font-semibold text-ink/45">
-            {business.user.name} · {business.user.email}
-          </p>
-        </div>
-        <CountryBadge country={business.country} />
+        <div className="flex min-w-0 items-center gap-3"><EntityAvatar value={business.name} /><div className="min-w-0"><h2 className="truncate text-sm font-extrabold text-ink">{business.name}</h2><p className="mt-1 truncate text-xs font-semibold text-[#62625b]">{business.user.name} · {business.user.email}</p></div></div>
+        <BusinessActions business={business} />
       </div>
+
+      <div className="mt-3"><CountryBadge country={business.country} /></div>
 
       <dl className="mt-3 grid grid-cols-3 gap-2 text-xs">
         <div className="rounded-lg bg-[#f7faf9] p-2">
@@ -145,10 +130,19 @@ function BusinessMobileCard({ business }: { business: AdminBusiness }) {
         </div>
       </dl>
 
-      <div className="mt-3">
-        <ViewLink id={business.id} />
-      </div>
     </article>
+  );
+}
+
+function BusinessActions({ business }: { business: AdminBusiness }) {
+  return (
+    <AdminActionMenu
+      label={`Actions for ${business.name}`}
+      items={[
+        { label: "View business", icon: Eye, to: `/admin/businesses/${business.id}` },
+        { label: "Manage billing", icon: CreditCard, to: `/admin/businesses/${business.id}/subscription` },
+      ]}
+    />
   );
 }
 
@@ -198,124 +192,51 @@ export default function AdminBusinessesPage() {
   const hasBusinesses = businesses.length > 0;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6">
-      <div>
-        <p className="text-xs font-bold uppercase tracking-[0.08em] text-leaf">SUPER_ADMIN</p>
-        <h1 className="mt-1 font-display text-xl font-bold text-ink">Businesses management</h1>
-        <p className="mt-1 text-sm font-semibold text-ink/45">
-          View system-wide businesses, owners, activity counts, and money totals.
-        </p>
-      </div>
+    <AdminPageFrame>
+      <AdminPageHeader icon={Building2} title="Businesses Management" description="View system-wide businesses, owners, activity counts, and money totals." />
 
-      <div className="mt-4 grid gap-2 rounded-lg border border-ink/10 bg-white p-3 shadow-sm sm:grid-cols-[minmax(0,1fr)_220px]">
-        <div className="relative">
-          <Search size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink/35" />
-          <input
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search business name..."
-            className="w-full rounded-lg border border-ink/15 bg-[#f7faf9] py-2.5 pl-10 pr-4 text-sm font-medium text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
-          />
-        </div>
-        <input
-          value={country}
-          onChange={(event) => setCountry(event.target.value)}
-          placeholder="Filter by country"
-          className="w-full rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2.5 text-sm font-medium text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
-        />
-      </div>
-
-      {error && <ErrorBanner message={error} />}
-
-      <section className="mt-4 overflow-hidden rounded-lg border border-ink/10 bg-white shadow-sm">
-        <div className="hidden xl:block">
-          <TableContainer>
-            <Table aria-label="Admin businesses table">
-              <TableHead>
-                <TableRow className="bg-[#f7faf9]">
-                  <TableCell>Business name</TableCell>
-                  <TableCell>Owner name</TableCell>
-                  <TableCell>Owner email</TableCell>
-                  <TableCell>Country</TableCell>
-                  <TableCell>Currency</TableCell>
-                  <TableCell>Products count</TableCell>
-                  <TableCell>Sales count</TableCell>
-                  <TableCell>Expenses count</TableCell>
-                  <TableCell>Total sales</TableCell>
-                  <TableCell>Total expenses</TableCell>
-                  <TableCell>Created date</TableCell>
-                  <TableCell>Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {isLoading ? (
-                  <LoadingRows />
-                ) : hasBusinesses ? (
-                  businesses.map((business) => (
-                    <TableRow key={business.id} hover>
-                      <TableCell className="font-bold text-ink">{business.name}</TableCell>
-                      <TableCell>{business.user.name}</TableCell>
-                      <TableCell>{business.user.email}</TableCell>
-                      <TableCell><CountryBadge country={business.country} /></TableCell>
-                      <TableCell>{business.currency}</TableCell>
-                      <TableCell>{business._count.products}</TableCell>
-                      <TableCell>{business._count.sales}</TableCell>
-                      <TableCell>{business._count.expenses}</TableCell>
-                      <TableCell className="font-bold text-leaf">
-                        {formatCurrency(business.totalSalesAmount, business.currency)}
-                      </TableCell>
-                      <TableCell className="font-bold text-clay">
-                        {formatCurrency(business.totalExpensesAmount, business.currency)}
-                      </TableCell>
-                      <TableCell>{formatDate(business.createdAt)}</TableCell>
-                      <TableCell><ViewLink id={business.id} /></TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={12}>
-                      <EmptyState message="No businesses match the current filters." />
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </div>
-
-        <div className="xl:hidden">
-          {isLoading ? (
-            <MobileLoadingCards />
-          ) : hasBusinesses ? (
-            <div className="space-y-3 p-3">
-              {businesses.map((business) => (
-                <BusinessMobileCard key={business.id} business={business} />
-              ))}
+      <div className="mt-7 space-y-5">
+        <AdminFilterPanel>
+          <div className="grid gap-4 lg:grid-cols-[1.7fr_1fr]">
+            <div className="relative">
+              <Search size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#62625b]" />
+              <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search business name, owner or email..." className="h-14 w-full rounded-2xl border border-[#dadad3] bg-[#fbfbf9] pl-12 pr-4 text-sm font-semibold text-ink outline-none transition focus:border-ink focus:bg-white focus:ring-2 focus:ring-[#435ee5]" />
             </div>
-          ) : (
-            <EmptyState message="No businesses match the current filters." />
-          )}
-        </div>
+            <input value={country} onChange={(event) => setCountry(event.target.value)} placeholder="Filter by country" className="h-14 w-full rounded-2xl border border-[#dadad3] bg-[#fbfbf9] px-4 text-sm font-semibold text-ink outline-none transition focus:border-ink focus:bg-white focus:ring-2 focus:ring-[#435ee5]" />
+          </div>
+        </AdminFilterPanel>
 
-        <TablePagination
-          component="div"
-          count={total}
-          page={page}
-          onPageChange={(_event, nextPage) => setPage(nextPage)}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={(event) => {
-            setRowsPerPage(Number(event.target.value));
-            setPage(0);
-          }}
-          rowsPerPageOptions={[5, 10, 25, 50]}
-        />
-      </section>
+        {error && <ErrorBanner message={error} />}
 
-      {!isLoading && !error && (
-        <p className="mt-3 text-xs font-semibold text-ink/40">
-          Admin business pages are read-only. Sales and expenses cannot be edited here yet.
-        </p>
-      )}
-    </div>
+        <section className="portal-table-card">
+          <div className="hidden xl:block">
+            <table className="portal-data-table" aria-label="Admin businesses table">
+              <thead><tr><th>Business</th><th>Owner</th><th>Location</th><th>Activity</th><th>Financials</th><th>Created</th><th className="text-right">Actions</th></tr></thead>
+              <tbody>
+                {isLoading ? <LoadingRows /> : hasBusinesses ? businesses.map((business) => (
+                  <tr key={business.id}>
+                    <td><div className="flex min-w-0 items-center gap-4"><EntityAvatar value={business.name} /><div><p className="font-extrabold text-ink">{business.name}</p><p className="mt-1 text-sm font-semibold text-[#62625b]">{business.currency}</p></div></div></td>
+                    <td><p className="font-extrabold text-ink">{business.user.name}</p><p className="mt-1 text-sm font-semibold text-[#62625b]">{business.user.email}</p></td>
+                    <td><CountryBadge country={business.country} /></td>
+                    <td><p className="font-extrabold text-ink">{business._count.products} products</p><p className="mt-1 text-sm font-semibold text-[#62625b]">{business._count.sales} sales · {business._count.expenses} expenses</p></td>
+                    <td><p className="font-extrabold text-[#0f7a4b]">{formatCurrency(business.totalSalesAmount, business.currency)} sales</p><p className="mt-1 text-sm font-semibold text-[#e60023]">{formatCurrency(business.totalExpensesAmount, business.currency)} expenses</p></td>
+                    <td className="font-semibold text-[#33332e]">{formatDate(business.createdAt)}</td>
+                    <td className="text-right"><BusinessActions business={business} /></td>
+                  </tr>
+                )) : <tr><td colSpan={7}><EmptyState message="No businesses match the current filters." /></td></tr>}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="divide-y divide-[#e5e5e0] xl:hidden">
+            {isLoading ? <MobileLoadingCards /> : hasBusinesses ? businesses.map((business) => <BusinessMobileCard key={business.id} business={business} />) : <EmptyState message="No businesses match the current filters." />}
+          </div>
+
+          <AdminTablePagination total={total} page={page} rowsPerPage={rowsPerPage} onPageChange={setPage} onRowsPerPageChange={(value) => { setRowsPerPage(value); setPage(0); }} />
+        </section>
+
+        {!isLoading && !error && <p className="text-xs font-semibold text-[#62625b]">Admin business pages are read-only. Sales and expenses cannot be edited here yet.</p>}
+      </div>
+    </AdminPageFrame>
   );
 }

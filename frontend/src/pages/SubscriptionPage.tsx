@@ -300,7 +300,7 @@ export default function SubscriptionPage() {
               </div>
             </section>
 
-            <section className="rounded-lg border border-ink/10 bg-white shadow-sm">
+            <section className="portal-table-card">
               <div className="border-b border-ink/10 px-4 py-3">
                 <h2 className="font-display text-base font-bold text-ink">Recent payments</h2>
               </div>

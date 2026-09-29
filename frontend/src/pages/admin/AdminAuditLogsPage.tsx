@@ -248,12 +248,12 @@ export default function AdminAuditLogsPage() {
 
       {error && <ErrorBanner message={error} />}
 
-      <section className="mt-4 overflow-hidden rounded-lg border border-ink/10 bg-white shadow-sm">
+      <section className="portal-table-card mt-4">
         <div className="hidden lg:block">
           <TableContainer>
             <Table aria-label="Admin audit logs table">
               <TableHead>
-                <TableRow className="bg-[#f7faf9]">
+                <TableRow className="portal-table-head-row">
                   <TableCell>Date</TableCell>
                   <TableCell>Admin</TableCell>
                   <TableCell>Action</TableCell>

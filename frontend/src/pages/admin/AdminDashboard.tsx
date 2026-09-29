@@ -330,7 +330,7 @@ export default function AdminDashboard() {
       </section>
 
       <div className="mt-5 grid gap-5 xl:grid-cols-2">
-        <section className="overflow-hidden rounded-xl border border-ink/10 bg-white shadow-sm">
+        <section className="portal-table-card">
           <PanelHeader title="Recent users" icon={Users} to="/admin/users" />
           <div className="grid grid-cols-[1.1fr_1.2fr_0.8fr_0.8fr] border-b border-ink/10 bg-white px-5 py-3 text-xs font-semibold text-ink/55">
             <span>User</span>
@@ -361,7 +361,7 @@ export default function AdminDashboard() {
           )}
         </section>
 
-        <section className="overflow-hidden rounded-xl border border-ink/10 bg-white shadow-sm">
+        <section className="portal-table-card">
           <PanelHeader title="Recent businesses" icon={Store} to="/admin/businesses" />
           <div className="grid grid-cols-[1.1fr_1fr_0.8fr_0.8fr] border-b border-ink/10 bg-white px-5 py-3 text-xs font-semibold text-ink/55">
             <span>Business</span>

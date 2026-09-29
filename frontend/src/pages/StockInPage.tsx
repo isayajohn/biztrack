@@ -256,8 +256,8 @@ export default function StockInPage() {
               No stock-in movements yet.
             </div>
           ) : (
-            <div className="overflow-hidden rounded-xl border border-ink/10 bg-white shadow-sm">
-              <table className="w-full text-sm">
+            <div className="portal-table-card">
+              <table className="portal-data-table w-full text-sm">
                 <thead>
                   <tr className="border-b border-ink/8 bg-[#f7faf9]">
                     <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-ink/45">

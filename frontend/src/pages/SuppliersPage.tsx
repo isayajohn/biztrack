@@ -253,10 +253,10 @@ export default function SuppliersPage() {
           </button>
         </div>
       ) : (
-        <div className="mt-4 overflow-hidden rounded-xl border border-ink/10 bg-white shadow-sm">
+        <div className="portal-table-card mt-4">
           {/* Desktop table */}
           <div className="hidden lg:block">
-            <table className="w-full text-sm">
+            <table className="portal-data-table w-full text-sm">
               <thead>
                 <tr className="border-b border-ink/8 bg-[#f7faf9]">
                   <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-ink/45">

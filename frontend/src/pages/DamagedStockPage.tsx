@@ -167,8 +167,8 @@ export default function DamagedStockPage() {
           <p className="font-semibold text-gray-500">No damaged stock reports</p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl bg-white shadow-sm">
-          <table className="w-full text-sm">
+        <div className="portal-table-card">
+          <table className="portal-data-table w-full text-sm">
             <thead className="border-b border-gray-100 bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
               <tr>
                 <th className="px-5 py-3">Product</th>

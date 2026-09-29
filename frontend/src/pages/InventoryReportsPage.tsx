@@ -93,8 +93,8 @@ export default function InventoryReportsPage() {
             All products are well stocked ✓
           </div>
         ) : (
-          <div className="overflow-hidden rounded-2xl bg-white shadow-sm">
-            <table className="w-full text-sm">
+          <div className="portal-table-card">
+            <table className="portal-data-table w-full text-sm">
               <thead className="border-b border-gray-100 bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                 <tr>
                   <th className="px-5 py-3">Product</th>
@@ -126,8 +126,8 @@ export default function InventoryReportsPage() {
             No products expiring in the next 30 days ✓
           </div>
         ) : (
-          <div className="overflow-hidden rounded-2xl bg-white shadow-sm">
-            <table className="w-full text-sm">
+          <div className="portal-table-card">
+            <table className="portal-data-table w-full text-sm">
               <thead className="border-b border-gray-100 bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                 <tr>
                   <th className="px-5 py-3">Product</th>
@@ -168,8 +168,8 @@ export default function InventoryReportsPage() {
       {kpis?.topProducts && kpis.topProducts.length > 0 && (
         <div>
           <h2 className="mb-3 text-lg font-bold text-gray-800">Top Selling Products</h2>
-          <div className="overflow-hidden rounded-2xl bg-white shadow-sm">
-            <table className="w-full text-sm">
+          <div className="portal-table-card">
+            <table className="portal-data-table w-full text-sm">
               <thead className="border-b border-gray-100 bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                 <tr>
                   <th className="px-5 py-3">#</th>

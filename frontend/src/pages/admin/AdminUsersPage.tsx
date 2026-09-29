@@ -1,11 +1,4 @@
 import { useEffect, useState } from "react";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TablePagination from "@mui/material/TablePagination";
-import TableRow from "@mui/material/TableRow";
 import {
   AlertCircle,
   CheckCircle2,
@@ -18,6 +11,7 @@ import {
   ShieldCheck,
   Trash2,
   UserRound,
+  Users,
   X,
 } from "lucide-react";
 import { useAuth } from "../../auth/AuthContext";
@@ -32,6 +26,14 @@ import {
 } from "../../services/adminApi";
 import type { AdminRole, AdminStatus, AdminUser } from "../../services/adminApi";
 import { getApiErrorMessage } from "../../services/apiClient";
+import {
+  AdminActionMenu,
+  AdminFilterPanel,
+  AdminPageFrame,
+  AdminPageHeader,
+  AdminTablePagination,
+  EntityAvatar,
+} from "../../components/admin/AdminTableUi";
 
 type PendingAction = {
   user: AdminUser;
@@ -152,13 +154,13 @@ function LoadingRows() {
   return (
     <>
       {Array.from({ length: 5 }).map((_, index) => (
-        <TableRow key={index}>
-          {Array.from({ length: 8 }).map((__, cellIndex) => (
-            <TableCell key={cellIndex}>
+        <tr key={index}>
+          {Array.from({ length: 7 }).map((__, cellIndex) => (
+            <td key={cellIndex}>
               <div className="h-3 w-full max-w-28 animate-pulse rounded-full bg-ink/8" />
-            </TableCell>
+            </td>
           ))}
-        </TableRow>
+        </tr>
       ))}
     </>
   );
@@ -178,39 +180,6 @@ function MobileLoadingCards() {
         </div>
       ))}
     </div>
-  );
-}
-
-function ActionButton({
-  label,
-  icon: Icon,
-  onClick,
-  disabled = false,
-  tone = "neutral",
-}: {
-  label: string;
-  icon?: typeof Eye;
-  onClick: () => void;
-  disabled?: boolean;
-  tone?: "neutral" | "leaf" | "clay";
-}) {
-  const toneClass =
-    tone === "leaf"
-      ? "border-leaf/20 text-leaf hover:bg-mint"
-      : tone === "clay"
-        ? "border-clay/20 text-clay hover:bg-orange-50"
-        : "border-ink/15 text-ink/60 hover:bg-[#eef8f4]";
-
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className={`inline-flex items-center justify-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-45 ${toneClass}`}
-    >
-      {Icon && <Icon size={13} aria-hidden="true" />}
-      {label}
-    </button>
   );
 }
 
@@ -478,97 +447,47 @@ function UserActions({
   const cannotDemoteSelf = isSelf && user.role === "SUPER_ADMIN";
 
   return (
-    <div className="flex flex-wrap gap-1.5">
-      <ActionButton label="View" icon={Eye} onClick={() => onView(user)} />
-      <ActionButton label="Edit" icon={Pencil} onClick={() => onEdit(user)} />
-      {user.role === "USER" ? (
-        <ActionButton
-          label="Make SUPER_ADMIN"
-          icon={ShieldCheck}
-          tone="leaf"
-          onClick={() =>
-            onRequestAction({
-              user,
-              kind: "role",
-              nextRole: "SUPER_ADMIN",
-              title: "Make user SUPER_ADMIN?",
-              body: `${user.name} will receive full platform administration access.`,
-              confirmLabel: "Make SUPER_ADMIN",
-              tone: "leaf",
-            })
-          }
-        />
-      ) : (
-        <ActionButton
-          label="Make USER"
-          icon={UserRound}
-          disabled={cannotDemoteSelf}
-          onClick={() =>
-            onRequestAction({
-              user,
-              kind: "role",
-              nextRole: "USER",
-              title: "Make user USER?",
-              body: `${user.name} will lose SUPER_ADMIN access and return to a standard user role.`,
-              confirmLabel: "Make USER",
-              tone: "clay",
-            })
-          }
-        />
-      )}
-      {user.status === "ACTIVE" ? (
-        <ActionButton
-          label="Suspend"
-          icon={ShieldAlert}
-          tone="clay"
-          disabled={cannotSuspendSelf}
-          onClick={() =>
-            onRequestAction({
-              user,
-              kind: "status",
-              nextStatus: "SUSPENDED",
-              title: "Suspend user?",
-              body: `${user.name} will lose access to BizTrack until their account is activated again.`,
-              confirmLabel: "Suspend",
-              tone: "clay",
-            })
-          }
-        />
-      ) : (
-        <ActionButton
-          label="Activate"
-          icon={CheckCircle2}
-          tone="leaf"
-          onClick={() =>
-            onRequestAction({
-              user,
-              kind: "status",
-              nextStatus: "ACTIVE",
-              title: "Activate user?",
-              body: `${user.name} will regain access to BizTrack.`,
-              confirmLabel: "Activate",
-              tone: "leaf",
-            })
-          }
-        />
-      )}
-      <ActionButton
-        label="Delete"
-        icon={Trash2}
-        tone="clay"
-        disabled={isSelf}
-        onClick={() =>
-          onRequestAction({
-            user,
-            kind: "delete",
-            title: "Delete user?",
-            body: `${user.name}, their businesses, products, sales, expenses, and subscriptions will be permanently deleted.`,
-            confirmLabel: "Delete user",
-            tone: "clay",
-          })
-        }
-      />
-    </div>
+    <AdminActionMenu
+      label={`Actions for ${user.name}`}
+      items={[
+        { label: "View details", icon: Eye, onClick: () => onView(user) },
+        { label: "Edit user", icon: Pencil, onClick: () => onEdit(user) },
+        user.role === "USER"
+          ? {
+              label: "Make SUPER_ADMIN",
+              icon: ShieldCheck,
+              tone: "success",
+              onClick: () => onRequestAction({ user, kind: "role", nextRole: "SUPER_ADMIN", title: "Make user SUPER_ADMIN?", body: `${user.name} will receive full platform administration access.`, confirmLabel: "Make SUPER_ADMIN", tone: "leaf" }),
+            }
+          : {
+              label: "Make USER",
+              icon: UserRound,
+              disabled: cannotDemoteSelf,
+              onClick: () => onRequestAction({ user, kind: "role", nextRole: "USER", title: "Make user USER?", body: `${user.name} will lose SUPER_ADMIN access and return to a standard user role.`, confirmLabel: "Make USER", tone: "clay" }),
+            },
+        user.status === "ACTIVE"
+          ? {
+              label: "Suspend user",
+              icon: ShieldAlert,
+              tone: "warning",
+              disabled: cannotSuspendSelf,
+              onClick: () => onRequestAction({ user, kind: "status", nextStatus: "SUSPENDED", title: "Suspend user?", body: `${user.name} will lose access to BizTrack until their account is activated again.`, confirmLabel: "Suspend", tone: "clay" }),
+            }
+          : {
+              label: "Activate user",
+              icon: CheckCircle2,
+              tone: "success",
+              onClick: () => onRequestAction({ user, kind: "status", nextStatus: "ACTIVE", title: "Activate user?", body: `${user.name} will regain access to BizTrack.`, confirmLabel: "Activate", tone: "leaf" }),
+            },
+        {
+          label: "Delete user",
+          icon: Trash2,
+          tone: "danger",
+          disabled: isSelf,
+          onClick: () => onRequestAction({ user, kind: "delete", title: "Delete user?", body: `${user.name}, their businesses, products, sales, expenses, and subscriptions will be permanently deleted.`, confirmLabel: "Delete user", tone: "clay" }),
+        },
+      ]}
+    />
   );
 }
 
@@ -791,167 +710,59 @@ export default function AdminUsersPage() {
   const hasUsers = users.length > 0;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-[0.08em] text-leaf">SUPER_ADMIN</p>
-          <h1 className="mt-1 font-display text-xl font-bold text-ink">Users management</h1>
-          <p className="mt-1 text-sm font-semibold text-ink/45">
-            Add, edit, assign roles, view, and remove BizTrack user access.
-          </p>
-        </div>
-        <button onClick={openCreateForm} className="inline-flex items-center justify-center gap-2 rounded-lg bg-leaf px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-leaf/90">
-          <Plus size={16} />
-          Add user
-        </button>
+    <AdminPageFrame>
+      <AdminPageHeader
+        icon={Users}
+        title="Users Management"
+        description="Add, edit, assign roles, view, and remove BizTrack user access."
+        action={<button onClick={openCreateForm} className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-[#e60023] px-5 text-sm font-bold text-white transition-colors hover:bg-[#cc001f]"><Plus size={17} />Add User</button>}
+      />
+
+      <div className="mt-7 space-y-5">
+        <AdminFilterPanel>
+          <div className="grid gap-4 lg:grid-cols-[1.7fr_1fr_1fr]">
+            <div className="relative"><Search size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#62625b]" /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search name or email..." className="h-14 w-full rounded-2xl border border-[#dadad3] bg-[#fbfbf9] pl-12 pr-4 text-sm font-semibold text-ink outline-none transition focus:border-ink focus:bg-white focus:ring-2 focus:ring-[#435ee5]" /></div>
+            <select value={role} onChange={(event) => setRole(event.target.value as "" | AdminRole)} className="h-14 rounded-2xl border border-[#dadad3] bg-[#fbfbf9] px-4 text-sm font-bold text-ink outline-none focus:border-ink focus:ring-2 focus:ring-[#435ee5]"><option value="">All roles</option><option value="USER">USER</option><option value="SUPER_ADMIN">SUPER_ADMIN</option></select>
+            <select value={status} onChange={(event) => setStatus(event.target.value as "" | AdminStatus)} className="h-14 rounded-2xl border border-[#dadad3] bg-[#fbfbf9] px-4 text-sm font-bold text-ink outline-none focus:border-ink focus:ring-2 focus:ring-[#435ee5]"><option value="">All statuses</option><option value="ACTIVE">ACTIVE</option><option value="SUSPENDED">SUSPENDED</option></select>
+          </div>
+        </AdminFilterPanel>
+
+        {success && <MessageBanner type="success" message={success} onDismiss={() => setSuccess("")} />}
+        {error && <MessageBanner type="error" message={error} onDismiss={() => setError("")} />}
+
+        <section className="portal-table-card">
+          <div className="hidden lg:block">
+            <table className="portal-data-table" aria-label="Admin users table">
+              <thead><tr><th>User</th><th>Role</th><th>Status</th><th>Businesses</th><th>Created</th><th>Last login</th><th className="text-right">Actions</th></tr></thead>
+              <tbody>
+                {isLoading ? <LoadingRows /> : hasUsers ? users.map((adminUser) => (
+                  <tr key={adminUser.id}>
+                    <td><div className="flex min-w-0 items-center gap-4"><EntityAvatar value={adminUser.name} /><div><p className="font-extrabold text-ink">{adminUser.name}</p><p className="mt-1 text-sm font-semibold text-[#62625b]">{adminUser.email}</p></div></div></td>
+                    <td><RoleBadge role={adminUser.role} /></td>
+                    <td><StatusBadge status={adminUser.status} /></td>
+                    <td><span className="font-extrabold text-ink">{adminUser.businessCount ?? 0}</span></td>
+                    <td className="font-semibold text-[#33332e]">{formatDate(adminUser.createdAt)}</td>
+                    <td className="font-semibold text-[#33332e]">{formatDate(adminUser.lastLoginAt)}</td>
+                    <td className="text-right"><UserActions user={adminUser} currentUserId={currentUser?.id} onView={openDetails} onEdit={openEditForm} onRequestAction={requestAction} /></td>
+                  </tr>
+                )) : <tr><td colSpan={7}><EmptyState message="No users match the current filters." /></td></tr>}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="divide-y divide-[#e5e5e0] lg:hidden">
+            {isLoading ? <MobileLoadingCards /> : hasUsers ? users.map((adminUser) => (
+              <article key={adminUser.id} className="p-5">
+                <div className="flex items-start justify-between gap-3"><div className="flex min-w-0 items-center gap-3"><EntityAvatar value={adminUser.name} /><div className="min-w-0"><h2 className="truncate text-sm font-extrabold text-ink">{adminUser.name}</h2><p className="mt-1 truncate text-xs font-semibold text-[#62625b]">{adminUser.email}</p></div></div><UserActions user={adminUser} currentUserId={currentUser?.id} onView={openDetails} onEdit={openEditForm} onRequestAction={requestAction} /></div>
+                <div className="mt-3 flex flex-wrap gap-2"><RoleBadge role={adminUser.role} /><StatusBadge status={adminUser.status} /></div>
+                <dl className="mt-4 grid grid-cols-2 gap-2 text-xs"><div className="rounded-2xl bg-[#f6f6f3] p-3"><dt className="font-bold text-[#62625b]">Businesses</dt><dd className="mt-1 font-extrabold text-ink">{adminUser.businessCount ?? 0}</dd></div><div className="rounded-2xl bg-[#f6f6f3] p-3"><dt className="font-bold text-[#62625b]">Created</dt><dd className="mt-1 font-extrabold text-ink">{formatDate(adminUser.createdAt)}</dd></div><div className="col-span-2 rounded-2xl bg-[#f6f6f3] p-3"><dt className="font-bold text-[#62625b]">Last login</dt><dd className="mt-1 font-extrabold text-ink">{formatDate(adminUser.lastLoginAt)}</dd></div></dl>
+              </article>
+            )) : <EmptyState message="No users match the current filters." />}
+          </div>
+
+          <AdminTablePagination total={total} page={page} rowsPerPage={rowsPerPage} onPageChange={setPage} onRowsPerPageChange={(value) => { setRowsPerPage(value); setPage(0); }} />
+        </section>
       </div>
-
-      <div className="mt-4 grid gap-2 rounded-lg border border-ink/10 bg-white p-3 shadow-sm sm:grid-cols-[minmax(0,1fr)_160px_160px]">
-        <div className="relative">
-          <Search size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink/35" />
-          <input
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search name or email..."
-            className="w-full rounded-lg border border-ink/15 bg-[#f7faf9] py-2.5 pl-10 pr-4 text-sm font-medium text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
-          />
-        </div>
-        <select
-          value={role}
-          onChange={(event) => setRole(event.target.value as "" | AdminRole)}
-          className="rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2.5 text-sm font-bold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
-        >
-          <option value="">All roles</option>
-          <option value="USER">USER</option>
-          <option value="SUPER_ADMIN">SUPER_ADMIN</option>
-        </select>
-        <select
-          value={status}
-          onChange={(event) => setStatus(event.target.value as "" | AdminStatus)}
-          className="rounded-lg border border-ink/15 bg-[#f7faf9] px-3 py-2.5 text-sm font-bold text-ink outline-none focus:border-leaf focus:ring-2 focus:ring-leaf/15"
-        >
-          <option value="">All statuses</option>
-          <option value="ACTIVE">ACTIVE</option>
-          <option value="SUSPENDED">SUSPENDED</option>
-        </select>
-      </div>
-
-      {success && <MessageBanner type="success" message={success} onDismiss={() => setSuccess("")} />}
-      {error && <MessageBanner type="error" message={error} onDismiss={() => setError("")} />}
-
-      <section className="mt-4 overflow-hidden rounded-lg border border-ink/10 bg-white shadow-sm">
-        <div className="hidden lg:block">
-          <TableContainer>
-            <Table aria-label="Admin users table">
-              <TableHead>
-                <TableRow className="bg-[#f7faf9]">
-                  <TableCell>Name</TableCell>
-                  <TableCell>Email</TableCell>
-                  <TableCell>Role</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Businesses count</TableCell>
-                  <TableCell>Created date</TableCell>
-                  <TableCell>Last login</TableCell>
-                  <TableCell>Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {isLoading ? (
-                  <LoadingRows />
-                ) : hasUsers ? (
-                  users.map((adminUser) => (
-                    <TableRow key={adminUser.id} hover>
-                      <TableCell className="font-bold text-ink">{adminUser.name}</TableCell>
-                      <TableCell>{adminUser.email}</TableCell>
-                      <TableCell><RoleBadge role={adminUser.role} /></TableCell>
-                      <TableCell><StatusBadge status={adminUser.status} /></TableCell>
-                      <TableCell>{adminUser.businessCount ?? 0}</TableCell>
-                      <TableCell>{formatDate(adminUser.createdAt)}</TableCell>
-                      <TableCell>{formatDate(adminUser.lastLoginAt)}</TableCell>
-                      <TableCell>
-                        <UserActions
-                          user={adminUser}
-                          currentUserId={currentUser?.id}
-                          onView={openDetails}
-                          onEdit={openEditForm}
-                          onRequestAction={requestAction}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={8}>
-                      <EmptyState message="No users match the current filters." />
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </div>
-
-        <div className="lg:hidden">
-          {isLoading ? (
-            <MobileLoadingCards />
-          ) : hasUsers ? (
-            <div className="space-y-3 p-3">
-              {users.map((adminUser) => (
-                <article key={adminUser.id} className="rounded-lg border border-ink/10 bg-white p-3 shadow-sm">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <h2 className="truncate text-sm font-extrabold text-ink">{adminUser.name}</h2>
-                      <p className="mt-0.5 truncate text-xs font-semibold text-ink/45">{adminUser.email}</p>
-                    </div>
-                    <div className="flex shrink-0 flex-col items-end gap-1">
-                      <RoleBadge role={adminUser.role} />
-                      <StatusBadge status={adminUser.status} />
-                    </div>
-                  </div>
-                  <dl className="mt-3 grid grid-cols-2 gap-2 text-xs">
-                    <div className="rounded-lg bg-[#f7faf9] p-2">
-                      <dt className="font-bold text-ink/35">Businesses</dt>
-                      <dd className="mt-0.5 font-extrabold text-ink">{adminUser.businessCount ?? 0}</dd>
-                    </div>
-                    <div className="rounded-lg bg-[#f7faf9] p-2">
-                      <dt className="font-bold text-ink/35">Created</dt>
-                      <dd className="mt-0.5 font-extrabold text-ink">{formatDate(adminUser.createdAt)}</dd>
-                    </div>
-                    <div className="col-span-2 rounded-lg bg-[#f7faf9] p-2">
-                      <dt className="font-bold text-ink/35">Last login</dt>
-                      <dd className="mt-0.5 font-extrabold text-ink">{formatDate(adminUser.lastLoginAt)}</dd>
-                    </div>
-                  </dl>
-                  <div className="mt-3">
-                    <UserActions
-                      user={adminUser}
-                      currentUserId={currentUser?.id}
-                      onView={openDetails}
-                      onEdit={openEditForm}
-                      onRequestAction={requestAction}
-                    />
-                  </div>
-                </article>
-              ))}
-            </div>
-          ) : (
-            <EmptyState message="No users match the current filters." />
-          )}
-        </div>
-
-        <TablePagination
-          component="div"
-          count={total}
-          page={page}
-          onPageChange={(_event, nextPage) => setPage(nextPage)}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={(event) => {
-            setRowsPerPage(Number(event.target.value));
-            setPage(0);
-          }}
-          rowsPerPageOptions={[5, 10, 25, 50]}
-        />
-      </section>
 
       {pendingAction && (
         <ConfirmationModal
@@ -982,6 +793,6 @@ export default function AdminUsersPage() {
           onSubmit={submitForm}
         />
       )}
-    </div>
+    </AdminPageFrame>
   );
 }
