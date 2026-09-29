@@ -3,7 +3,7 @@
 The app uses the deployed BizTrack API by default:
 
 ```text
-https://snow-aardvark-815146.hostingersite.com/api
+https://biztracktanzania.online/api
 ```
 
 For local development, override it at build or run time:

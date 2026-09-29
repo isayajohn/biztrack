@@ -165,7 +165,7 @@ Configure the Laravel scheduler in hPanel for every environment that needs sched
 
 - Local frontend: `http://localhost:5173`
 - Local API: `http://127.0.0.1:8000`
-- Existing production Hostinger URL: `https://snow-aardvark-815146.hostingersite.com`
+- Production Hostinger URL: `https://biztracktanzania.online`
 - Development deployment URL: not configured; set `APP_URL` in the `development` GitHub Environment.
 - Staging/UAT deployment URL: not configured; set `APP_URL` in the `staging` GitHub Environment.
 

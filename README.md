@@ -54,7 +54,7 @@ flutter run
 ```
 
 The default API URL is
-`https://snow-aardvark-815146.hostingersite.com/api`. For local development on
+`https://biztracktanzania.online/api`. For local development on
 an Android emulator, run with
 `--dart-define=BIZTRACK_API_BASE_URL=http://10.0.2.2:8002/api`. For an iOS
 simulator, use `http://127.0.0.1:8002/api`.
@@ -87,3 +87,6 @@ SSH settings are configured explicitly.
 See [docs/GIT_WORKFLOW.md](docs/GIT_WORKFLOW.md) for practical commands,
 promotion rules, required GitHub variables and secrets, branch protections,
 Hostinger preparation, and rollback procedures.
+
+For the verified manual Hostinger update workflow and live server layout, see
+[docs/HOSTINGER_SSH_DEPLOY.md](docs/HOSTINGER_SSH_DEPLOY.md).

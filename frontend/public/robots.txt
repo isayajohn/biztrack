@@ -23,4 +23,4 @@ Disallow: /admin
 # Auth utility pages stay crawlable (their <meta name="robots"> already
 # says noindex) so link equity still flows through them.
 
-Sitemap: https://snow-aardvark-815146.hostingersite.com/sitemap.xml
+Sitemap: https://biztracktanzania.online/sitemap.xml

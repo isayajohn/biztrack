@@ -35,8 +35,7 @@ const kBadgeAlpha = 0.10;
 //   Production/default           → deployed BizTrack API
 //   Android emulator            → flutter run --dart-define=BIZTRACK_API_BASE_URL=http://10.0.2.2:8002/api
 //   iOS simulator               → flutter run --dart-define=BIZTRACK_API_BASE_URL=http://127.0.0.1:8002/api
-const _kProductionApiBaseUrl =
-    'https://snow-aardvark-815146.hostingersite.com/api';
+const _kProductionApiBaseUrl = 'https://biztracktanzania.online/api';
 
 String get kApiBaseUrl {
   const override = String.fromEnvironment('BIZTRACK_API_BASE_URL');
