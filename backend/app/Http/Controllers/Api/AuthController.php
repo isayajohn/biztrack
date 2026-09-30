@@ -81,6 +81,7 @@ class AuthController extends Controller
             throw ValidationException::withMessages(['phone' => 'This phone number is already registered.']);
         }
 
+        $requiresApproval = (bool) SecurityConfig::first()?->require_admin_approval;
         $user = User::create([
             'id' => Str::uuid(),
             'name' => trim($data['name']),
@@ -89,6 +90,8 @@ class AuthController extends Controller
             'password_hash' => Hash::make($data['password']),
             'role' => 'USER',
             'status' => 'ACTIVE',
+            'approval_status' => $requiresApproval ? 'PENDING' : 'APPROVED',
+            'approved_at' => $requiresApproval ? null : now(),
             'registration_verification_method' => $verificationMethod,
             'onboarding_intent' => $onboardingIntent,
             'terms_accepted_at' => now(),
@@ -164,6 +167,10 @@ class AuthController extends Controller
             ], 403);
         }
 
+        if ($response = $this->approvalBlockedResponse($user)) {
+            return $response;
+        }
+
         $user->update([
             'failed_login_attempts' => 0,
             'locked_until' => null,
@@ -217,6 +224,7 @@ class AuthController extends Controller
             $user = User::where('email', $email)->first();
 
             if (! $user) {
+                $requiresApproval = (bool) SecurityConfig::first()?->require_admin_approval;
                 $user = User::create([
                     'id' => Str::uuid(),
                     'name' => $name,
@@ -224,6 +232,8 @@ class AuthController extends Controller
                     'password_hash' => Hash::make(Str::random(32)),
                     'role' => 'USER',
                     'status' => 'ACTIVE',
+                    'approval_status' => $requiresApproval ? 'PENDING' : 'APPROVED',
+                    'approved_at' => $requiresApproval ? null : now(),
                     'email_verified_at' => now(),
                 ]);
 
@@ -237,6 +247,10 @@ class AuthController extends Controller
 
             if ($user->status !== 'ACTIVE') {
                 return response()->json(['success' => false, 'error' => 'Account suspended'], 403);
+            }
+
+            if ($response = $this->approvalBlockedResponse($user)) {
+                return $response;
             }
 
             $user->update(['last_login_at' => now()]);
@@ -304,16 +318,7 @@ class AuthController extends Controller
             'target_id' => $user->id,
         ]);
 
-        $business = Business::forUser($user);
-        $token = JWTAuth::fromUser($user);
-
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'user' => $this->formatUser($user, $business),
-                'token' => $token,
-            ],
-        ]);
+        return $this->verificationAuthResponse($user);
     }
 
     public function verifyPhone(Request $request): JsonResponse
@@ -345,12 +350,7 @@ class AuthController extends Controller
             'target_id' => $user->id,
         ]);
 
-        $business = Business::forUser($user);
-        $token = JWTAuth::fromUser($user);
-        return response()->json(['success' => true, 'data' => [
-            'user' => $this->formatUser($user, $business),
-            'token' => $token,
-        ]]);
+        return $this->verificationAuthResponse($user);
     }
 
     public function resendPhoneVerification(Request $request): JsonResponse
@@ -481,7 +481,8 @@ class AuthController extends Controller
 
         if (($user->registration_verification_method === 'EMAIL' && !$user->email_verified_at)
             || ($user->registration_verification_method === 'PHONE' && !$user->phone_verified_at)
-            || $user->status !== 'ACTIVE') {
+            || $user->status !== 'ACTIVE'
+            || !$user->isApproved()) {
             return response()->json(['success' => true, 'data' => ['message' => 'OTP sent if account exists.']]);
         }
 
@@ -524,6 +525,9 @@ class AuthController extends Controller
         if (($user->registration_verification_method === 'EMAIL' && !$user->email_verified_at)
             || ($user->registration_verification_method === 'PHONE' && !$user->phone_verified_at)) {
             return response()->json(['success' => false, 'error' => 'Account verification required'], 403);
+        }
+        if ($response = $this->approvalBlockedResponse($user)) {
+            return $response;
         }
 
         $user->update([
@@ -664,6 +668,8 @@ class AuthController extends Controller
                 'emailAddressMasked' => $this->maskEmail($user->email),
                 'phoneNumberMasked' => $user->phone ? $this->maskPhone($user->phone) : null,
                 'onboardingIntent' => $user->onboarding_intent ?? 'CREATE',
+                'requiresApproval' => $user->approval_status !== 'APPROVED',
+                'approvalStatus' => $user->approval_status,
             ],
         ], $created ? 201 : 200);
     }
@@ -681,6 +687,9 @@ class AuthController extends Controller
             'phone' => $user->phone,
             'role' => $user->role,
             'status' => $user->status,
+            'approvalStatus' => $user->approval_status,
+            'approvedAt' => $user->approved_at,
+            'rejectionReason' => $user->rejection_reason,
             'businessRole' => $membership?->role ?? ($business?->user_id === $user->id ? 'OWNER' : null),
             'permissions' => $membership?->permissions ?? ($business?->user_id === $user->id ? ['*'] : []),
             'branch' => $membership?->branch ? ['id' => $membership->branch->id, 'name' => $membership->branch->name] : null,
@@ -702,5 +711,44 @@ class AuthController extends Controller
                 'country' => $business->country,
             ]] : [],
         ];
+    }
+
+    private function verificationAuthResponse(User $user): JsonResponse
+    {
+        $business = Business::forUser($user);
+        $approved = $user->isApproved();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'user' => $this->formatUser($user, $business),
+                'token' => $approved ? JWTAuth::fromUser($user) : null,
+                'requiresApproval' => !$approved,
+                'approvalStatus' => $user->approval_status,
+                'message' => $approved
+                    ? 'Account verified successfully.'
+                    : ($user->approval_status === 'REJECTED'
+                        ? 'Your email is verified, but the account was not approved. Contact support.'
+                        : 'Your account is verified and waiting for super-admin approval.'),
+            ],
+        ]);
+    }
+
+    private function approvalBlockedResponse(User $user): ?JsonResponse
+    {
+        if ($user->isApproved()) {
+            return null;
+        }
+
+        $rejected = $user->approval_status === 'REJECTED';
+        return response()->json([
+            'success' => false,
+            'error' => $rejected
+                ? 'Account approval was rejected. Contact support for assistance.'
+                : 'Account verified and waiting for super-admin approval.',
+            'code' => $rejected ? 'ACCOUNT_REJECTED' : 'ACCOUNT_PENDING_APPROVAL',
+            'approvalStatus' => $user->approval_status,
+            'rejectionReason' => $rejected ? $user->rejection_reason : null,
+        ], 403);
     }
 }

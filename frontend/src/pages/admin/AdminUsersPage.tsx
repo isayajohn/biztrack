@@ -21,10 +21,14 @@ import {
   createAdminUser,
   deleteAdminUser,
   updateAdminUser,
+  updateAdminUserApproval,
   updateAdminUserRole,
   updateAdminUserStatus,
+  updateAdminUserVerification,
+  resendAdminUserVerification,
+  unlockAdminUser,
 } from "../../services/adminApi";
-import type { AdminRole, AdminStatus, AdminUser } from "../../services/adminApi";
+import type { AdminApprovalStatus, AdminRole, AdminStatus, AdminUser } from "../../services/adminApi";
 import { getApiErrorMessage } from "../../services/apiClient";
 import {
   AdminActionMenu,
@@ -37,9 +41,11 @@ import {
 
 type PendingAction = {
   user: AdminUser;
-  kind: "role" | "status" | "delete";
+  kind: "role" | "status" | "approval" | "verification" | "resend" | "unlock" | "delete";
   nextRole?: AdminRole;
   nextStatus?: AdminStatus;
+  nextApproval?: AdminApprovalStatus;
+  verified?: boolean;
   title: string;
   body: string;
   confirmLabel: string;
@@ -102,6 +108,15 @@ function StatusBadge({ status }: { status: AdminStatus }) {
       {status}
     </span>
   );
+}
+
+function ApprovalBadge({ status }: { status: AdminApprovalStatus }) {
+  const classes = status === "APPROVED"
+    ? "border-leaf/20 bg-mint text-leaf"
+    : status === "REJECTED"
+      ? "border-red-200 bg-red-50 text-red-600"
+      : "border-amber-200 bg-amber-50 text-amber-700";
+  return <span className={`inline-flex rounded-full border px-2 py-1 text-[11px] font-extrabold ${classes}`}>{status}</span>;
 }
 
 function MessageBanner({
@@ -295,6 +310,18 @@ function UserDetailsModal({
                 <div className="mt-2"><StatusBadge status={user.status} /></div>
               </div>
               <div className="rounded-lg border border-ink/10 bg-[#f7faf9] p-3">
+                <p className="text-xs font-bold uppercase text-ink/40">Approval</p>
+                <div className="mt-2"><ApprovalBadge status={user.approvalStatus} /></div>
+              </div>
+              <div className="rounded-lg border border-ink/10 bg-[#f7faf9] p-3">
+                <p className="text-xs font-bold uppercase text-ink/40">Email verification</p>
+                <p className="mt-1 text-sm font-extrabold text-ink">{user.emailVerifiedAt ? `Verified ${formatDate(user.emailVerifiedAt)}` : "Not verified"}</p>
+              </div>
+              <div className="rounded-lg border border-ink/10 bg-[#f7faf9] p-3">
+                <p className="text-xs font-bold uppercase text-ink/40">Login lock</p>
+                <p className="mt-1 text-sm font-extrabold text-ink">{user.lockedUntil ? `Locked until ${formatDate(user.lockedUntil)}` : "Unlocked"}</p>
+              </div>
+              <div className="rounded-lg border border-ink/10 bg-[#f7faf9] p-3">
                 <p className="text-xs font-bold uppercase text-ink/40">Businesses count</p>
                 <p className="mt-1 text-xl font-extrabold text-ink">{user.businessCount ?? user.businesses?.length ?? 0}</p>
               </div>
@@ -452,6 +479,17 @@ function UserActions({
       items={[
         { label: "View details", icon: Eye, onClick: () => onView(user) },
         { label: "Edit user", icon: Pencil, onClick: () => onEdit(user) },
+        user.approvalStatus === "APPROVED"
+          ? { label: "Move to pending approval", icon: ShieldAlert, disabled: isSelf, onClick: () => onRequestAction({ user, kind: "approval", nextApproval: "PENDING", title: "Move account to pending?", body: `${user.name} will lose access until a super admin approves the account again.`, confirmLabel: "Move to pending", tone: "clay" }) }
+          : { label: "Approve account", icon: ShieldCheck, tone: "success", onClick: () => onRequestAction({ user, kind: "approval", nextApproval: "APPROVED", title: "Approve account?", body: `${user.name} will be allowed to sign in after completing contact verification.`, confirmLabel: "Approve", tone: "leaf" }) },
+        user.approvalStatus !== "REJECTED"
+          ? { label: "Reject account", icon: ShieldAlert, tone: "warning", disabled: isSelf, onClick: () => onRequestAction({ user, kind: "approval", nextApproval: "REJECTED", title: "Reject account?", body: `${user.name} will be denied access until the account is approved again.`, confirmLabel: "Reject", tone: "clay" }) }
+          : { label: "Return to pending", icon: ShieldAlert, onClick: () => onRequestAction({ user, kind: "approval", nextApproval: "PENDING", title: "Return account to pending?", body: `${user.name} can be reviewed and approved later.`, confirmLabel: "Return to pending", tone: "leaf" }) },
+        user.emailVerifiedAt
+          ? { label: "Mark email unverified", icon: AlertCircle, onClick: () => onRequestAction({ user, kind: "verification", verified: false, title: "Mark email unverified?", body: `${user.name} must verify the email address again before signing in.`, confirmLabel: "Mark unverified", tone: "clay" }) }
+          : { label: "Mark email verified", icon: CheckCircle2, tone: "success", onClick: () => onRequestAction({ user, kind: "verification", verified: true, title: "Verify email manually?", body: `This confirms ${user.name}'s email without requiring the email link.`, confirmLabel: "Mark verified", tone: "leaf" }) },
+        ...(!user.emailVerifiedAt ? [{ label: "Resend verification email", icon: CheckCircle2, onClick: () => onRequestAction({ user, kind: "resend" as const, title: "Resend verification email?", body: `A fresh activation link will be sent to ${user.email}.`, confirmLabel: "Send email", tone: "leaf" as const }) }] : []),
+        ...(user.lockedUntil || (user.failedLoginAttempts ?? 0) > 0 ? [{ label: "Unlock login", icon: ShieldCheck, tone: "success" as const, onClick: () => onRequestAction({ user, kind: "unlock" as const, title: "Unlock account?", body: `Failed login attempts and the temporary lock for ${user.name} will be cleared.`, confirmLabel: "Unlock", tone: "leaf" as const }) }] : []),
         user.role === "USER"
           ? {
               label: "Make SUPER_ADMIN",
@@ -497,6 +535,7 @@ export default function AdminUsersPage() {
   const [search, setSearch] = useState("");
   const [role, setRole] = useState<"" | AdminRole>("");
   const [status, setStatus] = useState<"" | AdminStatus>("");
+  const [approvalStatus, setApprovalStatus] = useState<"" | AdminApprovalStatus>("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -525,6 +564,7 @@ export default function AdminUsersPage() {
         search,
         role: role || undefined,
         status: status || undefined,
+        approvalStatus: approvalStatus || undefined,
         page: page + 1,
         limit: rowsPerPage,
       })
@@ -546,9 +586,9 @@ export default function AdminUsersPage() {
       alive = false;
       window.clearTimeout(timeout);
     };
-  }, [page, role, rowsPerPage, search, status]);
+  }, [approvalStatus, page, role, rowsPerPage, search, status]);
 
-  useEffect(() => setPage(0), [role, rowsPerPage, search, status]);
+  useEffect(() => setPage(0), [approvalStatus, role, rowsPerPage, search, status]);
 
   const openDetails = async (user: AdminUser) => {
     setDetailsOpen(true);
@@ -648,6 +688,12 @@ export default function AdminUsersPage() {
       return;
     }
 
+    if (isSelf && action.kind === "approval" && action.nextApproval !== "APPROVED") {
+      setSuccess("");
+      setError("You cannot revoke approval from your own account.");
+      return;
+    }
+
     setError("");
     setSuccess("");
     setPendingAction(action);
@@ -672,9 +718,22 @@ export default function AdminUsersPage() {
         return;
       }
 
+      if (pendingAction.kind === "resend") {
+        const result = await resendAdminUserVerification(pendingAction.user.id);
+        setSuccess(result.message);
+        setPendingAction(null);
+        return;
+      }
+
       const updatedUser =
         pendingAction.kind === "role" && pendingAction.nextRole
           ? await updateAdminUserRole(pendingAction.user.id, pendingAction.nextRole)
+          : pendingAction.kind === "approval" && pendingAction.nextApproval
+            ? await updateAdminUserApproval(pendingAction.user.id, pendingAction.nextApproval)
+          : pendingAction.kind === "verification" && pendingAction.verified !== undefined
+            ? await updateAdminUserVerification(pendingAction.user.id, pendingAction.verified)
+          : pendingAction.kind === "unlock"
+            ? await unlockAdminUser(pendingAction.user.id)
           : pendingAction.nextStatus
             ? await updateAdminUserStatus(pendingAction.user.id, pendingAction.nextStatus)
             : pendingAction.user;
@@ -714,16 +773,17 @@ export default function AdminUsersPage() {
       <AdminPageHeader
         icon={Users}
         title="Users Management"
-        description="Add, edit, assign roles, view, and remove BizTrack user access."
+        description="Approve accounts, manage verification, unlock access, assign roles, suspend, edit, and remove users."
         action={<button onClick={openCreateForm} className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-[#e60023] px-5 text-sm font-bold text-white transition-colors hover:bg-[#cc001f]"><Plus size={17} />Add User</button>}
       />
 
       <div className="mt-7 space-y-5">
         <AdminFilterPanel>
-          <div className="grid gap-4 lg:grid-cols-[1.7fr_1fr_1fr]">
+          <div className="grid gap-4 lg:grid-cols-[1.7fr_1fr_1fr_1fr]">
             <div className="relative"><Search size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#62625b]" /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search name or email..." className="h-14 w-full rounded-2xl border border-[#dadad3] bg-[#fbfbf9] pl-12 pr-4 text-sm font-semibold text-ink outline-none transition focus:border-ink focus:bg-white focus:ring-2 focus:ring-[#435ee5]" /></div>
             <select value={role} onChange={(event) => setRole(event.target.value as "" | AdminRole)} className="h-14 rounded-2xl border border-[#dadad3] bg-[#fbfbf9] px-4 text-sm font-bold text-ink outline-none focus:border-ink focus:ring-2 focus:ring-[#435ee5]"><option value="">All roles</option><option value="USER">USER</option><option value="SUPER_ADMIN">SUPER_ADMIN</option></select>
             <select value={status} onChange={(event) => setStatus(event.target.value as "" | AdminStatus)} className="h-14 rounded-2xl border border-[#dadad3] bg-[#fbfbf9] px-4 text-sm font-bold text-ink outline-none focus:border-ink focus:ring-2 focus:ring-[#435ee5]"><option value="">All statuses</option><option value="ACTIVE">ACTIVE</option><option value="SUSPENDED">SUSPENDED</option></select>
+            <select value={approvalStatus} onChange={(event) => setApprovalStatus(event.target.value as "" | AdminApprovalStatus)} className="h-14 rounded-2xl border border-[#dadad3] bg-[#fbfbf9] px-4 text-sm font-bold text-ink outline-none focus:border-ink focus:ring-2 focus:ring-[#435ee5]"><option value="">All approvals</option><option value="PENDING">PENDING</option><option value="APPROVED">APPROVED</option><option value="REJECTED">REJECTED</option></select>
           </div>
         </AdminFilterPanel>
 
@@ -733,19 +793,21 @@ export default function AdminUsersPage() {
         <section className="portal-table-card">
           <div className="hidden lg:block">
             <table className="portal-data-table" aria-label="Admin users table">
-              <thead><tr><th>User</th><th>Role</th><th>Status</th><th>Businesses</th><th>Created</th><th>Last login</th><th className="text-right">Actions</th></tr></thead>
+              <thead><tr><th>User</th><th>Role</th><th>Status</th><th>Approval</th><th>Verified</th><th>Businesses</th><th>Created</th><th>Last login</th><th className="text-right">Actions</th></tr></thead>
               <tbody>
                 {isLoading ? <LoadingRows /> : hasUsers ? users.map((adminUser) => (
                   <tr key={adminUser.id}>
                     <td><div className="flex min-w-0 items-center gap-4"><EntityAvatar value={adminUser.name} /><div><p className="font-extrabold text-ink">{adminUser.name}</p><p className="mt-1 text-sm font-semibold text-[#62625b]">{adminUser.email}</p></div></div></td>
                     <td><RoleBadge role={adminUser.role} /></td>
                     <td><StatusBadge status={adminUser.status} /></td>
+                    <td><ApprovalBadge status={adminUser.approvalStatus} /></td>
+                    <td className="font-semibold text-[#33332e]">{adminUser.emailVerifiedAt ? "Email" : adminUser.phoneVerifiedAt ? "Phone" : "No"}</td>
                     <td><span className="font-extrabold text-ink">{adminUser.businessCount ?? 0}</span></td>
                     <td className="font-semibold text-[#33332e]">{formatDate(adminUser.createdAt)}</td>
                     <td className="font-semibold text-[#33332e]">{formatDate(adminUser.lastLoginAt)}</td>
                     <td className="text-right"><UserActions user={adminUser} currentUserId={currentUser?.id} onView={openDetails} onEdit={openEditForm} onRequestAction={requestAction} /></td>
                   </tr>
-                )) : <tr><td colSpan={7}><EmptyState message="No users match the current filters." /></td></tr>}
+                )) : <tr><td colSpan={9}><EmptyState message="No users match the current filters." /></td></tr>}
               </tbody>
             </table>
           </div>
@@ -754,7 +816,7 @@ export default function AdminUsersPage() {
             {isLoading ? <MobileLoadingCards /> : hasUsers ? users.map((adminUser) => (
               <article key={adminUser.id} className="p-5">
                 <div className="flex items-start justify-between gap-3"><div className="flex min-w-0 items-center gap-3"><EntityAvatar value={adminUser.name} /><div className="min-w-0"><h2 className="truncate text-sm font-extrabold text-ink">{adminUser.name}</h2><p className="mt-1 truncate text-xs font-semibold text-[#62625b]">{adminUser.email}</p></div></div><UserActions user={adminUser} currentUserId={currentUser?.id} onView={openDetails} onEdit={openEditForm} onRequestAction={requestAction} /></div>
-                <div className="mt-3 flex flex-wrap gap-2"><RoleBadge role={adminUser.role} /><StatusBadge status={adminUser.status} /></div>
+                <div className="mt-3 flex flex-wrap gap-2"><RoleBadge role={adminUser.role} /><StatusBadge status={adminUser.status} /><ApprovalBadge status={adminUser.approvalStatus} /></div>
                 <dl className="mt-4 grid grid-cols-2 gap-2 text-xs"><div className="rounded-2xl bg-[#f6f6f3] p-3"><dt className="font-bold text-[#62625b]">Businesses</dt><dd className="mt-1 font-extrabold text-ink">{adminUser.businessCount ?? 0}</dd></div><div className="rounded-2xl bg-[#f6f6f3] p-3"><dt className="font-bold text-[#62625b]">Created</dt><dd className="mt-1 font-extrabold text-ink">{formatDate(adminUser.createdAt)}</dd></div><div className="col-span-2 rounded-2xl bg-[#f6f6f3] p-3"><dt className="font-bold text-[#62625b]">Last login</dt><dd className="mt-1 font-extrabold text-ink">{formatDate(adminUser.lastLoginAt)}</dd></div></dl>
               </article>
             )) : <EmptyState message="No users match the current filters." />}

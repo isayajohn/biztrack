@@ -39,12 +39,16 @@ export default function VerifyPhonePage() {
     setIsSubmitting(true);
     setError("");
     try {
-      const user = await verifyPhone(state.verificationId!, otp);
-      await refreshUser();
+      const result = await verifyPhone(state.verificationId!, otp);
       sessionStorage.removeItem("biztrack_registration_verification");
       setVerified(true);
+      if (!result.authenticated) {
+        setNotice(result.message);
+        return;
+      }
+      await refreshUser();
       setNotice("Phone verified. Opening your BizTrack workspace...");
-      window.setTimeout(() => navigate(user.role === "SUPER_ADMIN" ? "/admin" : user.businessId ? "/dashboard" : "/onboarding", { replace: true }), 900);
+      window.setTimeout(() => navigate(result.user.role === "SUPER_ADMIN" ? "/admin" : result.user.businessId ? "/dashboard" : "/onboarding", { replace: true }), 900);
     } catch (err) {
       setError(getApiErrorMessage(err));
     } finally {

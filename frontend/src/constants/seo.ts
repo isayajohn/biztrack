@@ -3,11 +3,11 @@
 // from it.
 export const SITE_URL = "https://biztracktanzania.online";
 export const SITE_NAME = "BizTrack";
-export const DEFAULT_TITLE = "BizTrack | Business management for growing African businesses";
+export const DEFAULT_TITLE = "BizTrack Tanzania | POS, inventory and business management";
 export const DEFAULT_DESCRIPTION =
-  "BizTrack brings sales, inventory, finance, customers, debts, reports, and AI insights together in one real-time platform.";
-export const DEFAULT_OG_IMAGE = `${SITE_URL}/landing-hero-devices.png`;
-export const TWITTER_HANDLE = "@biztrack";
+  "Manage sales, POS, inventory, expenses, customers, debts, branches and reports with BizTrack, built in Tanzania for growing African businesses.";
+export const DEFAULT_OG_IMAGE = `${SITE_URL}/landing-dashboard.png`;
+export const TWITTER_HANDLE = "";
 
 export function absoluteUrl(path: string): string {
   return `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;

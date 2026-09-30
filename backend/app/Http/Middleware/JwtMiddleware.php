@@ -21,6 +21,16 @@ class JwtMiddleware
             if ($user->status !== 'ACTIVE') {
                 return response()->json(['success' => false, 'error' => 'Account suspended'], 403);
             }
+            if (!$user->isApproved()) {
+                $rejected = $user->approval_status === 'REJECTED';
+                return response()->json([
+                    'success' => false,
+                    'error' => $rejected
+                        ? 'Account approval was rejected. Contact support for assistance.'
+                        : 'Account verified and waiting for super-admin approval.',
+                    'code' => $rejected ? 'ACCOUNT_REJECTED' : 'ACCOUNT_PENDING_APPROVAL',
+                ], 403);
+            }
             auth()->setUser($user);
         } catch (TokenExpiredException $e) {
             return response()->json(['success' => false, 'error' => 'Token expired'], 401);

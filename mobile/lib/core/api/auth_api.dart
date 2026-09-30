@@ -52,7 +52,7 @@ class AuthApi {
     };
   }
 
-  Future<Map<String, dynamic>> verifyPhone(
+  Future<VerificationResult> verifyPhone(
     String verificationId,
     String otp,
   ) async {
@@ -60,7 +60,19 @@ class AuthApi {
       'verificationId': verificationId,
       'otp': otp,
     }, auth: false);
-    return _extractAuthResponse(data);
+    if (data is Map<String, dynamic>) {
+      final userJson = data['user'];
+      if (userJson is Map) {
+        return VerificationResult(
+          user: User.fromJson(Map<String, dynamic>.from(userJson)),
+          token: data['token']?.toString(),
+          requiresApproval: data['requiresApproval'] == true,
+          approvalStatus: data['approvalStatus']?.toString() ?? 'APPROVED',
+          message: data['message']?.toString() ?? 'Account verified successfully.',
+        );
+      }
+    }
+    throw ApiException('Invalid verification response');
   }
 
   Future<bool> resendPhoneVerification(String verificationId) async {
@@ -188,6 +200,7 @@ class RegistrationResult {
   final String onboardingIntent;
   final String target;
   final bool sent;
+  final bool requiresApproval;
 
   const RegistrationResult({
     required this.verificationId,
@@ -195,6 +208,7 @@ class RegistrationResult {
     required this.onboardingIntent,
     required this.target,
     required this.sent,
+    required this.requiresApproval,
   });
 
   factory RegistrationResult.fromJson(Map<String, dynamic> json) {
@@ -212,6 +226,7 @@ class RegistrationResult {
       sent: method == 'PHONE'
           ? json['verificationOtpSent'] == true
           : json['verificationEmailSent'] == true,
+      requiresApproval: json['requiresApproval'] == true,
     );
   }
 
@@ -221,6 +236,7 @@ class RegistrationResult {
     'onboardingIntent': onboardingIntent,
     'target': target,
     'sent': sent,
+    'requiresApproval': requiresApproval,
   };
 
   factory RegistrationResult.fromStoredJson(Map<String, dynamic> json) {
@@ -230,6 +246,25 @@ class RegistrationResult {
       onboardingIntent: json['onboardingIntent']?.toString() ?? 'CREATE',
       target: json['target']?.toString() ?? '',
       sent: json['sent'] == true,
+      requiresApproval: json['requiresApproval'] == true,
     );
   }
+}
+
+class VerificationResult {
+  final User user;
+  final String? token;
+  final bool requiresApproval;
+  final String approvalStatus;
+  final String message;
+
+  const VerificationResult({
+    required this.user,
+    required this.token,
+    required this.requiresApproval,
+    required this.approvalStatus,
+    required this.message,
+  });
+
+  bool get isAuthenticated => token != null && token!.isNotEmpty;
 }

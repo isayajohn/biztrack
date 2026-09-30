@@ -18,6 +18,8 @@ class User extends Authenticatable implements JWTSubject
 
     protected $fillable = [
         'name', 'email', 'phone', 'password_hash', 'role', 'status',
+        'approval_status', 'approved_at', 'approved_by', 'rejected_at',
+        'rejected_by', 'rejection_reason',
         'email_verified_at', 'phone_verified_at', 'registration_verification_method',
         'onboarding_intent', 'terms_accepted_at', 'terms_accepted_version',
         'privacy_accepted_at', 'privacy_accepted_version',
@@ -39,6 +41,8 @@ class User extends Authenticatable implements JWTSubject
         'privacy_accepted_at' => 'datetime',
         'locked_until' => 'datetime',
         'last_login_at' => 'datetime',
+        'approved_at' => 'datetime',
+        'rejected_at' => 'datetime',
     ];
 
     public function getJWTIdentifier()
@@ -76,5 +80,10 @@ class User extends Authenticatable implements JWTSubject
     public function isActive(): bool
     {
         return $this->status === 'ACTIVE';
+    }
+
+    public function isApproved(): bool
+    {
+        return $this->approval_status === 'APPROVED';
     }
 }

@@ -9,6 +9,7 @@ type SecurityForm = Omit<SecurityConfig, "id" | "createdAt" | "updatedAt">;
 
 const defaults: SecurityForm = {
   requireEmailVerification: true,
+  requireAdminApproval: false,
   enablePasswordReset: true,
   enableOtpLogin: false,
   enableSmsOtp: false,
@@ -104,6 +105,7 @@ export default function AdminSecurityConfigPage() {
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {[
                 ["requireEmailVerification", "Require email verification"],
+                ["requireAdminApproval", "Require super-admin approval for new accounts"],
                 ["enablePasswordReset", "Enable password reset"],
                 ["enableOtpLogin", "Enable OTP login"],
                 ["enableSmsOtp", "Enable SMS OTP"],

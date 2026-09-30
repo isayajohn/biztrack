@@ -6,83 +6,84 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./auth/AuthContext";
 import AppAlertProvider from "./components/AppAlertProvider";
 import AdminRoute from "./components/AdminRoute";
-import AdminLayout from "./components/admin/AdminLayout";
-import AppLayout from "./components/app/AppLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
-import AboutPage from "./pages/AboutPage";
-import DemoDashboard from "./pages/DemoDashboard";
-import ForbiddenPage from "./pages/ForbiddenPage";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
-import VerifyEmailPage from "./pages/VerifyEmailPage";
-import VerifyAccountPage from "./pages/VerifyAccountPage";
-import VerifyPhonePage from "./pages/VerifyPhonePage";
-import ForgetPasswordPage from "./pages/ForgetPasswordPage";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
-import Dashboard from "./pages/Dashboard";
-import SalesPage from "./pages/SalesPage";
-import SaleFormPage from "./pages/SaleFormPage";
-import SaleReceiptPage from "./pages/SaleReceiptPage";
-import RecurringInvoicesPage from "./pages/RecurringInvoicesPage";
-import RecurringInvoiceFormPage from "./pages/RecurringInvoiceFormPage";
-import PosPage from "./pages/PosPage";
-import ExpensesPage from "./pages/ExpensesPage";
-import ExpenseFormPage from "./pages/ExpenseFormPage";
-import ProductsPage from "./pages/ProductsPage";
-import ProductFormPage from "./pages/ProductFormPage";
-import ProductLabelPage from "./pages/ProductLabelPage";
-import ReportsPage from "./pages/ReportsPage";
-import CashFlowReportPage from "./pages/CashFlowReportPage";
-import PurchaseReportPage from "./pages/PurchaseReportPage";
-import SubscriptionPage from "./pages/SubscriptionPage";
-import SettingsPage from "./pages/SettingsPage";
-import OnboardingPage from "./pages/OnboardingPage";
-import CategoriesPage from "./pages/CategoriesPage";
-import BrandsPage from "./pages/BrandsPage";
-import PromotionsPage from "./pages/PromotionsPage";
-import BranchesPage from "./pages/BranchesPage";
-import StaffPage from "./pages/StaffPage";
-import SuppliersPage from "./pages/SuppliersPage";
-import CustomersPage from "./pages/CustomersPage";
-import CustomerStatementPage from "./pages/CustomerStatementPage";
-import PurchasesPage from "./pages/PurchasesPage";
-import StockMovementsPage from "./pages/StockMovementsPage";
-import StockAdjustmentsPage from "./pages/StockAdjustmentsPage";
-import StockInPage from "./pages/StockInPage";
-import DamagedStockPage from "./pages/DamagedStockPage";
-import InventoryReportsPage from "./pages/InventoryReportsPage";
-import NotificationsPage from "./pages/NotificationsPage";
-import DebtsOverviewPage from "./pages/DebtsOverviewPage";
-import CustomerDebtsPage from "./pages/CustomerDebtsPage";
-import SupplierDebtsPage from "./pages/SupplierDebtsPage";
-import DebtFormPage from "./pages/DebtFormPage";
-import DebtDetailPage from "./pages/DebtDetailPage";
-import DebtPaymentsPage from "./pages/DebtPaymentsPage";
-import DebtRemindersPage from "./pages/DebtRemindersPage";
-import DebtReportsPage from "./pages/DebtReportsPage";
-import AdminAuditLogsPage from "./pages/admin/AdminAuditLogsPage";
-import AdminBusinessDetailPage from "./pages/admin/AdminBusinessDetailPage";
-import AdminBusinessesPage from "./pages/admin/AdminBusinessesPage";
-import AdminCollectionsPage from "./pages/admin/AdminCollectionsPage";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import AdminEmailConfigPage from "./pages/admin/AdminEmailConfigPage";
-import AdminEmailProviderConfigPage from "./pages/admin/AdminEmailProviderConfigPage";
-import AdminEmailTemplatesPage from "./pages/admin/AdminEmailTemplatesPage";
-import AdminLandingPagePage from "./pages/admin/AdminLandingPagePage";
-import AdminPackageFormPage from "./pages/admin/AdminPackageFormPage";
-import AdminPackagesPage from "./pages/admin/AdminPackagesPage";
-import AdminSecurityConfigPage from "./pages/admin/AdminSecurityConfigPage";
-import AdminSettingsPage from "./pages/admin/AdminSettingsPage";
-import AdminSmsConfigPage from "./pages/admin/AdminSmsConfigPage";
-import AdminSmsProviderConfigPage from "./pages/admin/AdminSmsProviderConfigPage";
-import AdminSmsTemplatesPage from "./pages/admin/AdminSmsTemplatesPage";
-import AdminSubscriptionsPage from "./pages/admin/AdminSubscriptionsPage";
-import AdminUserDetailPage from "./pages/admin/AdminUserDetailPage";
-import AdminUsersPage from "./pages/admin/AdminUsersPage";
 import { muiTheme } from "./theme";
 import { LandingLanguageProvider } from "./i18n/LandingLanguageContext";
 import "./styles.css";
+
+const AppLayout = React.lazy(() => import("./components/app/AppLayout"));
+const AdminLayout = React.lazy(() => import("./components/admin/AdminLayout"));
+const AboutPage = React.lazy(() => import("./pages/AboutPage"));
+const DemoDashboard = React.lazy(() => import("./pages/DemoDashboard"));
+const ForbiddenPage = React.lazy(() => import("./pages/ForbiddenPage"));
+const LoginPage = React.lazy(() => import("./pages/LoginPage"));
+const RegisterPage = React.lazy(() => import("./pages/RegisterPage"));
+const VerifyEmailPage = React.lazy(() => import("./pages/VerifyEmailPage"));
+const VerifyAccountPage = React.lazy(() => import("./pages/VerifyAccountPage"));
+const VerifyPhonePage = React.lazy(() => import("./pages/VerifyPhonePage"));
+const ForgetPasswordPage = React.lazy(() => import("./pages/ForgetPasswordPage"));
+const ResetPasswordPage = React.lazy(() => import("./pages/ResetPasswordPage"));
+const Dashboard = React.lazy(() => import("./pages/Dashboard"));
+const SalesPage = React.lazy(() => import("./pages/SalesPage"));
+const SaleFormPage = React.lazy(() => import("./pages/SaleFormPage"));
+const SaleReceiptPage = React.lazy(() => import("./pages/SaleReceiptPage"));
+const RecurringInvoicesPage = React.lazy(() => import("./pages/RecurringInvoicesPage"));
+const RecurringInvoiceFormPage = React.lazy(() => import("./pages/RecurringInvoiceFormPage"));
+const PosPage = React.lazy(() => import("./pages/PosPage"));
+const ExpensesPage = React.lazy(() => import("./pages/ExpensesPage"));
+const ExpenseFormPage = React.lazy(() => import("./pages/ExpenseFormPage"));
+const ProductsPage = React.lazy(() => import("./pages/ProductsPage"));
+const ProductFormPage = React.lazy(() => import("./pages/ProductFormPage"));
+const ProductLabelPage = React.lazy(() => import("./pages/ProductLabelPage"));
+const ReportsPage = React.lazy(() => import("./pages/ReportsPage"));
+const CashFlowReportPage = React.lazy(() => import("./pages/CashFlowReportPage"));
+const PurchaseReportPage = React.lazy(() => import("./pages/PurchaseReportPage"));
+const SubscriptionPage = React.lazy(() => import("./pages/SubscriptionPage"));
+const SettingsPage = React.lazy(() => import("./pages/SettingsPage"));
+const OnboardingPage = React.lazy(() => import("./pages/OnboardingPage"));
+const CategoriesPage = React.lazy(() => import("./pages/CategoriesPage"));
+const BrandsPage = React.lazy(() => import("./pages/BrandsPage"));
+const PromotionsPage = React.lazy(() => import("./pages/PromotionsPage"));
+const BranchesPage = React.lazy(() => import("./pages/BranchesPage"));
+const StaffPage = React.lazy(() => import("./pages/StaffPage"));
+const SuppliersPage = React.lazy(() => import("./pages/SuppliersPage"));
+const CustomersPage = React.lazy(() => import("./pages/CustomersPage"));
+const CustomerStatementPage = React.lazy(() => import("./pages/CustomerStatementPage"));
+const PurchasesPage = React.lazy(() => import("./pages/PurchasesPage"));
+const StockMovementsPage = React.lazy(() => import("./pages/StockMovementsPage"));
+const StockAdjustmentsPage = React.lazy(() => import("./pages/StockAdjustmentsPage"));
+const StockInPage = React.lazy(() => import("./pages/StockInPage"));
+const DamagedStockPage = React.lazy(() => import("./pages/DamagedStockPage"));
+const InventoryReportsPage = React.lazy(() => import("./pages/InventoryReportsPage"));
+const NotificationsPage = React.lazy(() => import("./pages/NotificationsPage"));
+const DebtsOverviewPage = React.lazy(() => import("./pages/DebtsOverviewPage"));
+const CustomerDebtsPage = React.lazy(() => import("./pages/CustomerDebtsPage"));
+const SupplierDebtsPage = React.lazy(() => import("./pages/SupplierDebtsPage"));
+const DebtFormPage = React.lazy(() => import("./pages/DebtFormPage"));
+const DebtDetailPage = React.lazy(() => import("./pages/DebtDetailPage"));
+const DebtPaymentsPage = React.lazy(() => import("./pages/DebtPaymentsPage"));
+const DebtRemindersPage = React.lazy(() => import("./pages/DebtRemindersPage"));
+const DebtReportsPage = React.lazy(() => import("./pages/DebtReportsPage"));
+const AdminAuditLogsPage = React.lazy(() => import("./pages/admin/AdminAuditLogsPage"));
+const AdminBusinessDetailPage = React.lazy(() => import("./pages/admin/AdminBusinessDetailPage"));
+const AdminBusinessesPage = React.lazy(() => import("./pages/admin/AdminBusinessesPage"));
+const AdminCollectionsPage = React.lazy(() => import("./pages/admin/AdminCollectionsPage"));
+const AdminDashboard = React.lazy(() => import("./pages/admin/AdminDashboard"));
+const AdminEmailConfigPage = React.lazy(() => import("./pages/admin/AdminEmailConfigPage"));
+const AdminEmailProviderConfigPage = React.lazy(() => import("./pages/admin/AdminEmailProviderConfigPage"));
+const AdminEmailTemplatesPage = React.lazy(() => import("./pages/admin/AdminEmailTemplatesPage"));
+const AdminLandingPagePage = React.lazy(() => import("./pages/admin/AdminLandingPagePage"));
+const AdminPackageFormPage = React.lazy(() => import("./pages/admin/AdminPackageFormPage"));
+const AdminPackagesPage = React.lazy(() => import("./pages/admin/AdminPackagesPage"));
+const AdminSecurityConfigPage = React.lazy(() => import("./pages/admin/AdminSecurityConfigPage"));
+const AdminSettingsPage = React.lazy(() => import("./pages/admin/AdminSettingsPage"));
+const AdminSmsConfigPage = React.lazy(() => import("./pages/admin/AdminSmsConfigPage"));
+const AdminSmsProviderConfigPage = React.lazy(() => import("./pages/admin/AdminSmsProviderConfigPage"));
+const AdminSmsTemplatesPage = React.lazy(() => import("./pages/admin/AdminSmsTemplatesPage"));
+const AdminSubscriptionsPage = React.lazy(() => import("./pages/admin/AdminSubscriptionsPage"));
+const AdminUserDetailPage = React.lazy(() => import("./pages/admin/AdminUserDetailPage"));
+const AdminUsersPage = React.lazy(() => import("./pages/admin/AdminUsersPage"));
 
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";
 
@@ -108,6 +109,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <AppAlertProvider>
             <AuthProvider>
               <LandingLanguageProvider>
+              <React.Suspense fallback={<div className="min-h-screen bg-[#080b17]" aria-label="Loading BizTrack" />}>
               <Routes>
             {/* Public routes */}
             <Route path="/" element={<LandingPage />} />
@@ -203,6 +205,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               </Route>
             </Route>
               </Routes>
+              </React.Suspense>
               </LandingLanguageProvider>
             </AuthProvider>
           </AppAlertProvider>

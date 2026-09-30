@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\AppBranding;
+use App\Models\AuthToken;
 use App\Models\AuditLog;
 use App\Models\Business;
 use App\Models\BusinessSubscription;
@@ -15,6 +16,7 @@ use App\Models\SmsConfig;
 use App\Models\User;
 use App\Services\AuditService;
 use App\Services\EncryptionService;
+use App\Services\EmailService;
 use App\Services\SmsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -24,7 +26,11 @@ use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
 {
-    public function __construct(private EncryptionService $encryptionService, private SmsService $smsService) {}
+    public function __construct(
+        private EncryptionService $encryptionService,
+        private SmsService $smsService,
+        private EmailService $emailService,
+    ) {}
 
     public function getAdminStats(Request $request): JsonResponse
     {
@@ -371,6 +377,7 @@ class AdminController extends Controller
     {
         $data = $request->validate([
             'requireEmailVerification' => 'sometimes|boolean',
+            'requireAdminApproval' => 'sometimes|boolean',
             'enablePasswordReset' => 'sometimes|boolean',
             'enableOtpLogin' => 'sometimes|boolean',
             'enableSmsOtp' => 'sometimes|boolean',
@@ -476,6 +483,7 @@ class AdminController extends Controller
         }
         if ($request->filled('role')) $query->where('role', $request->role);
         if ($request->filled('status')) $query->where('status', $request->status);
+        if ($request->filled('approvalStatus')) $query->where('approval_status', $request->approvalStatus);
 
         $total = $query->count();
         $page = (int) $request->get('page', 1);
@@ -519,6 +527,9 @@ class AdminController extends Controller
             'password_hash' => Hash::make($data['password']),
             'role' => $data['role'],
             'status' => $data['status'],
+            'approval_status' => 'APPROVED',
+            'approved_at' => now(),
+            'approved_by' => auth()->id(),
             'email_verified_at' => now(),
         ]);
 
@@ -619,6 +630,100 @@ class AdminController extends Controller
         return response()->json(['success' => true, 'data' => $this->formatAdminUser($user->fresh()->loadCount('businesses'))]);
     }
 
+    public function updateUserApproval(Request $request, string $id): JsonResponse
+    {
+        $data = $request->validate([
+            'approvalStatus' => 'required|in:PENDING,APPROVED,REJECTED',
+            'reason' => 'nullable|string|max:1000',
+        ]);
+        $user = User::find($id);
+        if (!$user) return response()->json(['success' => false, 'error' => 'Not found'], 404);
+        if ($user->id === auth()->id() && $data['approvalStatus'] !== 'APPROVED') {
+            return response()->json(['success' => false, 'error' => 'You cannot revoke approval from your own account'], 400);
+        }
+
+        $status = $data['approvalStatus'];
+        $payload = [
+            'approval_status' => $status,
+            'approved_at' => $status === 'APPROVED' ? now() : null,
+            'approved_by' => $status === 'APPROVED' ? auth()->id() : null,
+            'rejected_at' => $status === 'REJECTED' ? now() : null,
+            'rejected_by' => $status === 'REJECTED' ? auth()->id() : null,
+            'rejection_reason' => $status === 'REJECTED' ? ($data['reason'] ?? null) : null,
+        ];
+        $user->update($payload);
+
+        AuditService::log([
+            'actor_id' => auth()->id(),
+            'action' => 'USER_APPROVAL_UPDATED',
+            'target_type' => 'User',
+            'target_id' => $id,
+            'details' => ['approvalStatus' => $status, 'reason' => $payload['rejection_reason']],
+        ]);
+
+        return response()->json(['success' => true, 'data' => $this->formatAdminUser($user->fresh()->loadCount('businesses'))]);
+    }
+
+    public function updateUserVerification(Request $request, string $id): JsonResponse
+    {
+        $data = $request->validate(['verified' => 'required|boolean']);
+        $user = User::find($id);
+        if (!$user) return response()->json(['success' => false, 'error' => 'Not found'], 404);
+        if (!$user->email) return response()->json(['success' => false, 'error' => 'This user has no email address'], 422);
+
+        $user->update([
+            'email_verified_at' => $data['verified'] ? ($user->email_verified_at ?? now()) : null,
+            'email_verification_token_hash' => null,
+            'email_verification_expires_at' => null,
+        ]);
+        AuthToken::where('user_id', $user->id)->where('type', 'EMAIL_VERIFICATION')->delete();
+
+        AuditService::log([
+            'actor_id' => auth()->id(),
+            'action' => $data['verified'] ? 'USER_EMAIL_VERIFIED_MANUALLY' : 'USER_EMAIL_UNVERIFIED_MANUALLY',
+            'target_type' => 'User',
+            'target_id' => $id,
+        ]);
+
+        return response()->json(['success' => true, 'data' => $this->formatAdminUser($user->fresh()->loadCount('businesses'))]);
+    }
+
+    public function resendUserVerification(Request $request, string $id): JsonResponse
+    {
+        $user = User::find($id);
+        if (!$user) return response()->json(['success' => false, 'error' => 'Not found'], 404);
+        if (!$user->email) return response()->json(['success' => false, 'error' => 'This user has no email address'], 422);
+        if ($user->email_verified_at) return response()->json(['success' => false, 'error' => 'Email is already verified'], 422);
+
+        $sent = $this->sendUserEmailVerification($user);
+        AuditService::log([
+            'actor_id' => auth()->id(),
+            'action' => 'USER_VERIFICATION_EMAIL_RESENT',
+            'target_type' => 'User',
+            'target_id' => $id,
+            'details' => ['sent' => $sent],
+        ]);
+
+        if (!$sent) return response()->json(['success' => false, 'error' => 'Verification email could not be sent. Check the email configuration.'], 502);
+        return response()->json(['success' => true, 'data' => ['message' => 'Verification email sent.']]);
+    }
+
+    public function unlockUser(Request $request, string $id): JsonResponse
+    {
+        $user = User::find($id);
+        if (!$user) return response()->json(['success' => false, 'error' => 'Not found'], 404);
+
+        $user->update(['failed_login_attempts' => 0, 'locked_until' => null]);
+        AuditService::log([
+            'actor_id' => auth()->id(),
+            'action' => 'USER_UNLOCKED',
+            'target_type' => 'User',
+            'target_id' => $id,
+        ]);
+
+        return response()->json(['success' => true, 'data' => $this->formatAdminUser($user->fresh()->loadCount('businesses'))]);
+    }
+
     public function deleteUser(Request $request, string $id): JsonResponse
     {
         $user = User::find($id);
@@ -646,12 +751,50 @@ class AdminController extends Controller
             'phone' => $u->phone,
             'role' => $u->role,
             'status' => $u->status,
+            'approvalStatus' => $u->approval_status,
+            'approvedAt' => $u->approved_at,
+            'approvedBy' => $u->approved_by,
+            'rejectedAt' => $u->rejected_at,
+            'rejectedBy' => $u->rejected_by,
+            'rejectionReason' => $u->rejection_reason,
             'businessCount' => $u->businesses_count ?? $u->businesses()->count(),
             'emailVerifiedAt' => $u->email_verified_at,
+            'phoneVerifiedAt' => $u->phone_verified_at,
+            'verificationMethod' => $u->registration_verification_method,
+            'failedLoginAttempts' => $u->failed_login_attempts,
+            'lockedUntil' => $u->locked_until,
             'lastLoginAt' => $u->last_login_at,
             'createdAt' => $u->created_at,
             'updatedAt' => $u->updated_at,
         ];
+    }
+
+    private function sendUserEmailVerification(User $user): bool
+    {
+        $rawToken = Str::random(64);
+        $tokenHash = hash('sha256', $rawToken);
+        $expiresAt = now()->addDay();
+
+        AuthToken::where('user_id', $user->id)->where('type', 'EMAIL_VERIFICATION')->delete();
+        AuthToken::create([
+            'id' => Str::uuid(),
+            'user_id' => $user->id,
+            'type' => 'EMAIL_VERIFICATION',
+            'token_hash' => $tokenHash,
+            'expires_at' => $expiresAt,
+            'created_at' => now(),
+        ]);
+        $user->update([
+            'email_verification_token_hash' => $tokenHash,
+            'email_verification_expires_at' => $expiresAt,
+        ]);
+
+        $verifyUrl = rtrim((string) config('app.frontend_url'), '/').'/verify-email?token='.$rawToken;
+        return $this->emailService->sendFromTemplate('EMAIL_VERIFICATION', $user->email, $user->name, [
+            'name' => $user->name,
+            'verifyUrl' => $verifyUrl,
+            'token' => $rawToken,
+        ]);
     }
 
     private function formatSmsConfig(SmsConfig $config): array

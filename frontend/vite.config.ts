@@ -8,14 +8,26 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       workbox: {
-        // The app ships as a single large JS bundle today; raise the default 2 MiB
-        // Workbox precache limit so it isn't silently excluded from offline caching.
-        maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
+        // Keep first-load bandwidth focused on the public page. Route chunks and
+        // media are cached as they are used instead of downloading the full app.
+        globPatterns: ["**/*.{html,css,ico,svg,webmanifest}", "icons/*.png"],
+        runtimeCaching: [
+          {
+            urlPattern: /\/assets\/.*\.js$/,
+            handler: "StaleWhileRevalidate",
+            options: { cacheName: "biztrack-route-chunks", expiration: { maxEntries: 180, maxAgeSeconds: 60 * 60 * 24 * 30 } },
+          },
+          {
+            urlPattern: /\.(?:png|jpg|jpeg|webp)$/,
+            handler: "CacheFirst",
+            options: { cacheName: "biztrack-images", expiration: { maxEntries: 80, maxAgeSeconds: 60 * 60 * 24 * 30 } },
+          },
+        ],
       },
       manifest: {
         name: "BizTrack",
         short_name: "BizTrack",
-        description: "BizTrack is the business operating system for growing African businesses — sales, inventory, finance, customers, debts, reports, and AI insights in real time.",
+        description: "POS, inventory, sales, expenses, debts and business reporting for growing Tanzanian and African businesses.",
         theme_color: "#18bd97",
         background_color: "#eef5f2",
         display: "standalone",

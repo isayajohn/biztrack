@@ -20,6 +20,7 @@ class SecurityConfigController extends Controller
     {
         $data = $request->validate([
             'requireEmailVerification' => 'sometimes|boolean',
+            'requireAdminApproval' => 'sometimes|boolean',
             'enablePasswordReset' => 'sometimes|boolean',
             'enableOtpLogin' => 'sometimes|boolean',
             'enableSmsOtp' => 'sometimes|boolean',

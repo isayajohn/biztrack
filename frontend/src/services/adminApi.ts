@@ -3,6 +3,7 @@ import type { AppBranding } from "./landingApi";
 
 export type AdminRole = "USER" | "SUPER_ADMIN";
 export type AdminStatus = "ACTIVE" | "SUSPENDED";
+export type AdminApprovalStatus = "PENDING" | "APPROVED" | "REJECTED";
 export type PackageStatus = "ACTIVE" | "INACTIVE";
 export type SubscriptionStatus = "TRIAL" | "ACTIVE" | "SUSPENDED" | "CANCELLED" | "EXPIRED";
 export type BillingCycle = "MONTHLY" | "YEARLY" | "LIFETIME" | "MANUAL";
@@ -24,6 +25,15 @@ export type AdminUser = {
   email: string;
   role: AdminRole;
   status: AdminStatus;
+  approvalStatus: AdminApprovalStatus;
+  approvedAt?: string | null;
+  rejectedAt?: string | null;
+  rejectionReason?: string | null;
+  emailVerifiedAt?: string | null;
+  phoneVerifiedAt?: string | null;
+  verificationMethod?: "EMAIL" | "PHONE" | null;
+  failedLoginAttempts?: number;
+  lockedUntil?: string | null;
   lastLoginAt?: string | null;
   businessCount?: number;
   businesses?: Array<{
@@ -393,6 +403,7 @@ export type SmsTestResult = {
 export type SecurityConfig = {
   id: string;
   requireEmailVerification: boolean;
+  requireAdminApproval: boolean;
   enablePasswordReset: boolean;
   enableOtpLogin: boolean;
   enableSmsOtp: boolean;
@@ -546,6 +557,7 @@ type ApiSmsConfig = Partial<SmsConfig> & {
 
 type ApiSecurityConfig = Partial<SecurityConfig> & {
   require_email_verification?: boolean | number;
+  require_admin_approval?: boolean | number;
   enable_password_reset?: boolean | number;
   enable_otp_login?: boolean | number;
   enable_sms_otp?: boolean | number;
@@ -574,7 +586,15 @@ type ApiAdminBusiness = Partial<Omit<AdminBusiness, "_count" | "user">> & {
 
 type ApiAdminUser = Partial<Omit<AdminUser, "businesses">> & {
   phone?: string | null;
+  approval_status?: AdminApprovalStatus;
+  approved_at?: string | null;
+  rejected_at?: string | null;
+  rejection_reason?: string | null;
   email_verified_at?: string | null;
+  phone_verified_at?: string | null;
+  registration_verification_method?: "EMAIL" | "PHONE" | null;
+  failed_login_attempts?: number;
+  locked_until?: string | null;
   last_login_at?: string | null;
   created_at?: string;
   updated_at?: string;
@@ -686,6 +706,7 @@ const emptyLandingContent: LandingPageContent = {
 const defaultSecurityConfig: SecurityConfig = {
   id: "",
   requireEmailVerification: true,
+  requireAdminApproval: false,
   enablePasswordReset: true,
   enableOtpLogin: false,
   enableSmsOtp: false,
@@ -835,6 +856,7 @@ function normalizeSecurityConfig(config: ApiSecurityConfig | null): SecurityConf
   return {
     id: config.id ?? "",
     requireEmailVerification: Boolean(config.requireEmailVerification ?? config.require_email_verification ?? defaultSecurityConfig.requireEmailVerification),
+    requireAdminApproval: Boolean(config.requireAdminApproval ?? config.require_admin_approval ?? defaultSecurityConfig.requireAdminApproval),
     enablePasswordReset: Boolean(config.enablePasswordReset ?? config.enable_password_reset ?? defaultSecurityConfig.enablePasswordReset),
     enableOtpLogin: Boolean(config.enableOtpLogin ?? config.enable_otp_login ?? defaultSecurityConfig.enableOtpLogin),
     enableSmsOtp: Boolean(config.enableSmsOtp ?? config.enable_sms_otp ?? defaultSecurityConfig.enableSmsOtp),
@@ -892,6 +914,15 @@ function normalizeAdminUser(user: ApiAdminUser): AdminUser {
     email: user.email ?? "",
     role: user.role ?? "USER",
     status: user.status ?? "ACTIVE",
+    approvalStatus: user.approvalStatus ?? user.approval_status ?? "APPROVED",
+    approvedAt: user.approvedAt ?? user.approved_at ?? null,
+    rejectedAt: user.rejectedAt ?? user.rejected_at ?? null,
+    rejectionReason: user.rejectionReason ?? user.rejection_reason ?? null,
+    emailVerifiedAt: user.emailVerifiedAt ?? user.email_verified_at ?? null,
+    phoneVerifiedAt: user.phoneVerifiedAt ?? user.phone_verified_at ?? null,
+    verificationMethod: user.verificationMethod ?? user.registration_verification_method ?? null,
+    failedLoginAttempts: numberOrZero(user.failedLoginAttempts ?? user.failed_login_attempts),
+    lockedUntil: user.lockedUntil ?? user.locked_until ?? null,
     lastLoginAt: user.lastLoginAt ?? user.last_login_at ?? null,
     businessCount: numberOrZero(user.businessCount ?? user.businesses_count ?? businesses?.length),
     businesses,
@@ -1077,6 +1108,22 @@ export async function updateAdminUserRole(id: string, role: AdminRole) {
   return normalizeAdminUser(unwrap<ApiAdminUser>(await apiClient.patch(`/admin/users/${id}/role`, { role })));
 }
 
+export async function updateAdminUserApproval(id: string, approvalStatus: AdminApprovalStatus, reason?: string) {
+  return normalizeAdminUser(unwrap<ApiAdminUser>(await apiClient.patch(`/admin/users/${id}/approval`, { approvalStatus, reason })));
+}
+
+export async function updateAdminUserVerification(id: string, verified: boolean) {
+  return normalizeAdminUser(unwrap<ApiAdminUser>(await apiClient.patch(`/admin/users/${id}/verification`, { verified })));
+}
+
+export async function resendAdminUserVerification(id: string) {
+  return unwrap<{ message: string }>(await apiClient.post(`/admin/users/${id}/resend-verification`));
+}
+
+export async function unlockAdminUser(id: string) {
+  return normalizeAdminUser(unwrap<ApiAdminUser>(await apiClient.post(`/admin/users/${id}/unlock`)));
+}
+
 export async function deleteAdminUser(id: string) {
   await apiClient.delete(`/admin/users/${id}`);
 }
@@ -1085,6 +1132,7 @@ export async function getAdminUsersPage(params: {
   search?: string;
   role?: AdminRole;
   status?: AdminStatus;
+  approvalStatus?: AdminApprovalStatus;
   page?: number;
   limit?: number;
 } = {}) {

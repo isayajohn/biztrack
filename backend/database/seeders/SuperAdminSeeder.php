@@ -29,6 +29,8 @@ class SuperAdminSeeder extends Seeder
                     'password_hash' => Hash::make($password),
                     'role' => 'SUPER_ADMIN',
                     'status' => 'ACTIVE',
+                    'approval_status' => 'APPROVED',
+                    'approved_at' => now(),
                     'email_verified_at' => now(),
                 ]);
                 $this->command->info("Super admin created: $email");
@@ -37,6 +39,8 @@ class SuperAdminSeeder extends Seeder
             $existing->update([
                 'password_hash' => Hash::make($password),
                 'status' => 'ACTIVE',
+                'approval_status' => 'APPROVED',
+                'approved_at' => $existing->approved_at ?? now(),
                 'email_verified_at' => $existing->email_verified_at ?? now(),
             ]);
             $this->command->info("Super admin credentials updated: $email");
@@ -49,6 +53,7 @@ class SuperAdminSeeder extends Seeder
             SecurityConfig::create([
                 'id' => Str::uuid(),
                 'require_email_verification' => false,
+                'require_admin_approval' => false,
                 'enable_password_reset' => true,
                 'enable_otp_login' => false,
                 'enable_sms_otp' => false,

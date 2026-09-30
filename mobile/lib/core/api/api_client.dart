@@ -8,8 +8,9 @@ import '../theme/app_theme.dart' show kApiBaseUrl;
 class ApiException implements Exception {
   final String message;
   final int? statusCode;
+  final String? code;
 
-  ApiException(this.message, {this.statusCode});
+  ApiException(this.message, {this.statusCode, this.code});
 
   @override
   String toString() => message;
@@ -135,7 +136,11 @@ class ApiClient {
                     : body['errors'].toString()
               : 'Request failed');
     }
-    throw ApiException(message.toString(), statusCode: response.statusCode);
+    throw ApiException(
+      message.toString(),
+      statusCode: response.statusCode,
+      code: body is Map ? body['code']?.toString() : null,
+    );
   }
 
   Future<dynamic> get(String path, {Map<String, String>? params}) async {

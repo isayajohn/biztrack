@@ -46,6 +46,7 @@ rsync -a \
   --exclude='.env' \
   --exclude='.git/' \
   --exclude='node_modules/' \
+  --exclude='vendor/' \
   --exclude='tests/' \
   "${repo_root}/backend/" \
   "${stage_dir}/"

@@ -36,7 +36,9 @@ class _RegistrationVerificationScreenState
     _notice = widget.registration.sent
         ? (isPhone
               ? 'Enter the 6-digit code sent to your phone.'
-              : 'Check your email and open the verification link.')
+              : widget.registration.requiresApproval
+                  ? 'Check your email and open the verification link. A super admin must then approve your account.'
+                  : 'Check your email and open the verification link.')
         : 'Your account was created, but the verification message could not be sent. Use resend to try again.';
   }
 
@@ -55,11 +57,19 @@ class _RegistrationVerificationScreenState
       _error = null;
     });
     try {
-      await context.read<AuthProvider>().verifyPhone(
+      final authenticated = await context.read<AuthProvider>().verifyPhone(
         widget.registration.verificationId,
         _otp.text,
       );
-      if (mounted) context.go('/onboarding');
+      if (!mounted) return;
+      if (authenticated) {
+        context.go('/onboarding');
+      } else {
+        setState(() {
+          _notice = 'Phone verified. Your account is waiting for super-admin approval. You can sign in after it is approved.';
+          _otp.clear();
+        });
+      }
     } catch (reason) {
       if (mounted) setState(() => _error = reason.toString());
     } finally {
@@ -192,7 +202,7 @@ class _RegistrationVerificationScreenState
                           SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              'After opening the verification link, return here and sign in to continue to workspace setup.',
+                              'After opening the verification link, return here and sign in. If approval is enabled, wait for a super admin to approve the account first.',
                               style: TextStyle(
                                 color: kMuted,
                                 fontSize: 12.5,

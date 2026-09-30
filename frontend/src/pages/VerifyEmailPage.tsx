@@ -14,6 +14,7 @@ export default function VerifyEmailPage() {
   const hasSubmitted = useRef(false);
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [message, setMessage] = useState("Verifying your account...");
+  const [waitingForApproval, setWaitingForApproval] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -30,14 +31,19 @@ export default function VerifyEmailPage() {
 
     authApi
       .verifyEmail(token)
-      .then(async (user) => {
+      .then(async (result) => {
         if (!alive) return;
-        await refreshUser();
         sessionStorage.removeItem("biztrack_registration_verification");
         setStatus("success");
+        if (!result.authenticated) {
+          setWaitingForApproval(true);
+          setMessage(result.message);
+          return;
+        }
+        await refreshUser();
         setMessage("Your account is verified. Taking you to BizTrack...");
         window.setTimeout(() => {
-          navigate(user.role === "SUPER_ADMIN" ? "/admin" : user.businessId ? "/dashboard" : "/onboarding", { replace: true });
+          navigate(result.user.role === "SUPER_ADMIN" ? "/admin" : result.user.businessId ? "/dashboard" : "/onboarding", { replace: true });
         }, 900);
       })
       .catch((error) => {
@@ -80,6 +86,9 @@ export default function VerifyEmailPage() {
           {status === "success" ? "Account verified" : status === "error" ? "Verification failed" : "Verifying account"}
         </h1>
         <p className="mt-3 text-sm font-semibold leading-6 text-white/50">{message}</p>
+        {status === "success" && waitingForApproval && (
+          <Link to="/login" className="mt-6 block rounded-xl bg-[#12e4d7] px-4 py-3 text-sm font-black text-[#051210] transition-colors hover:bg-white">Back to login</Link>
+        )}
         {status === "error" && (
           <div className="mt-6 flex flex-col gap-2">
             <Link

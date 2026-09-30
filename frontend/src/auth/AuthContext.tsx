@@ -11,6 +11,7 @@ export type User = {
   email: string;
   role: "USER" | "SUPER_ADMIN";
   status: "ACTIVE" | "SUSPENDED";
+  approvalStatus: "PENDING" | "APPROVED" | "REJECTED";
   businessRole?: "OWNER" | "MANAGER" | "CASHIER" | "INVENTORY" | "ACCOUNTANT" | "CUSTOM";
   permissions?: string[];
   branch?: { id: string; name: string } | null;
@@ -46,6 +47,7 @@ export type RegisterResult = {
   emailAddressMasked?: string | null;
   verificationId: string;
   onboardingIntent: "CREATE" | "JOIN";
+  requiresApproval: boolean;
 };
 
 type AuthContextType = {
@@ -160,6 +162,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       emailAddressMasked: result.emailAddressMasked,
       verificationId: result.verificationId,
       onboardingIntent: result.onboardingIntent,
+      requiresApproval: result.requiresApproval,
     };
   }, []);
 

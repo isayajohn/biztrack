@@ -17,6 +17,7 @@ type ApiUser = {
   email: string | null;
   role: "USER" | "SUPER_ADMIN";
   status: "ACTIVE" | "SUSPENDED";
+  approvalStatus?: "PENDING" | "APPROVED" | "REJECTED";
   businessRole?: User["businessRole"];
   permissions?: string[];
   branch?: { id: string; name: string } | null;
@@ -39,6 +40,9 @@ type AuthResponse = {
   emailAddressMasked?: string | null;
   verificationId?: string;
   onboardingIntent?: "CREATE" | "JOIN";
+  requiresApproval?: boolean;
+  approvalStatus?: "PENDING" | "APPROVED" | "REJECTED";
+  message?: string;
 };
 
 type ProfileResponse = {
@@ -59,6 +63,7 @@ export function mapApiUser(user: ApiUser): User {
     email: user.email ?? "",
     role: user.role,
     status: user.status,
+    approvalStatus: user.approvalStatus ?? "APPROVED",
     businessRole: user.businessRole,
     permissions: user.permissions ?? [],
     branch: user.branch ?? null,
@@ -116,6 +121,7 @@ export async function register(data: RegisterData): Promise<RegisterApiResult> {
     emailAddressMasked: result.emailAddressMasked,
     verificationId: result.verificationId ?? result.user.id,
     onboardingIntent: result.onboardingIntent ?? "CREATE",
+    requiresApproval: Boolean(result.requiresApproval),
   };
 }
 
@@ -131,11 +137,24 @@ export async function validateInvitation(code: string): Promise<InvitationPrevie
   return unwrap<InvitationPreview>(await apiClient.post("/auth/invitations/validate", { code }));
 }
 
-export async function verifyPhone(verificationId: string, otp: string): Promise<User> {
+export type VerificationResult = {
+  user: User;
+  authenticated: boolean;
+  requiresApproval: boolean;
+  approvalStatus: "PENDING" | "APPROVED" | "REJECTED";
+  message: string;
+};
+
+export async function verifyPhone(verificationId: string, otp: string): Promise<VerificationResult> {
   const result = unwrap<AuthResponse>(await apiClient.post("/auth/verify-phone", { verificationId, otp }));
-  if (!result.token) throw new Error("Authentication token was not returned.");
-  localStorage.setItem(AUTH_TOKEN_KEY, result.token);
-  return mapApiUser(result.user);
+  if (result.token) localStorage.setItem(AUTH_TOKEN_KEY, result.token);
+  return {
+    user: mapApiUser(result.user),
+    authenticated: Boolean(result.token),
+    requiresApproval: Boolean(result.requiresApproval),
+    approvalStatus: result.approvalStatus ?? result.user.approvalStatus ?? "APPROVED",
+    message: result.message ?? "Account verified successfully.",
+  };
 }
 
 export async function resendPhoneVerification(verificationId: string): Promise<{ message: string; sent: boolean }> {
@@ -152,13 +171,18 @@ export async function getProfile(): Promise<User> {
   return mapApiUser("user" in result ? result.user : result);
 }
 
-export async function verifyEmail(token: string): Promise<User> {
+export async function verifyEmail(token: string): Promise<VerificationResult> {
   const result = unwrap<AuthResponse>(
     await apiClient.post("/auth/verify-email", { token }),
   );
-  if (!result.token) throw new Error("Authentication token was not returned.");
-  localStorage.setItem(AUTH_TOKEN_KEY, result.token);
-  return mapApiUser(result.user);
+  if (result.token) localStorage.setItem(AUTH_TOKEN_KEY, result.token);
+  return {
+    user: mapApiUser(result.user),
+    authenticated: Boolean(result.token),
+    requiresApproval: Boolean(result.requiresApproval),
+    approvalStatus: result.approvalStatus ?? result.user.approvalStatus ?? "APPROVED",
+    message: result.message ?? "Account verified successfully.",
+  };
 }
 
 export async function forgotPassword(email: string): Promise<string> {

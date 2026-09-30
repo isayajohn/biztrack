@@ -407,6 +407,10 @@ Route::middleware('jwt.auth')->group(function () {
         Route::put('/users/{id}', [AdminController::class, 'updateUser']);
         Route::patch('/users/{id}/status', [AdminController::class, 'updateUserStatus']);
         Route::patch('/users/{id}/role', [AdminController::class, 'updateUserRole']);
+        Route::patch('/users/{id}/approval', [AdminController::class, 'updateUserApproval']);
+        Route::patch('/users/{id}/verification', [AdminController::class, 'updateUserVerification']);
+        Route::post('/users/{id}/resend-verification', [AdminController::class, 'resendUserVerification']);
+        Route::post('/users/{id}/unlock', [AdminController::class, 'unlockUser']);
         Route::delete('/users/{id}', [AdminController::class, 'deleteUser']);
     });
 });

@@ -14,7 +14,7 @@ class SecurityConfig extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'require_email_verification', 'enable_password_reset', 'enable_otp_login',
+        'require_email_verification', 'require_admin_approval', 'enable_password_reset', 'enable_otp_login',
         'enable_sms_otp', 'password_min_length', 'password_require_number',
         'password_require_special_char', 'otp_expiry_minutes', 'max_login_attempts',
         'lockout_minutes', 'session_expiry_minutes',
@@ -22,6 +22,7 @@ class SecurityConfig extends Model
 
     protected $casts = [
         'require_email_verification' => 'boolean',
+        'require_admin_approval' => 'boolean',
         'enable_password_reset' => 'boolean',
         'enable_otp_login' => 'boolean',
         'enable_sms_otp' => 'boolean',

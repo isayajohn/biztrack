@@ -59,20 +59,32 @@ export function useSeo({
     document.title = title;
 
     upsertMeta("name", "description", description);
-    upsertMeta("name", "robots", index ? "index, follow" : "noindex, nofollow");
+    const robots = index
+      ? "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+      : "noindex, nofollow";
+    upsertMeta("name", "robots", robots);
+    upsertMeta("name", "googlebot", robots);
+    upsertMeta("name", "bingbot", robots);
     upsertLink("canonical", canonicalUrl);
 
+    upsertMeta("property", "og:locale", "en_TZ");
     upsertMeta("property", "og:title", title);
     upsertMeta("property", "og:description", description);
     upsertMeta("property", "og:type", type);
     upsertMeta("property", "og:url", canonicalUrl);
     upsertMeta("property", "og:image", image);
+    upsertMeta("property", "og:image:secure_url", image);
+    upsertMeta("property", "og:image:type", "image/png");
+    upsertMeta("property", "og:image:width", "2880");
+    upsertMeta("property", "og:image:height", "1800");
+    upsertMeta("property", "og:image:alt", "BizTrack business dashboard");
     upsertMeta("property", "og:site_name", SITE_NAME);
 
     upsertMeta("name", "twitter:card", "summary_large_image");
     upsertMeta("name", "twitter:title", title);
     upsertMeta("name", "twitter:description", description);
     upsertMeta("name", "twitter:image", image);
+    upsertMeta("name", "twitter:image:alt", "BizTrack business dashboard");
     if (TWITTER_HANDLE) upsertMeta("name", "twitter:site", TWITTER_HANDLE);
 
     const scripts: HTMLScriptElement[] = [];
@@ -100,11 +112,29 @@ export function useSeo({
  */
 export function useNoIndex(follow = true) {
   useEffect(() => {
-    const previous = document.head.querySelector<HTMLMetaElement>('meta[name="robots"]')?.getAttribute("content");
-    upsertMeta("name", "robots", `noindex, ${follow ? "follow" : "nofollow"}`);
+    const directive = `noindex, ${follow ? "follow" : "nofollow"}`;
+    const previousRobots = document.head.querySelector<HTMLMetaElement>('meta[name="robots"]')?.getAttribute("content");
+    const previousGooglebot = document.head.querySelector<HTMLMetaElement>('meta[name="googlebot"]')?.getAttribute("content");
+    const previousBingbot = document.head.querySelector<HTMLMetaElement>('meta[name="bingbot"]')?.getAttribute("content");
+    const titles: Record<string, string> = {
+      "/login": "Sign in | BizTrack",
+      "/auth": "Sign in | BizTrack",
+      "/register": "Create an account | BizTrack",
+      "/forgot-password": "Reset your password | BizTrack",
+      "/verify-account": "Verify your account | BizTrack",
+      "/verify-email": "Verify your email | BizTrack",
+      "/verify-phone": "Verify your phone | BizTrack",
+    };
+    document.title = titles[window.location.pathname] ?? "BizTrack Business Management";
+    upsertMeta("name", "robots", directive);
+    upsertMeta("name", "googlebot", directive);
+    upsertMeta("name", "bingbot", directive);
+    upsertLink("canonical", `${SITE_URL}${window.location.pathname}`);
 
     return () => {
-      if (previous) upsertMeta("name", "robots", previous);
+      if (previousRobots) upsertMeta("name", "robots", previousRobots);
+      if (previousGooglebot) upsertMeta("name", "googlebot", previousGooglebot);
+      if (previousBingbot) upsertMeta("name", "bingbot", previousBingbot);
     };
   }, [follow]);
 }

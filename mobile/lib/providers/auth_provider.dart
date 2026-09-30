@@ -101,14 +101,22 @@ class AuthProvider extends ChangeNotifier {
     return result;
   }
 
-  Future<void> verifyPhone(String verificationId, String otp) async {
+  Future<bool> verifyPhone(String verificationId, String otp) async {
     final result = await _authApi.verifyPhone(verificationId, otp);
-    _token = result['token'] as String;
-    _user = result['user'] as User;
-    await _apiClient.saveToken(_token!);
     await clearPendingRegistration(notify: false);
+    if (!result.isAuthenticated) {
+      _token = null;
+      _user = null;
+      _status = AuthStatus.unauthenticated;
+      notifyListeners();
+      return false;
+    }
+    _token = result.token;
+    _user = result.user;
+    await _apiClient.saveToken(_token!);
     _status = AuthStatus.authenticated;
     notifyListeners();
+    return true;
   }
 
   Future<bool> resendPhoneVerification(String verificationId) =>
