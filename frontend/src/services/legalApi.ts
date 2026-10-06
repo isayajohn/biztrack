@@ -24,3 +24,8 @@ export async function getLegalDocuments(): Promise<LegalDocuments> {
   const response = await apiClient.get<{ data: LegalDocuments }>("/public/legal-documents");
   return response.data.data;
 }
+
+export async function getLegalDocument(type: "terms" | "privacy"): Promise<LegalDocument> {
+  const response = await apiClient.get<{ data: LegalDocument }>(`/public/legal-documents/${type}`);
+  return response.data.data;
+}

@@ -77,7 +77,7 @@ export default function LandingFooter({ seoDescription, tagline }: Props) {
 
         <div className="flex flex-col gap-4 border-t border-white/[0.08] py-7 text-xs text-white/25 sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} BizTrack. {isSwahili ? "Haki zote zimehifadhiwa." : "All rights reserved."}</p>
-          <div className="flex gap-5"><a href="#" className="hover:text-white/50">{isSwahili ? "Faragha" : "Privacy"}</a><a href="#" className="hover:text-white/50">{isSwahili ? "Masharti" : "Terms"}</a></div>
+          <div className="flex gap-5"><Link to="/privacy-policy" className="hover:text-white/50">{isSwahili ? "Faragha" : "Privacy"}</Link><a href="/register#legal-consent" className="hover:text-white/50">{isSwahili ? "Masharti" : "Terms"}</a></div>
         </div>
       </div>
     </footer>

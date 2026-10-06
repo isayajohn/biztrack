@@ -157,7 +157,7 @@ export default function RegisterPage() {
             <div>
               <div className="flex items-start gap-3 text-sm leading-6 text-white/55">
                 <input id="legal-consent" type="checkbox" checked={accepted} disabled={!legalDocuments || legalLoading} onChange={(event) => { setAccepted(event.target.checked); setErrors((current) => ({ ...current, terms: undefined })); }} className="mt-1 h-4 w-4 accent-[#12e4d7] disabled:opacity-40" />
-                <p>I agree to the <button type="button" onClick={() => legalDocuments && setOpenDocument(legalDocuments.terms)} className="font-bold text-[#12e4d7] hover:underline disabled:opacity-50" disabled={!legalDocuments}>Terms and Conditions</button> and <button type="button" onClick={() => legalDocuments && setOpenDocument(legalDocuments.privacy)} className="font-bold text-[#12e4d7] hover:underline disabled:opacity-50" disabled={!legalDocuments}>Privacy Policy</button>.</p>
+                <p>I agree to the <button type="button" onClick={() => legalDocuments && setOpenDocument(legalDocuments.terms)} className="font-bold text-[#12e4d7] hover:underline disabled:opacity-50" disabled={!legalDocuments}>Terms and Conditions</button> and <Link to="/privacy-policy" target="_blank" rel="noopener noreferrer" className="font-bold text-[#12e4d7] hover:underline">Privacy Policy</Link>.</p>
               </div>
               {legalLoading && <p className="mt-2 text-xs font-semibold text-white/35">Loading Terms and Privacy Policy...</p>}
               {legalError && <p className="mt-2 text-xs font-semibold text-red-300">Unable to load legal documents: {legalError}</p>}

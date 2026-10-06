@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\LandingPageContent;
+use App\Models\LegalDocument;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 
@@ -80,6 +81,19 @@ class SpaController extends Controller
                 'BizTrack Demo | Preview sales, stock and profit tracking',
                 $description,
                 $this->demoSchema($description),
+            );
+        }
+
+        if ($route === '/privacy-policy') {
+            $document = LegalDocument::published()->where('type', 'PRIVACY')->latest('published_at')->first();
+            $description = $this->clean($document?->summary)
+                ?: 'Learn how BizTrack collects, uses, protects and manages personal and business information across its web and mobile services.';
+
+            return $this->indexed(
+                $route,
+                'Privacy Policy | BizTrack Tanzania',
+                $description,
+                $this->privacySchema($description, $document),
             );
         }
 
@@ -208,6 +222,32 @@ class SpaController extends Controller
                 'inLanguage' => 'en',
             ],
             $this->breadcrumbSchema('Demo', '/demo'),
+        ];
+    }
+
+    private function privacySchema(string $description, ?LegalDocument $document): array
+    {
+        $page = [
+            '@type' => 'WebPage',
+            '@id' => self::SITE_URL.'/privacy-policy#webpage',
+            'url' => self::SITE_URL.'/privacy-policy',
+            'name' => $document?->title ?: 'BizTrack Privacy Policy',
+            'description' => $description,
+            'publisher' => ['@id' => self::SITE_URL.'/#organization'],
+            'inLanguage' => 'en',
+        ];
+
+        if ($document?->effective_date) {
+            $page['datePublished'] = $document->effective_date->toDateString();
+        }
+        if ($document?->published_at) {
+            $page['dateModified'] = $document->published_at->toDateString();
+        }
+
+        return [
+            $this->organizationSchema(),
+            $page,
+            $this->breadcrumbSchema('Privacy Policy', '/privacy-policy'),
         ];
     }
 

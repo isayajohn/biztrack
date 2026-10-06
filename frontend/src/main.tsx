@@ -19,6 +19,7 @@ const DemoDashboard = React.lazy(() => import("./pages/DemoDashboard"));
 const ForbiddenPage = React.lazy(() => import("./pages/ForbiddenPage"));
 const LoginPage = React.lazy(() => import("./pages/LoginPage"));
 const RegisterPage = React.lazy(() => import("./pages/RegisterPage"));
+const PrivacyPolicyPage = React.lazy(() => import("./pages/PrivacyPolicyPage"));
 const VerifyEmailPage = React.lazy(() => import("./pages/VerifyEmailPage"));
 const VerifyAccountPage = React.lazy(() => import("./pages/VerifyAccountPage"));
 const VerifyPhonePage = React.lazy(() => import("./pages/VerifyPhonePage"));
@@ -119,6 +120,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="/403" element={<ForbiddenPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
             <Route path="/verify-account" element={<VerifyAccountPage />} />
 <Route path="/verify-email" element={<VerifyEmailPage />} />
             <Route path="/verify-phone" element={<VerifyPhonePage />} />
